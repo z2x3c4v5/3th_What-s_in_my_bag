@@ -4,192 +4,272 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>What's in my bag?</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Jua&display=swap">
 <style>
-/* Layout: one centered column, three steps (words → my bag → speaking). One bag with five slots is shared by all three. */
+/* Layout: candy-colored single column. Three chunky step buttons (orange words, pink bag, sky speaking).
+   One five-item bear backpack is shared by all steps; on step 2 the items sit inside the bag between its back and front layers. */
 :root {
-  --bg: #f4f3ef;
+  color-scheme: light;
+  --bg: #fff6e0;
+  --dot: #ffe6ad;
   --panel: #ffffff;
-  --fg: #1f2328;
-  --muted: #6b7280;
-  --line: #e4e2db;
-  --accent: #2458e6;
-  --accent-ink: #ffffff;
-  --soft: #e9effd;
-  --ok: #1f9d55;
-  --bad: #d64545;
-  --font-en: "Nunito", "Noto Sans KR", system-ui, sans-serif;
-  --font-ko: "Noto Sans KR", "Nunito", system-ui, sans-serif;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #17191d; --panel: #22252b; --fg: #eceef2; --muted: #9aa1ad; --line: #343840;
-    --accent: #5b8aff; --accent-ink: #0f1420; --soft: #243253; --ok: #3cc374; --bad: #ff6b6b; color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #17191d; --panel: #22252b; --fg: #eceef2; --muted: #9aa1ad; --line: #343840;
-  --accent: #5b8aff; --accent-ink: #0f1420; --soft: #243253; --ok: #3cc374; --bad: #ff6b6b; color-scheme: dark;
+  --ink: #3a2e5c;
+  --muted: #8a7fa8;
+  --line: #f0e2c2;
+  --orange: #ff8a4c; --orange-d: #e0662a;
+  --pink: #ff6fa8;   --pink-d: #db4a86;
+  --sky: #41aef7;    --sky-d: #1f88d2;
+  --mint: #2fbf71;   --mint-d: #1f9657;
+  --red: #ff5d6c;    --red-d: #d93c4c;
+  --sun: #ffc93c;
+  --p1: #ffe9dc; --p2: #dcf6e9; --p3: #ddefff; --p4: #ece4ff; --p5: #fff3c4; --p6: #ffe2ee;
+  /* 가방 색 (고르기 버튼으로 바뀌어요) */
+  --bag-1: #ffd75e; --bag-2: #f5a623; --bag-3: #6b3f1f; --bag-4: #fff4d6; --bag-5: #e08a12;
+  --font-en: "Fredoka", "Jua", system-ui, sans-serif;
+  --font-ko: "Jua", "Fredoka", system-ui, sans-serif;
 }
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { height: 100%; }
-body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-ko); font-size: 17px; line-height: 1.5; -webkit-tap-highlight-color: transparent; user-select: none; }
+body {
+  margin: 0; color: var(--ink); font-family: var(--font-ko); font-size: 18px; line-height: 1.45;
+  background: var(--bg) radial-gradient(var(--dot) 2.2px, transparent 2.8px) 0 0 / 30px 30px;
+  -webkit-tap-highlight-color: transparent; user-select: none;
+}
 button { font: inherit; color: inherit; }
 svg { display: block; }
-.wrap { max-width: 820px; margin: 0 auto; padding-block: 18px 150px; padding-inline: 16px; }
+.wrap { max-width: 860px; margin: 0 auto; padding-block: 16px 160px; padding-inline: 16px; }
 
-header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
-h1 { font-family: var(--font-en); font-weight: 800; font-size: 1.5rem; margin: 0; letter-spacing: -.01em; }
-.steps { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 4px; gap: 4px; }
-.step { border: 0; background: transparent; border-radius: 10px; padding: 10px 6px; cursor: pointer; color: var(--muted); font-weight: 700; font-size: .95rem; display: flex; align-items: center; justify-content: center; gap: 6px; }
-.step .n { font-family: var(--font-en); font-size: .8rem; opacity: .7; }
-.step[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
-.step[aria-selected="true"] .n { opacity: 1; }
-button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--soft); outline-offset: 2px; }
-.panel { margin-top: 18px; }
-.lead { color: var(--muted); font-size: .95rem; margin: 0 0 14px; }
+/* Header */
+header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+header .logo { width: 58px; height: 64px; flex: none; }
+header .logo svg { width: 100%; height: 100%; }
+h1 { font-family: var(--font-en); font-weight: 700; font-size: clamp(1.6rem, 5vw, 2.3rem); line-height: 1.05; margin: 0; letter-spacing: -.01em; }
+h1 .b { color: var(--pink); }
+header p { margin: 2px 0 0; color: var(--muted); font-size: 1rem; }
 
-/* shared bits */
-.play { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: var(--panel); cursor: pointer; display: inline-grid; place-items: center; flex: none; }
-.play svg { width: 16px; height: 16px; fill: var(--fg); }
-.play:active { transform: scale(.94); }
-.btn { font-weight: 700; font-size: 1rem; border: 1px solid var(--line); border-radius: 12px; padding: 12px 20px; cursor: pointer; background: var(--panel); color: var(--fg); }
-.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-.btn.yes { background: var(--ok); color: #fff; border-color: var(--ok); }
-.btn.no { background: var(--bad); color: #fff; border-color: var(--bad); }
-.btn.big { font-family: var(--font-en); font-size: 1.2rem; padding: 14px 24px; flex: 1; }
+/* Steps */
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.step {
+  --c: var(--orange); --cd: var(--orange-d);
+  border: 3px solid var(--c); background: #fff; color: var(--c); border-radius: 22px; padding: 8px 6px 10px; cursor: pointer;
+  font-size: clamp(1rem, 3.4vw, 1.25rem); box-shadow: 0 5px 0 var(--cd); display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: transform .08s, box-shadow .08s;
+}
+.step:nth-child(2) { --c: var(--pink); --cd: var(--pink-d); }
+.step:nth-child(3) { --c: var(--sky); --cd: var(--sky-d); }
+.step .ico { width: 34px; height: 34px; flex: none; display: grid; place-items: center; }
+.step .ico svg { width: 100%; height: 100%; }
+.step .mic-ico { border-radius: 50%; background: var(--c); }
+.step .mic-ico svg { width: 60%; height: 60%; fill: #fff; }
+.step[aria-selected="true"] { background: var(--c); color: #fff; }
+.step[aria-selected="true"] .mic-ico { background: #fff; }
+.step[aria-selected="true"] .mic-ico svg { fill: var(--c); }
+.step:active { transform: translateY(3px); box-shadow: 0 2px 0 var(--cd); }
+@media (max-width: 460px) { .step { flex-direction: column; gap: 2px; } }
+button:focus-visible, [tabindex]:focus-visible { outline: 4px solid var(--sun); outline-offset: 2px; }
+
+.panel { margin-top: 20px; }
+#learn { --theme: var(--orange); --theme-d: var(--orange-d); }
+#bag   { --theme: var(--pink);   --theme-d: var(--pink-d); }
+#say   { --theme: var(--sky);    --theme-d: var(--sky-d); }
+.lead { display: flex; align-items: center; gap: 10px; background: #fff; border: 3px dashed var(--theme); border-radius: 18px; padding: 10px 14px; margin: 0 0 16px; font-size: 1.05rem; }
+.lead .n { flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--theme); color: #fff; display: grid; place-items: center; font-family: var(--font-en); font-weight: 700; }
+.lead b { color: var(--theme-d); font-weight: 400; }
+
+/* shared */
+.card { background: var(--panel); border: 3px solid var(--line); border-radius: 24px; padding: 14px 16px; box-shadow: 0 5px 0 rgba(58,46,92,.08); }
+.play { width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--p3); cursor: pointer; display: inline-grid; place-items: center; flex: none; }
+.play svg { width: 18px; height: 18px; fill: var(--sky-d); }
+.play:active { transform: scale(.92); }
+.btn {
+  --c: var(--theme); --cd: var(--theme-d);
+  font-family: var(--font-ko); font-size: 1.05rem; border: 0; border-radius: 16px; padding: 11px 18px; cursor: pointer;
+  background: var(--c); color: #fff; box-shadow: 0 4px 0 var(--cd); transition: transform .08s, box-shadow .08s;
+}
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--cd); }
+.btn.soft { background: #fff; color: var(--ink); box-shadow: 0 4px 0 var(--line); border: 3px solid var(--line); padding: 8px 16px; }
+.btn.yes { --c: var(--mint); --cd: var(--mint-d); }
+.btn.no  { --c: var(--red);  --cd: var(--red-d); }
+.btn.big { font-family: var(--font-en); font-weight: 600; font-size: 1.3rem; padding: 14px 18px; flex: 1; }
 .btn:disabled { opacity: .45; cursor: default; }
-.card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; }
 
 /* 1. words */
-.dialog { display: grid; gap: 6px; margin-bottom: 16px; }
-.dialog .l { display: grid; grid-template-columns: 2.2em 1fr auto; align-items: center; gap: 10px; font-family: var(--font-en); font-weight: 700; font-size: 1.2rem; }
-.dialog .who { font-family: var(--font-ko); font-size: .8rem; color: var(--muted); font-weight: 700; }
-.dialog em { font-style: normal; color: var(--accent); }
-.shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-.item { background: var(--panel); border: 2px solid var(--line); border-radius: 16px; padding: 14px 10px 10px; display: grid; justify-items: center; gap: 2px; cursor: grab; text-align: center; touch-action: none; }
-.item .pic { width: 84px; height: 84px; position: relative; }
-.item .pic .spk { position: absolute; right: -10px; bottom: -4px; width: 26px; height: 26px; border-radius: 50%; background: var(--soft); display: grid; place-items: center; }
-.item .pic .spk svg { width: 13px; height: 13px; fill: var(--accent); }
-.item .pic svg { width: 100%; height: 100%; }
-.item .en { font-family: var(--font-en); font-weight: 800; font-size: 1.1rem; margin-top: 4px; }
-.item .ko { color: var(--muted); font-size: .85rem; }
-.item.active { border-color: var(--accent); }
-.item.inbag { border-color: var(--ok); }
-.item .put { margin-top: 8px; width: 100%; border: 0; border-radius: 10px; padding: 9px 8px; font-weight: 700; font-size: .9rem; cursor: pointer; background: var(--soft); color: var(--accent); }
-.item.inbag .put { background: var(--ok); color: #fff; }
-.item .put:disabled { background: var(--line); color: var(--muted); cursor: default; }
-.drag-ghost { position: fixed; z-index: 50; pointer-events: none; width: 84px; height: 84px; transform: translate(-50%, -50%) scale(1.1); filter: drop-shadow(0 8px 10px rgba(0,0,0,.25)); }
-.drag-ghost svg { width: 100%; height: 100%; }
+.chat { display: grid; gap: 10px; margin-bottom: 18px; }
+.msg { display: flex; align-items: flex-end; gap: 10px; }
+.msg.me { flex-direction: row-reverse; }
+.ava { width: 48px; height: 48px; border-radius: 50%; background: #fff; border: 3px solid var(--sky); flex: none; overflow: hidden; display: grid; place-items: center; font-size: .95rem; color: var(--pink-d); }
+.ava svg { width: 100%; height: 100%; }
+.msg.me .ava { border-color: var(--pink); background: var(--p6); }
+.bub { background: #fff; border: 3px solid var(--sky); border-radius: 22px 22px 22px 6px; padding: 8px 10px 8px 16px; font-family: var(--font-en); font-weight: 600; font-size: clamp(1.05rem, 3.4vw, 1.3rem); display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 0 rgba(58,46,92,.08); min-width: 0; }
+.msg.me .bub { border-color: var(--pink); border-radius: 22px 22px 6px 22px; }
+.msg.me .play { background: var(--p6); } .msg.me .play svg { fill: var(--pink-d); }
+.bub em { font-style: normal; color: var(--orange-d); background: var(--p5); padding: 0 .25em; border-radius: 8px; }
 
-/* bag dock, shown on steps 1 and 3 */
-.dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background: var(--panel); border-top: 1px solid var(--line); transition: background .15s; }
-.dock .in { max-width: 820px; margin: 0 auto; display: flex; align-items: center; gap: 14px; cursor: pointer; }
-.dock .bagico { width: 60px; height: 60px; flex: none; }
+.shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+.item {
+  background: var(--tint); border: 3px solid #fff; border-radius: 26px; padding: 12px 10px 12px; display: grid; justify-items: center; gap: 0;
+  cursor: grab; text-align: center; touch-action: none; box-shadow: 0 5px 0 rgba(58,46,92,.1); transition: transform .1s;
+}
+.item:active { transform: scale(.97); }
+.item .pic { width: 92px; height: 92px; background: #fff; border-radius: 50%; padding: 10px; position: relative; box-shadow: inset 0 -4px 0 rgba(58,46,92,.06); }
+.item .pic svg { width: 100%; height: 100%; }
+.item .pic .spk { position: absolute; right: -4px; bottom: -2px; width: 30px; height: 30px; border-radius: 50%; background: var(--sky); display: grid; place-items: center; box-shadow: 0 2px 0 var(--sky-d); }
+.item .pic .spk svg { width: 15px; height: 15px; fill: #fff; }
+.item.tap .pic { animation: wiggle .45s; }
+@keyframes wiggle { 25% { transform: rotate(-8deg) scale(1.06); } 75% { transform: rotate(8deg) scale(1.06); } }
+.item .en { font-family: var(--font-en); font-weight: 600; font-size: 1.2rem; margin-top: 8px; line-height: 1.15; }
+.item .ko { color: var(--muted); font-size: .95rem; }
+.item.active { border-color: var(--orange); }
+.item.inbag { border-color: var(--mint); }
+.item .put { margin-top: 10px; width: 100%; border: 0; border-radius: 14px; padding: 9px 6px; font-size: .98rem; cursor: pointer; background: var(--orange); color: #fff; box-shadow: 0 4px 0 var(--orange-d); }
+.item .put:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--orange-d); }
+.item.inbag .put { background: var(--mint); box-shadow: 0 4px 0 var(--mint-d); }
+.item .put:disabled { background: #ece5d3; color: #a89e86; box-shadow: 0 4px 0 #dcd2bb; cursor: default; transform: none; }
+.drag-ghost { position: fixed; z-index: 60; pointer-events: none; width: 90px; height: 90px; transform: translate(-50%, -50%) rotate(-8deg) scale(1.1); filter: drop-shadow(0 10px 10px rgba(58,46,92,.3)); }
+.drag-ghost svg { width: 100%; height: 100%; }
+.credit { margin-top: 26px; font-size: .8rem; color: var(--muted); text-align: center; }
+
+/* bag dock (steps 1 and 3) */
+.dock {
+  position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 40; max-width: 836px; margin: 0 auto;
+  background: #fff; border: 3px solid var(--pink); border-radius: 26px; padding: 8px 14px; box-shadow: 0 6px 0 var(--pink-d), 0 12px 28px rgba(58,46,92,.18);
+  display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background .15s, transform .15s;
+}
+.dock .bagico { width: 56px; height: 62px; flex: none; }
 .dock .bagico svg { width: 100%; height: 100%; }
-.slots { display: flex; gap: 6px; flex: 1; min-width: 0; }
-.slot { width: 46px; height: 46px; border-radius: 12px; border: 2px dashed var(--line); display: grid; place-items: center; flex: none; }
-.slot.filled { border: 2px solid var(--line); background: var(--bg); }
-.slot svg { width: 36px; height: 36px; }
-.dock .txt { text-align: right; flex: none; }
-.dock .txt b { display: block; font-family: var(--font-en); font-size: 1.1rem; font-variant-numeric: tabular-nums; }
-.dock .txt small { color: var(--muted); font-size: .8rem; }
-.dock.over { background: var(--soft); }
-.dock.pop .bagico { animation: pop .3s; }
-.dock.full .txt b { color: var(--ok); }
-@keyframes pop { 40% { transform: scale(1.12) rotate(-4deg); } }
+.slots { display: flex; gap: 6px; flex: 1; min-width: 0; overflow: hidden; }
+.slot { width: 46px; height: 46px; border-radius: 50%; border: 3px dashed #ffc3da; display: grid; place-items: center; flex: none; background: #fff; }
+.slot.filled { border: 3px solid var(--pink); background: var(--p6); }
+.slot svg { width: 32px; height: 32px; }
+.dock .txt { text-align: center; flex: none; line-height: 1.1; }
+.dock .txt b { display: block; font-family: var(--font-en); font-weight: 700; font-size: 1.35rem; color: var(--pink-d); font-variant-numeric: tabular-nums; }
+.dock .txt small { color: var(--muted); font-size: .85rem; }
+.dock.over { background: var(--p6); transform: scale(1.03); }
+.dock.pop .bagico { animation: squish .45s; }
+@keyframes squish { 30% { transform: scale(1.15, .85); } 60% { transform: scale(.92, 1.1); } }
+@media (max-width: 460px) { .slot { width: 38px; height: 38px; } .slot svg { width: 26px; height: 26px; } .dock .bagico { width: 46px; height: 52px; } }
 
 /* 2. my bag */
-.bagview { display: grid; justify-items: center; gap: 16px; }
-.backpack { position: relative; width: min(100%, 380px); }
-.backpack > svg { width: 100%; height: auto; }
-.inside { position: absolute; left: 16%; right: 16%; top: 23%; height: 41%; display: grid; grid-template-columns: repeat(6, 1fr); gap: 3% 2%; padding: 3% 5%; align-content: space-evenly; }
-.inside .s { position: relative; aspect-ratio: 1; border-radius: 14px; border: 2px dashed rgba(255,255,255,.35); display: grid; place-items: center; }
-.inside .s .x { position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; padding: 0; border-radius: 50%; border: 0; background: var(--panel); color: var(--muted); font-weight: 800; font-size: 1rem; line-height: 1; cursor: pointer; animation: none; box-shadow: 0 1px 3px rgba(0,0,0,.3); display: grid; place-items: center; }
-.inside .s:nth-child(1) { grid-column: 1 / 3; } .inside .s:nth-child(2) { grid-column: 3 / 5; } .inside .s:nth-child(3) { grid-column: 5 / 7; }
-.inside .s:nth-child(4) { grid-column: 2 / 4; } .inside .s:nth-child(5) { grid-column: 4 / 6; }
-.inside .s button:not(.x) { width: 100%; height: 100%; border: 0; background: transparent; padding: 6%; cursor: pointer; animation: drop .4s; }
-.inside .s button svg { width: 100%; height: 100%; filter: drop-shadow(0 3px 3px rgba(0,0,0,.45)); }
-.inside .s button:hover { transform: translateY(-3px); }
-@keyframes drop { from { transform: translateY(-30px); opacity: 0; } }
-.have { width: 100%; display: flex; align-items: center; gap: 12px; }
-.have .s { font-family: var(--font-en); font-weight: 700; font-size: 1.15rem; flex: 1; min-width: 0; }
-.have .s small { display: block; font-family: var(--font-ko); font-weight: 400; color: var(--muted); font-size: .85rem; }
-.ask { width: 100%; display: grid; gap: 14px; padding: 18px 16px; }
-.ask .q { display: flex; align-items: center; gap: 12px; }
-.ask .q .face { width: 48px; height: 48px; flex: none; }
-.ask .q .face svg { width: 100%; height: 100%; }
-.ask .q .t { font-family: var(--font-en); font-weight: 800; font-size: 1.4rem; flex: 1; min-width: 0; }
+.bagarea { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 720px) { .bagarea { grid-template-columns: 1fr; } }
+.bagcol { display: grid; justify-items: center; gap: 12px; }
+.bagstage { position: relative; width: min(100%, 380px); padding-top: 34px; }
+.bagstage .holder { position: relative; }
+.bagstage svg.back { width: 100%; height: auto; }
+.bagstage svg.front { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.bagstage svg.front .hit { pointer-events: visiblePainted; cursor: pointer; }
+.bagstage .items { position: absolute; inset: 0; }
+.bagstage .it { position: absolute; width: 32%; aspect-ratio: 1; padding: 0; border: 0; background: transparent; cursor: pointer; transform: rotate(var(--r)); transform-origin: 50% 85%; }
+.bagstage .it svg { width: 100%; height: 100%; filter: drop-shadow(0 4px 3px rgba(40,20,10,.35)); }
+.bagstage .it.new { animation: fall .7s cubic-bezier(.3,1.4,.5,1) both; }
+.bagstage .it.wig { animation: shake .5s; }
+@keyframes fall { 0% { transform: translateY(-150%) rotate(calc(var(--r) - 30deg)); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(0) rotate(var(--r)); } }
+@keyframes shake { 25% { transform: translateY(-10%) rotate(calc(var(--r) - 10deg)); } 75% { transform: translateY(-10%) rotate(calc(var(--r) + 10deg)); } }
+.bagstage.squish .holder { animation: squish .5s; transform-origin: 50% 100%; }
+.bear-say {
+  position: absolute; top: 0; right: 4%; max-width: 70%; background: #fff; border: 3px solid var(--pink); border-radius: 18px; padding: 6px 14px;
+  font-family: var(--font-en); font-weight: 600; font-size: 1.1rem; color: var(--ink); box-shadow: 0 4px 0 var(--pink-d); z-index: 5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: opacity .2s, transform .2s;
+}
+.bear-say::after { content: ""; position: absolute; left: 22px; bottom: -11px; border: 8px solid transparent; border-top-color: var(--pink); border-bottom: 0; }
+.bear-say.hide { opacity: 0; transform: translateY(6px); }
+.swatches { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.swatches span { color: var(--muted); font-size: .95rem; }
+.sw { width: 38px; height: 38px; border-radius: 50%; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 0 2px var(--line), 0 3px 0 rgba(58,46,92,.15); padding: 0; }
+.sw[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--ink), 0 3px 0 rgba(58,46,92,.15); }
+
+.side { display: grid; gap: 14px; min-width: 0; }
+.ttl { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; font-size: 1.15rem; }
+.ttl b { font-family: var(--font-en); font-weight: 700; color: var(--pink-d); font-variant-numeric: tabular-nums; }
+.ichips { display: flex; flex-wrap: wrap; gap: 8px; }
+.ichip { display: inline-flex; align-items: center; background: var(--p6); border: 3px solid #ffc3da; border-radius: 999px; overflow: hidden; }
+.ichip .w { display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; padding: 4px 4px 4px 6px; font-family: var(--font-en); font-weight: 600; font-size: 1rem; cursor: pointer; }
+.ichip .w svg { width: 28px; height: 28px; }
+.ichip .x { border: 0; background: transparent; width: 32px; height: 36px; cursor: pointer; color: var(--pink-d); font-family: var(--font-en); font-weight: 700; font-size: 1.15rem; }
+.ichip .x:hover { background: #ffd3e4; }
+.none { color: var(--muted); display: grid; gap: 10px; justify-items: start; }
+.have { display: flex; align-items: center; gap: 12px; }
+.have .s { font-family: var(--font-en); font-weight: 600; font-size: 1.2rem; flex: 1; min-width: 0; }
+.ask { display: grid; gap: 12px; }
+.ask .q { display: flex; align-items: center; gap: 10px; }
+.ask .q .ava { border-color: var(--sky); }
+.ask .q .t { font-family: var(--font-en); font-weight: 600; font-size: 1.3rem; flex: 1; min-width: 0; }
 .row { display: flex; gap: 10px; }
 .rowc { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-.fb { min-height: 1.5em; font-family: var(--font-en); font-weight: 700; font-size: 1.05rem; }
-.fb.ok { color: var(--ok); } .fb.bad { color: var(--bad); }
+.fb { min-height: 1.5em; font-family: var(--font-en); font-weight: 600; font-size: 1.1rem; text-align: center; }
+.fb.ok { color: var(--mint-d); } .fb.bad { color: var(--red-d); }
+.fb .ko { font-family: var(--font-ko); }
 
 /* 3. speaking */
-.warn { background: var(--soft); border-radius: 12px; padding: 10px 14px; font-size: .9rem; margin-bottom: 14px; }
-.empty { border-style: dashed; padding: 36px 16px; text-align: center; display: grid; gap: 12px; justify-items: center; color: var(--muted); }
-.empty .bagico { width: 96px; height: 96px; }
+.warn { background: var(--p5); border: 3px solid var(--sun); border-radius: 16px; padding: 10px 14px; font-size: .95rem; margin-bottom: 14px; }
+.empty { text-align: center; display: grid; gap: 12px; justify-items: center; padding: 30px 16px; color: var(--muted); }
+.empty .bagico { width: 110px; height: 120px; }
+.empty .bagico svg { width: 100%; height: 100%; }
 .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-.chip { display: inline-flex; align-items: center; gap: 8px; background: var(--panel); border: 2px solid var(--line); border-radius: 999px; padding: 6px 14px 6px 8px; font-family: var(--font-en); font-weight: 800; font-size: 1rem; cursor: pointer; }
-.chip svg { width: 28px; height: 28px; }
-.chip[aria-pressed="true"] { border-color: var(--accent); background: var(--soft); }
-.chip .done { color: var(--ok); }
-.stage { display: grid; gap: 0; padding: 0; overflow: hidden; }
-.stage .head { display: flex; align-items: center; gap: 14px; padding: 16px; border-bottom: 1px solid var(--line); }
-.stage .head .pic { width: 72px; height: 72px; flex: none; }
+.chip { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 3px solid var(--line); border-radius: 999px; padding: 5px 14px 5px 6px; font-family: var(--font-en); font-weight: 600; font-size: 1.05rem; cursor: pointer; box-shadow: 0 3px 0 var(--line); }
+.chip svg { width: 32px; height: 32px; }
+.chip[aria-pressed="true"] { border-color: var(--sky); background: var(--p3); box-shadow: 0 3px 0 var(--sky); }
+.chip .done { color: var(--mint); font-size: 1.1rem; }
+.stage { padding: 0; overflow: hidden; border-color: #bfe2fb; }
+.stage .head { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--p3); }
+.stage .head .pic { width: 76px; height: 76px; flex: none; background: #fff; border-radius: 50%; padding: 8px; }
 .stage .head .pic svg { width: 100%; height: 100%; }
-.stage .head .t { font-family: var(--font-en); font-weight: 800; font-size: 1.3rem; }
-.stage .head .t small { display: block; font-family: var(--font-ko); font-weight: 400; color: var(--muted); font-size: .85rem; }
-.line { display: grid; grid-template-columns: 1fr auto; gap: 8px 14px; align-items: center; padding: 16px; border-bottom: 1px solid var(--line); }
-.line:last-child { border-bottom: 0; }
-.line .who { font-size: .8rem; color: var(--muted); font-weight: 700; grid-column: 1 / 3; }
-.sentence { font-family: var(--font-en); font-weight: 800; font-size: clamp(1.2rem, 3.6vw, 1.6rem); line-height: 1.3; min-width: 0; }
+.stage .head .t { font-family: var(--font-en); font-weight: 700; font-size: 1.5rem; flex: 1; min-width: 0; }
+.stage .head .t small { display: block; font-family: var(--font-ko); font-weight: 400; color: var(--muted); font-size: 1rem; }
+.line { display: grid; grid-template-columns: 1fr auto; gap: 8px 14px; align-items: center; padding: 14px 16px; border-top: 3px dashed #dcefff; }
+.line .who { grid-column: 1 / 3; justify-self: start; font-size: .9rem; border-radius: 999px; padding: 2px 12px; background: var(--p3); color: var(--sky-d); }
+.line[data-k="yes"] .who { background: var(--p2); color: var(--mint-d); }
+.line[data-k="no"] .who { background: #ffe1e4; color: var(--red-d); }
+.sentence { font-family: var(--font-en); font-weight: 600; font-size: clamp(1.25rem, 3.8vw, 1.65rem); line-height: 1.3; min-width: 0; }
 .sentence .w { display: inline-block; border-radius: 6px; }
-.sentence .w.hit { color: var(--ok); }
-.sentence .w.miss { color: var(--bad); text-decoration: underline wavy; text-underline-offset: 4px; }
+.sentence .w.hit { color: var(--mint-d); }
+.sentence .w.miss { color: var(--red-d); text-decoration: underline wavy; text-underline-offset: 4px; }
 .ctl { display: flex; align-items: center; gap: 10px; }
-.round { border: 0; border-radius: 50%; cursor: pointer; display: grid; place-items: center; }
+.round { border: 0; border-radius: 50%; cursor: pointer; display: grid; place-items: center; transition: transform .08s, box-shadow .08s; }
 .round svg { fill: currentColor; }
-.listen { width: 48px; height: 48px; background: var(--soft); color: var(--accent); }
-.listen svg { width: 20px; height: 20px; }
-.mic { width: 60px; height: 60px; background: var(--accent); color: var(--accent-ink); box-shadow: 0 6px 16px rgba(36, 88, 230, .3); }
-.mic svg { width: 26px; height: 26px; }
-.mic.on { background: var(--bad); box-shadow: 0 0 0 0 rgba(214,69,69,.4); animation: pulse 1.1s infinite; }
-@keyframes pulse { 70% { box-shadow: 0 0 0 16px rgba(214,69,69,0); } 100% { box-shadow: 0 0 0 0 rgba(214,69,69,0); } }
+.listen { width: 52px; height: 52px; background: var(--p3); color: var(--sky-d); box-shadow: 0 4px 0 #b8dcf7; }
+.listen svg { width: 22px; height: 22px; }
+.mic { width: 64px; height: 64px; background: var(--pink); color: #fff; box-shadow: 0 5px 0 var(--pink-d); }
+.mic svg { width: 28px; height: 28px; }
+.round:active { transform: translateY(3px); box-shadow: none; }
+.mic.on { background: var(--red); animation: pulse 1.1s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,93,108,.5); } 70% { box-shadow: 0 0 0 18px rgba(255,93,108,0); } 100% { box-shadow: 0 0 0 0 rgba(255,93,108,0); } }
 .mic:disabled { opacity: .35; box-shadow: none; cursor: default; }
 .result { grid-column: 1 / 3; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; align-items: center; }
 .result:empty { display: none; }
-.pct { font-family: var(--font-en); font-weight: 800; font-size: 1.5rem; line-height: 1; font-variant-numeric: tabular-nums; grid-row: span 2; }
-.pct.good { color: var(--ok); } .pct.mid { color: #c48a00; } .pct.low { color: var(--bad); }
-.meter { height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; }
-.meter i { display: block; height: 100%; width: 0; background: var(--bad); border-radius: 999px; transition: width .4s; }
-.meter i.mid { background: #e6a800; } .meter i.good { background: var(--ok); }
-.heard { font-size: .85rem; color: var(--muted); }
-.heard b { color: var(--fg); font-weight: 500; }
+.pct { font-family: var(--font-en); font-weight: 700; font-size: 1.7rem; line-height: 1; font-variant-numeric: tabular-nums; grid-row: span 2; }
+.pct.good { color: var(--mint-d); } .pct.mid { color: #d99400; } .pct.low { color: var(--red-d); }
+.meter { height: 12px; border-radius: 999px; background: #eef3f8; overflow: hidden; }
+.meter i { display: block; height: 100%; width: 0; background: var(--red); border-radius: 999px; transition: width .4s; }
+.meter i.mid { background: var(--sun); } .meter i.good { background: var(--mint); }
+.heard { font-size: .95rem; color: var(--muted); }
+.heard b { color: var(--ink); font-family: var(--font-en); font-weight: 500; }
 .heard.only { grid-column: 1 / 3; }
-.credit { margin-top: 28px; font-size: .75rem; color: var(--muted); text-align: center; }
 
 @media (max-width: 480px) { .line { grid-template-columns: 1fr; } .ctl { justify-content: flex-end; } .line .who, .result { grid-column: 1; } }
-@media (prefers-reduced-motion: reduce) { .dock.pop .bagico, .inside .s button, .mic.on { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .dock.pop .bagico, .bagstage .it.new, .bagstage .it.wig, .bagstage.squish .holder, .item.tap .pic, .mic.on { animation: none; } }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header><h1>What's in my bag?</h1></header>
+  <header>
+    <div class="logo" id="logo"></div>
+    <div><h1>What's in my <span class="b">bag</span>?</h1><p>내 가방에는 뭐가 들어 있을까?</p></div>
+  </header>
   <div class="steps" role="tablist">
-    <button class="step" role="tab" id="t-learn" aria-selected="true" aria-controls="learn"><span class="n">1</span>단어</button>
-    <button class="step" role="tab" id="t-bag" aria-selected="false" aria-controls="bag"><span class="n">2</span>내 가방</button>
-    <button class="step" role="tab" id="t-say" aria-selected="false" aria-controls="say"><span class="n">3</span>말하기</button>
+    <button class="step" role="tab" id="t-learn" aria-selected="true" aria-controls="learn"><span class="ico" id="ico1"></span>1. 단어</button>
+    <button class="step" role="tab" id="t-bag" aria-selected="false" aria-controls="bag"><span class="ico" id="ico2"></span>2. 내 가방</button>
+    <button class="step" role="tab" id="t-say" aria-selected="false" aria-controls="say"><span class="ico mic-ico" id="ico3"></span>3. 말하기</button>
   </div>
 
   <!-- 1. 단어 -->
   <section class="panel" id="learn" role="tabpanel">
-    <p class="lead">물건을 누르면 소리가 나요. "가방에 넣기"를 누르거나 아래 가방으로 끌어다 놓으면 들어가요. 가방에는 <b>5개</b>까지 넣을 수 있어요.</p>
-    <div class="card dialog" id="dialog">
-      <div class="l"><span class="who">친구</span><span id="d-q"></span><button class="play" data-k="q" aria-label="듣기"></button></div>
-      <div class="l"><span class="who">나</span><span id="d-a"></span><button class="play" data-k="a" aria-label="듣기"></button></div>
+    <p class="lead"><span class="n">1</span><span>그림을 누르면 단어를 들려줘요. <b>가방에 넣기</b>를 누르거나 아래 가방으로 끌어다 놓아요. 가방에는 <b>5개</b>까지 들어가요!</span></p>
+    <div class="chat" id="dialog">
+      <div class="msg"><span class="ava" id="ava-friend"></span><div class="bub"><span id="d-q"></span><button class="play" data-k="q" aria-label="듣기"></button></div></div>
+      <div class="msg me"><span class="ava">나</span><div class="bub"><span id="d-a"></span><button class="play" data-k="a" aria-label="듣기"></button></div></div>
     </div>
     <div class="shelf" id="shelf"></div>
     <p class="credit">물건 그림: Fluent Emoji (Microsoft, MIT)</p>
@@ -197,17 +277,27 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--soft);
 
   <!-- 2. 내 가방 -->
   <section class="panel" id="bag" role="tabpanel" hidden>
-    <div class="bagview">
-      <div class="backpack" id="backpack"></div>
-      <div class="card have">
-        <span class="s" id="have-s"></span>
-        <button class="play" id="have-play" aria-label="듣기"></button>
+    <p class="lead"><span class="n">2</span><span>가방 속 물건을 누르면 단어를 들려줘요. 곰돌이 얼굴을 눌러 보세요!</span></p>
+    <div class="bagarea">
+      <div class="bagcol">
+        <div class="bagstage" id="bagstage">
+          <div class="bear-say hide" id="bear-say"></div>
+          <div class="holder" id="holder"></div>
+        </div>
+        <div class="swatches" id="swatches"><span>가방 색</span></div>
       </div>
-      <div class="card ask">
-        <div class="q"><span class="face" id="face"></span><span class="t" id="ask-t"></span><button class="play" id="ask-play" aria-label="듣기"></button></div>
-        <div class="row"><button class="btn big yes" id="ans-yes">Yes, I do.</button><button class="btn big no" id="ans-no">No, I don't.</button></div>
-        <div class="fb" id="ask-fb"></div>
-        <div class="rowc"><button class="btn" id="ask-next">다른 질문</button><button class="btn" id="bag-more">물건 더 넣기</button><button class="btn" id="bag-reset">가방 비우기</button></div>
+      <div class="side">
+        <div class="card">
+          <div class="ttl"><span>가방 속 물건</span><b id="bag-n">0 / 5</b></div>
+          <div class="ichips" id="ichips"></div>
+        </div>
+        <div class="card have"><span class="s" id="have-s"></span><button class="play" id="have-play" aria-label="듣기"></button></div>
+        <div class="card ask">
+          <div class="q"><span class="ava" id="ava-ask"></span><span class="t" id="ask-t"></span><button class="play" id="ask-play" aria-label="듣기"></button></div>
+          <div class="row"><button class="btn big yes" id="ans-yes">Yes, I do.</button><button class="btn big no" id="ans-no">No, I don't.</button></div>
+          <div class="fb" id="ask-fb"></div>
+          <div class="rowc"><button class="btn soft" id="ask-next">다른 질문</button><button class="btn soft" id="bag-reset">가방 비우기</button></div>
+        </div>
       </div>
     </div>
   </section>
@@ -218,10 +308,10 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--soft);
     <div class="card empty" id="say-empty">
       <div class="bagico" id="empty-bag"></div>
       <div>가방이 비어 있어요.<br>1번에서 물건을 가방에 넣으면 그 물건으로 말하기 연습을 해요.</div>
-      <button class="btn primary" id="say-go">1번으로 가기</button>
+      <button class="btn" id="say-go">1번으로 가기</button>
     </div>
     <div id="say-body" hidden>
-      <p class="lead">가방에 있는 물건을 골라요. 문장을 듣고, 🎤 를 누른 뒤 따라 말하면 정확도를 알려줘요.</p>
+      <p class="lead"><span class="n">3</span><span>물건을 고르고, 🔊 로 듣고, 🎤 를 누른 뒤 따라 말해요. 정확도를 알려줘요!</span></p>
       <div class="chips" id="chips"></div>
       <div class="card stage" id="stage"></div>
     </div>
@@ -229,11 +319,9 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--soft);
 </div>
 
 <div class="dock" id="dock" role="button" tabindex="0" aria-label="내 가방 열기">
-  <div class="in">
-    <div class="bagico" id="dock-bag"></div>
-    <div class="slots" id="slots"></div>
-    <div class="txt"><b id="dock-n">0 / 5</b><small>내 가방</small></div>
-  </div>
+  <div class="bagico" id="dock-bag"></div>
+  <div class="slots" id="slots"></div>
+  <div class="txt"><b id="dock-n">0/5</b><small>내 가방</small></div>
 </div>
 
 <script>
@@ -271,37 +359,55 @@ const CUSTOM = {
     <rect x="5" y="8.3" width="22" height="1" rx=".5" fill="rgba(255,255,255,.5)"/><ellipse cx="16" cy="30" rx="12" ry="1.2" fill="rgba(0,0,0,.15)"/>`),
 };
 const PIC = { ...FLUENT, ...CUSTOM };
-// 그라데이션/필터 정의는 숨겨진 탭 안에 있으면 깨지므로, 항상 보이는 스프라이트 하나로 모아요
-const SPRITE = [];
-const hoist = svg => svg.replace(/<defs>[\s\S]*?<\/defs>/g, m => { SPRITE.push(m.slice(6, -7)); return ""; });
-for (const k in PIC) PIC[k] = hoist(PIC[k]);
-// 열린 백팩 (물건 5칸)
-let BAG_SVG = `<svg viewBox="0 0 300 320" xmlns="http://www.w3.org/2000/svg">
-  <defs>${G("bg1","#ffd96a","#f7b733")}${G("bg2","#f2a93b","#d98a16")}${G("bg3","#7a4a2e","#4a2a18")}${G("bg4","#fff3d6","#ffe3a8")}${G("bg5","#ffe9a8","#ffd45e")}</defs>
-  <rect x="62" y="70" width="34" height="230" rx="17" fill="url(#bg2)"/><rect x="204" y="70" width="34" height="230" rx="17" fill="url(#bg2)"/>
-  <path d="M108 54c0-22 18-34 42-34s42 12 42 34v10h-16v-8c0-12-10-20-26-20s-26 8-26 20v8h-16z" fill="url(#bg2)"/>
-  <circle cx="66" cy="78" r="30" fill="url(#bg1)"/><circle cx="66" cy="78" r="16" fill="url(#bg4)"/>
-  <circle cx="234" cy="78" r="30" fill="url(#bg1)"/><circle cx="234" cy="78" r="16" fill="url(#bg4)"/>
-  <rect x="30" y="60" width="240" height="252" rx="54" fill="url(#bg1)"/>
-  <rect x="44" y="70" width="212" height="136" rx="26" fill="url(#bg3)"/>
-  <rect x="44" y="70" width="212" height="12" rx="6" fill="rgba(0,0,0,.25)"/>
-  <rect x="30" y="198" width="240" height="16" rx="8" fill="url(#bg2)"/>
-  <ellipse cx="150" cy="262" rx="82" ry="46" fill="url(#bg4)"/>
-  <ellipse cx="150" cy="262" rx="82" ry="46" fill="none" stroke="url(#bg2)" stroke-width="4"/>
-  <circle cx="120" cy="252" r="7" fill="#3b2a1e"/><circle cx="180" cy="252" r="7" fill="#3b2a1e"/>
-  <circle cx="122.5" cy="249.5" r="2.2" fill="#fff"/><circle cx="182.5" cy="249.5" r="2.2" fill="#fff"/>
-  <ellipse cx="150" cy="268" rx="8" ry="5.5" fill="#3b2a1e"/>
-  <path d="M138 278q12 10 24 0" stroke="#3b2a1e" stroke-width="4" fill="none" stroke-linecap="round"/>
-  <circle cx="104" cy="270" r="9" fill="#ff9aa8" opacity=".55"/><circle cx="196" cy="270" r="9" fill="#ff9aa8" opacity=".55"/>
-  <rect x="118" y="224" width="64" height="9" rx="4.5" fill="url(#bg5)"/>
-</svg>`;
-let FACE = V(`<defs>${G("fc1","#ffe3c9","#f2c6a0")}${G("fc2","#4a3426","#2b1c14")}</defs><circle cx="16" cy="17" r="12" fill="url(#fc1)"/><path d="M5 15c0-8 5-12 11-12s11 4 11 12c-3-3-5-4-11-4S8 12 5 15z" fill="url(#fc2)"/><circle cx="12" cy="17.5" r="1.3" fill="#1f2328"/><circle cx="20" cy="17.5" r="1.3" fill="#1f2328"/><path d="M12.5 22q3.5 2.6 7 0" stroke="#1f2328" stroke-width="1.2" fill="none" stroke-linecap="round"/>`);
-BAG_SVG = hoist(BAG_SVG); FACE = hoist(FACE);
-document.body.insertAdjacentHTML("afterbegin", `<svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden"><defs>${SPRITE.join("")}</defs></svg>`);
+
+// ---------- 곰돌이 백팩: 뒷판 / (물건) / 앞판 세 겹 ----------
+// 색은 CSS 변수 --bag-1..5 를 따라가요 (가방 색 고르기)
+const GV = (id, a, b, x2 = 0, y2 = 1) => `<linearGradient id="${id}" x1="0" y1="0" x2="${x2}" y2="${y2}"><stop offset="0" style="stop-color:${a}"/><stop offset="1" style="stop-color:${b}"/></linearGradient>`;
+const BAG_DEFS = GV("bagM", "var(--bag-1)", "var(--bag-2)") + GV("bagF", "var(--bag-1)", "var(--bag-2)", .3, 1) + GV("bagD", "var(--bag-2)", "var(--bag-5)")
+  + GV("bagIn", "var(--bag-3)", "#1d1220") + GV("bagFace", "#ffffff", "var(--bag-4)");
+const BAG_BACK = `
+  <rect x="16" y="214" width="34" height="84" rx="17" style="fill:var(--bag-5)"/><rect x="250" y="214" width="34" height="84" rx="17" style="fill:var(--bag-5)"/>
+  <rect x="21" y="226" width="24" height="10" rx="5" fill="rgba(255,255,255,.35)"/><rect x="255" y="226" width="24" height="10" rx="5" fill="rgba(255,255,255,.35)"/>
+  <path d="M114 70c0-30 16-48 36-48s36 18 36 48" fill="none" stroke="url(#bagD)" stroke-width="16" stroke-linecap="round"/>
+  <circle cx="68" cy="76" r="34" fill="url(#bagM)"/><circle cx="68" cy="76" r="18" style="fill:var(--bag-4)"/>
+  <circle cx="232" cy="76" r="34" fill="url(#bagM)"/><circle cx="232" cy="76" r="18" style="fill:var(--bag-4)"/>
+  <rect x="34" y="54" width="232" height="266" rx="76" fill="url(#bagM)"/>
+  <path d="M72 108c12-24 34-38 62-42" stroke="rgba(255,255,255,.55)" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <ellipse cx="150" cy="152" rx="104" ry="28" fill="url(#bagIn)"/>
+  <path d="M46 152a104 28 0 0 1 208 0" fill="none" stroke="url(#bagD)" stroke-width="7"/>`;
+const BAG_FRONT = `
+  <path class="hit" d="M34 154 Q150 190 266 154 V244 a76 76 0 0 1 -76 76 H110 a76 76 0 0 1 -76 -76 Z" fill="url(#bagF)"/>
+  <path d="M36 157 Q150 193 264 157" fill="none" stroke="url(#bagD)" stroke-width="9" stroke-linecap="round"/>
+  <path d="M44 172 Q150 206 256 172" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="3" stroke-dasharray="7 7" stroke-linecap="round"/>
+  <rect x="226" y="164" width="9" height="20" rx="4.5" fill="#c9c3d6"/>
+  <path d="M230.5 212c-12-8-17-14-17-20a8.5 8.5 0 0 1 17-2.5 8.5 8.5 0 0 1 17 2.5c0 6-5 12-17 20z" fill="#ff6fa8" stroke="#fff" stroke-width="2.5"/>
+  <path d="M58 206l4 8 9 1.3-6.5 6.3 1.5 9-8-4.2-8 4.2 1.5-9-6.5-6.3 9-1.3z" fill="#ffc93c" stroke="#fff" stroke-width="2"/>
+  <ellipse class="hit" cx="150" cy="258" rx="84" ry="52" fill="url(#bagFace)" style="stroke:var(--bag-2)" stroke-width="4"/>
+  <circle cx="121" cy="250" r="9.5" fill="#3a2a2a"/><circle cx="179" cy="250" r="9.5" fill="#3a2a2a"/>
+  <circle cx="124.5" cy="246.5" r="3.4" fill="#fff"/><circle cx="182.5" cy="246.5" r="3.4" fill="#fff"/>
+  <ellipse cx="150" cy="264" rx="10" ry="7" fill="#3a2a2a"/><ellipse cx="147" cy="261.5" rx="3" ry="1.8" fill="rgba(255,255,255,.6)"/>
+  <path d="M137 274q6.5 8 13 0q6.5 8 13 0" stroke="#3a2a2a" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <ellipse cx="101" cy="268" rx="13" ry="8" fill="#ff8fab" opacity=".55"/><ellipse cx="199" cy="268" rx="13" ry="8" fill="#ff8fab" opacity=".55"/>
+  <path d="M52 254c2 20 10 36 24 46" stroke="rgba(255,255,255,.4)" stroke-width="8" fill="none" stroke-linecap="round"/>`;
+const BAG_ICON = `<svg viewBox="0 0 300 330" xmlns="http://www.w3.org/2000/svg">${BAG_BACK}${BAG_FRONT}</svg>`;
+const BAG_COLORS = {
+  yellow: ["#ffd75e", "#f5a623", "#6b3f1f", "#fff4d6", "#e08a12"],
+  pink:   ["#ffb6d0", "#ff7aa8", "#6e2343", "#fff0f5", "#ec5f93"],
+  mint:   ["#a6efcb", "#3cc98e", "#1d5944", "#effff7", "#27a873"],
+  sky:    ["#b3e0ff", "#5ab0f5", "#1b3d6b", "#f0f8ff", "#3a92dc"],
+  purple: ["#d6c6ff", "#9b7cf2", "#33215e", "#f6f2ff", "#8063dc"],
+};
+const FACE = V(`<circle cx="16" cy="17" r="13" fill="#ffe0c4"/><path d="M4 15c0-8 5.5-12.5 12-12.5S28 7 28 15c-3-3.4-6-4.6-12-4.6S7 11.6 4 15z" fill="#4a3426"/><circle cx="11.6" cy="17.6" r="1.6" fill="#3a2e5c"/><circle cx="20.4" cy="17.6" r="1.6" fill="#3a2e5c"/><ellipse cx="9" cy="21" rx="2.2" ry="1.3" fill="#ff9cb3" opacity=".7"/><ellipse cx="23" cy="21" rx="2.2" ry="1.3" fill="#ff9cb3" opacity=".7"/><path d="M12.5 22q3.5 3 7 0" stroke="#3a2e5c" stroke-width="1.3" fill="none" stroke-linecap="round"/>`);
 const ICON = {
   speaker: `<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 4V5L7 9zm11 3a4 4 0 0 0-2-3.5v7A4 4 0 0 0 14 12zm-2-8.8v2.1A7 7 0 0 1 19 12a7 7 0 0 1-7 6.7v2.1A9 9 0 0 0 21 12a9 9 0 0 0-9-8.8z"/></svg>`,
   mic: `<svg viewBox="0 0 24 24"><path d="M12 15a4 4 0 0 0 4-4V6a4 4 0 0 0-8 0v5a4 4 0 0 0 4 4zm6-4h-2a4 4 0 0 1-8 0H6a6 6 0 0 0 5 5.9V20H8v2h8v-2h-3v-3.1A6 6 0 0 0 18 11z"/></svg>`,
 };
+
+// 그라데이션/필터 정의는 숨겨진 탭 안에 있으면 깨지므로, 항상 보이는 스프라이트 하나로 모아요
+const SPRITE = [BAG_DEFS];
+const hoist = svg => svg.replace(/<defs>[\s\S]*?<\/defs>/g, m => { SPRITE.push(m.slice(6, -7)); return ""; });
+for (const k in PIC) PIC[k] = hoist(PIC[k]);
+document.body.insertAdjacentHTML("afterbegin", `<svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden"><defs>${SPRITE.join("")}</defs></svg>`);
 
 // ---------- 단어 ----------
 const WORDS = [
@@ -326,6 +432,7 @@ const WORDS = [
   { id: "apple",    en: "apple",        ko: "사과",   art: "an" },
   { id: "brush",    en: "paintbrush",   ko: "붓",     art: "a" },
 ];
+const TINTS = ["--p1", "--p2", "--p3", "--p4", "--p5", "--p6"];
 const byId = Object.fromEntries(WORDS.map(w => [w.id, w]));
 const withArt = w => (w.art ? w.art + " " : "") + w.en;
 const S = {
@@ -352,14 +459,32 @@ function speak(text, rate = 0.85) {
 
 // ---------- 가방: 세 단계가 함께 쓰는 상태 (최대 5개) ----------
 const bag = [];
+let lastAdded = null;
 const inBag = id => bag.includes(id);
 const isFull = () => bag.length >= MAX;
 const watchers = [];
 const onBag = fn => watchers.push(fn);
 function changed() { watchers.forEach(fn => fn()); try { localStorage.setItem("bag-items", JSON.stringify(bag)); } catch (e) {} }
-function putIn(id) { if (inBag(id) || isFull()) return false; bag.push(id); changed(); return true; }
-function takeOut(id) { const i = bag.indexOf(id); if (i >= 0) { bag.splice(i, 1); changed(); } }
+function putIn(id) { if (inBag(id) || isFull()) return false; bag.push(id); lastAdded = id; changed(); return true; }
+function takeOut(id) { const i = bag.indexOf(id); if (i >= 0) { bag.splice(i, 1); lastAdded = null; changed(); } }
 try { JSON.parse(localStorage.getItem("bag-items") || "[]").slice(0, MAX).forEach(id => byId[id] && bag.push(id)); } catch (e) {}
+
+// 가방 색
+function setBagColor(name) {
+  const c = BAG_COLORS[name] || BAG_COLORS.yellow;
+  c.forEach((v, i) => document.documentElement.style.setProperty(`--bag-${i + 1}`, v));
+  document.querySelectorAll(".sw").forEach(b => b.setAttribute("aria-pressed", b.dataset.c === name));
+  try { localStorage.setItem("bag-color", name); } catch (e) {}
+}
+Object.entries(BAG_COLORS).forEach(([name, c]) => {
+  const b = document.createElement("button");
+  b.className = "sw"; b.dataset.c = name; b.style.background = c[1]; b.setAttribute("aria-label", name + " 가방");
+  b.addEventListener("click", () => { setBagColor(name); bearSay({ yellow: "Yellow!", pink: "Pink!", mint: "Green!", sky: "Blue!", purple: "Purple!" }[name]); });
+  $("swatches").appendChild(b);
+});
+let startColor = "yellow";
+try { const c = localStorage.getItem("bag-color"); if (BAG_COLORS[c]) startColor = c; } catch (e) {}
+setBagColor(startColor);
 
 // ---------- 단계 전환 ----------
 const steps = [...document.querySelectorAll(".step")];
@@ -371,14 +496,16 @@ function show(id) {
   window.scrollTo({ top: 0 });
 }
 steps.forEach(s => s.addEventListener("click", () => show(s.getAttribute("aria-controls"))));
+$("logo").innerHTML = BAG_ICON; $("ico1").innerHTML = PIC.book; $("ico2").innerHTML = BAG_ICON; $("ico3").innerHTML = ICON.mic;
+$("ava-friend").innerHTML = FACE; $("ava-ask").innerHTML = FACE;
 document.querySelectorAll(".play").forEach(b => b.innerHTML = ICON.speaker);
 
 // ---------- 1. 단어 ----------
 const dock = $("dock");
-$("dock-bag").innerHTML = BAG_SVG; $("empty-bag").innerHTML = BAG_SVG;
+$("dock-bag").innerHTML = BAG_ICON; $("empty-bag").innerHTML = BAG_ICON;
 dock.addEventListener("click", () => show("bag"));
 dock.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); show("bag"); } });
-const overDock = y => y >= dock.getBoundingClientRect().top - 20;
+const overDock = y => y >= dock.getBoundingClientRect().top - 24;
 
 let current = WORDS[0];
 function setDialog(w) {
@@ -389,20 +516,22 @@ function setDialog(w) {
 }
 document.querySelectorAll("#dialog .play").forEach(b => b.addEventListener("click", () => speak(b.dataset.k === "q" ? S.q(current) : (inBag(current.id) ? S.yes(current) : S.no(current)))));
 
-WORDS.forEach(w => {
+WORDS.forEach((w, i) => {
   const el = document.createElement("div");
   el.className = "item"; el.dataset.id = w.id; el.tabIndex = 0; el.setAttribute("role", "button");
+  el.style.setProperty("--tint", `var(${TINTS[i % TINTS.length]})`);
   el.innerHTML = `<div class="pic">${PIC[w.id]}<span class="spk">${ICON.speaker}</span></div><div class="en">${w.en}</div><div class="ko">${w.ko}</div><button class="put" type="button">가방에 넣기</button>`;
-  const tap = () => { setDialog(w); speak(w.en); };
+  const tap = () => { setDialog(w); speak(w.en); el.classList.remove("tap"); void el.offsetWidth; el.classList.add("tap"); };
   el.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tap(); } });
   el.querySelector(".put").addEventListener("click", e => { e.stopPropagation(); if (inBag(w.id)) { takeOut(w.id); setDialog(w); speak(`${w.en}. I don't have ${withArt(w)}.`); } else add(w); });
   drag(el, w, tap);
   $("shelf").appendChild(el);
 });
+function bounceDock() { dock.classList.remove("pop"); void dock.offsetWidth; dock.classList.add("pop"); }
 function add(w) {
-  if (inBag(w.id)) { speak(`I already have ${withArt(w)}.`); }
-  else if (isFull()) { speak("My bag is full."); dock.classList.remove("pop"); void dock.offsetWidth; dock.classList.add("pop"); }
-  else { putIn(w.id); dock.classList.remove("pop"); void dock.offsetWidth; dock.classList.add("pop"); speak(`${w.en}. I have ${withArt(w)}.`); }
+  if (inBag(w.id)) speak(`I already have ${withArt(w)}.`);
+  else if (isFull()) { speak("My bag is full."); bounceDock(); }
+  else { putIn(w.id); bounceDock(); speak(`${w.en}. I have ${withArt(w)}.`); }
   setDialog(w);
 }
 function drag(el, w, onTap) {
@@ -432,18 +561,28 @@ onBag(() => {
   [...$("shelf").children].forEach(c => {
     const on = inBag(c.dataset.id), b = c.querySelector(".put");
     c.classList.toggle("inbag", on);
-    b.textContent = on ? "✓ 꺼내기" : full ? "가방이 가득 찼어요" : "가방에 넣기";
+    b.textContent = on ? "✓ 가방 속 · 꺼내기" : full ? "가방이 꽉 찼어요" : "가방에 넣기";
     b.disabled = !on && full;
   });
-  $("dock-n").textContent = `${bag.length} / ${MAX}`;
-  dock.classList.toggle("full", full);
+  $("dock-n").textContent = `${bag.length}/${MAX}`;
   $("slots").innerHTML = Array.from({ length: MAX }, (_, i) => bag[i] ? `<span class="slot filled">${PIC[bag[i]]}</span>` : `<span class="slot"></span>`).join("");
   setDialog(current);
 });
 
 // ---------- 2. 내 가방 ----------
-$("backpack").innerHTML = BAG_SVG + `<div class="inside" id="inside"></div>`;
-$("face").innerHTML = FACE;
+$("holder").innerHTML = `<svg class="back" viewBox="0 0 300 330" xmlns="http://www.w3.org/2000/svg">${BAG_BACK}</svg><div class="items" id="items"></div><svg class="front" viewBox="0 0 300 330" xmlns="http://www.w3.org/2000/svg">${BAG_FRONT}</svg>`;
+// 물건은 가방 입구에 꽂혀서 아랫부분이 앞판에 가려져요
+const POS = { 1: [150], 2: [116, 184], 3: [92, 150, 208], 4: [84, 128, 172, 216], 5: [80, 115, 150, 185, 220] };
+const ROT = [-16, 10, -4, 14, -10], LIFT = [8, -8, -14, -6, 8];
+let sayTimer = null;
+function bearSay(text) {
+  const b = $("bear-say"); b.textContent = text; b.classList.remove("hide");
+  clearTimeout(sayTimer); sayTimer = setTimeout(() => b.classList.add("hide"), 2200);
+}
+function squish() { const s = $("bagstage"); s.classList.remove("squish"); void s.offsetWidth; s.classList.add("squish"); }
+$("holder").querySelectorAll(".front .hit").forEach(h => h.addEventListener("click", () => {
+  const t = haveSentence(); speak(t); bearSay(bag.length ? "What's in my bag?" : "My bag is empty!"); squish();
+}));
 function haveSentence() {
   const p = bag.map(id => withArt(byId[id]));
   if (!p.length) return "My bag is empty.";
@@ -451,17 +590,28 @@ function haveSentence() {
   return `I have ${p.slice(0, -1).join(", ")} and ${p.at(-1)}.`;
 }
 function renderBag() {
-  $("inside").innerHTML = Array.from({ length: MAX }, (_, i) => {
-    const id = bag[i];
-    return `<div class="s">${id ? `<button data-id="${id}" aria-label="${byId[id].en} 듣기">${PIC[id]}</button><button class="x" data-id="${id}" aria-label="${byId[id].en} 꺼내기" title="꺼내기">×</button>` : ""}</div>`;
+  const xs = POS[bag.length] || [];
+  // 가운데 물건이 뒤에, 바깥 물건이 앞에 오도록
+  $("items").innerHTML = bag.map((id, i) => {
+    const left = (xs[i] - 48) / 300 * 100, top = (200 - 96 - LIFT[i]) / 330 * 100;
+    const z = 10 - Math.abs(xs[i] - 150) / 20 | 0;
+    return `<button class="it${id === lastAdded ? " new" : ""}" data-id="${id}" style="left:${left}%;top:${top}%;--r:${ROT[i]}deg;z-index:${10 - z}" aria-label="${byId[id].en} 듣기">${PIC[id]}</button>`;
   }).join("");
-  $("inside").querySelectorAll("button:not(.x)").forEach(b => b.addEventListener("click", () => speak(byId[b.dataset.id].en)));
-  $("inside").querySelectorAll("button.x").forEach(b => b.addEventListener("click", () => { takeOut(b.dataset.id); speak(`I don't have ${withArt(byId[b.dataset.id])}.`); }));
-  $("have-s").innerHTML = `${haveSentence()}<small>${bag.length ? `${bag.length}개 · 물건을 누르면 단어를 들려주고, × 를 누르면 꺼내요` : "1번에서 물건을 넣어 보세요"}</small>`;
+  $("items").querySelectorAll(".it").forEach(b => {
+    b.addEventListener("animationend", () => b.classList.remove("new", "wig"));
+    b.addEventListener("click", () => { const w = byId[b.dataset.id]; speak(w.en); bearSay(`${withArt(w)}!`); b.classList.remove("new", "wig"); void b.offsetWidth; b.classList.add("wig"); });
+  });
+  lastAdded = null;
+  $("bag-n").textContent = `${bag.length} / ${MAX}`;
+  $("ichips").innerHTML = bag.length ? bag.map(id => `<span class="ichip"><button class="w" data-id="${id}">${PIC[id]}${byId[id].en}</button><button class="x" data-id="${id}" aria-label="${byId[id].en} 꺼내기" title="꺼내기">×</button></span>`).join("")
+    : `<div class="none">아직 비어 있어요. 1번에서 물건을 넣어 보세요!<button class="btn" id="go-learn">물건 넣으러 가기</button></div>`;
+  $("ichips").querySelectorAll(".w").forEach(b => b.addEventListener("click", () => { const w = byId[b.dataset.id]; speak(w.en); bearSay(`${withArt(w)}!`); }));
+  $("ichips").querySelectorAll(".x").forEach(b => b.addEventListener("click", () => { const w = byId[b.dataset.id]; takeOut(w.id); speak(`I don't have ${withArt(w)}.`); bearSay("Bye bye!"); }));
+  const go = $("go-learn"); if (go) go.addEventListener("click", () => show("learn"));
+  $("have-s").textContent = haveSentence();
 }
 $("have-play").addEventListener("click", () => speak(haveSentence()));
-$("bag-more").addEventListener("click", () => show("learn"));
-$("bag-reset").addEventListener("click", () => { bag.length = 0; changed(); speak("My bag is empty."); });
+$("bag-reset").addEventListener("click", () => { bag.length = 0; changed(); speak("My bag is empty."); bearSay("My bag is empty!"); });
 onBag(renderBag);
 
 let askW = WORDS[0], answered = false;
@@ -469,14 +619,14 @@ function nextAsk(sayIt = true) {
   const ins = WORDS.filter(w => inBag(w.id)), outs = WORDS.filter(w => !inBag(w.id));
   const pool = ins.length && Math.random() < 0.5 ? ins : outs.length ? outs : ins;
   askW = pool[Math.floor(Math.random() * pool.length)]; answered = false;
-  $("ask-t").textContent = S.q(askW); $("ask-fb").textContent = ""; $("ask-fb").className = "fb";
+  $("ask-t").textContent = S.q(askW); $("ask-fb").innerHTML = ""; $("ask-fb").className = "fb";
   if (sayIt) speak(S.q(askW));
 }
 function answer(yes) {
   if (answered) return;
   const truth = inBag(askW.id);
-  if (yes === truth) { answered = true; const s = yes ? S.yes(askW) : S.no(askW); $("ask-fb").textContent = s; $("ask-fb").className = "fb ok"; speak(s); }
-  else { $("ask-fb").textContent = truth ? `가방을 다시 봐요. ${askW.ko}이(가) 있어요.` : `가방을 다시 봐요. ${askW.ko}이(가) 없어요.`; $("ask-fb").className = "fb bad"; speak("Look in your bag."); }
+  if (yes === truth) { answered = true; const s = yes ? S.yes(askW) : S.no(askW); $("ask-fb").textContent = "⭐ " + s; $("ask-fb").className = "fb ok"; speak(s); bearSay("Great!"); squish(); }
+  else { $("ask-fb").innerHTML = `<span class="ko">가방을 다시 봐요. ${askW.ko}이(가) ${truth ? "있어요" : "없어요"}.</span>`; $("ask-fb").className = "fb bad"; speak("Look in your bag."); }
 }
 $("ans-yes").addEventListener("click", () => answer(true));
 $("ans-no").addEventListener("click", () => answer(false));
@@ -491,9 +641,10 @@ let sayId = null;
 const best = {};                     // "id:k" -> 최고 정확도
 const LINES = [
   { k: "q",   who: "친구가 물어봐요" },
-  { k: "yes", who: "내가 대답해요 · 가방에 있어요" },
-  { k: "no",  who: "내가 대답해요 · 가방에 없을 때는 이렇게" },
+  { k: "yes", who: "가방에 있을 때" },
+  { k: "no",  who: "가방에 없을 때" },
 ];
+const grade = a => a >= 80 ? "good" : a >= 50 ? "mid" : "low";
 function renderSay() {
   const empty = bag.length === 0;
   $("say-empty").hidden = !empty; $("say-body").hidden = empty;
@@ -501,17 +652,18 @@ function renderSay() {
   if (!sayId || !inBag(sayId)) sayId = bag[0];
   $("chips").innerHTML = bag.map(id => {
     const done = LINES.every(L => (best[id + ":" + L.k] || 0) >= 80);
-    return `<button class="chip" data-id="${id}" aria-pressed="${id === sayId}">${PIC[id]}${byId[id].en}${done ? '<span class="done">✓</span>' : ""}</button>`;
+    return `<button class="chip" data-id="${id}" aria-pressed="${id === sayId}">${PIC[id]}${byId[id].en}${done ? '<span class="done">★</span>' : ""}</button>`;
   }).join("");
   $("chips").querySelectorAll(".chip").forEach(c => c.addEventListener("click", () => { sayId = c.dataset.id; renderSay(); speak(byId[sayId].en); }));
   const w = byId[sayId];
-  $("stage").innerHTML = `<div class="head"><div class="pic">${PIC[w.id]}</div><div class="t">${withArt(w)}<small>${w.ko}</small></div></div>` + LINES.map(L => {
+  $("stage").innerHTML = `<div class="head"><div class="pic">${PIC[w.id]}</div><div class="t">${withArt(w)}<small>${w.ko}</small></div><button class="play" aria-label="단어 듣기">${ICON.speaker}</button></div>` + LINES.map(L => {
     const text = S[L.k](w), b = best[w.id + ":" + L.k];
     return `<div class="line" data-k="${L.k}"><div class="who">${L.who}</div>
       <div class="sentence">${text.split(" ").map(t => `<span class="w">${t}</span>`).join(" ")}</div>
       <div class="ctl"><button class="round listen" aria-label="듣기">${ICON.speaker}</button><button class="round mic" aria-label="따라 말하기" ${SR ? "" : "disabled"}>${ICON.mic}</button></div>
       <div class="result">${b != null ? `<div class="pct ${grade(b)}">${b}%</div><div class="meter"><i class="${grade(b)}" style="width:${b}%"></i></div><div class="heard">지금까지 최고 기록</div>` : ""}</div></div>`;
   }).join("");
+  $("stage").querySelector(".head .play").addEventListener("click", () => speak(w.en));
   $("stage").querySelectorAll(".line").forEach(line => {
     const text = S[line.dataset.k](w);
     line.querySelector(".listen").addEventListener("click", () => speak(text));
@@ -519,7 +671,6 @@ function renderSay() {
   });
 }
 onBag(() => { if (!$("say").hidden) renderSay(); });
-const grade = a => a >= 80 ? "good" : a >= 50 ? "mid" : "low";
 
 // 표시 단어 하나 = 비교 단어 하나가 되도록, 들린 "do not" 은 "don't" 로 모아요
 const norm = s => s.toLowerCase().replace(/’/g, "'").replace(/\bdo not\b/g, "don't").replace(/\bi am\b/g, "i'm").replace(/[^a-z0-9 ]/g, "").split(/\s+/).filter(Boolean);
@@ -549,7 +700,7 @@ function listen(line, text, key) {
     const g = grade(top.acc);
     line.querySelectorAll(".w").forEach((el, i) => el.className = "w " + (top.hit[i] ? "hit" : "miss"));
     res.innerHTML = `<div class="pct ${g}">${top.acc}%</div><div class="meter"><i class="${g}" style="width:${top.acc}%"></i></div>
-      <div class="heard">들린 말: <b>${top.said}</b> · ${g === "good" ? "Excellent!" : g === "mid" ? "Good try! 빨간 단어를 다시 들어 보세요." : "다시 한 번. 듣기를 누르고 천천히 말해요."}</div>`;
+      <div class="heard">들린 말: <b>${top.said}</b> · ${g === "good" ? "Excellent! ⭐" : g === "mid" ? "Good try! 빨간 단어를 다시 들어 보세요." : "다시 한 번! 듣기를 누르고 천천히 말해요."}</div>`;
     best[key] = Math.max(best[key] || 0, top.acc);
     if (g === "good") { speak("Excellent!"); const id = key.split(":")[0]; if (LINES.every(L => (best[id + ":" + L.k] || 0) >= 80)) setTimeout(renderSay, 1200); }
   };
