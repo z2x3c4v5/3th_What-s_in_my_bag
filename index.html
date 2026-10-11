@@ -4,706 +4,532 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>What's in my bag?</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap">
 <style>
-/* Layout: three tabs over one shared bag. Tab 1 drags words into a floating mini-bag, tab 2 practices sentences for what is in it, tab 3 shows the bag itself. */
+/* Layout: one centered column, three steps. Each step shows one thing: the shelf of items, one sentence to say, the bag. */
 :root {
-  --bg: #fff8e7;          /* warm paper */
+  --bg: #f4f3ef;
   --panel: #ffffff;
-  --fg: #2b2a33;
-  --muted: #6d6a7c;
-  --line: #efe3c4;
-  --accent: #ff8a3d;      /* orange backpack */
+  --fg: #1f2328;
+  --muted: #6b7280;
+  --line: #e4e2db;
+  --accent: #2458e6;
   --accent-ink: #ffffff;
-  --sky: #cfe9ff;         /* soft blue, for the question bubble */
-  --yes: #35b56b;
-  --no: #f2545b;
-  --star: #ffc531;
-  --chip: #fff1d6;
-  --shadow: 0 6px 0 #f0d9a8;
-  --font-display: "Fredoka", "Noto Sans KR", system-ui, sans-serif;
-  --font-body: "Noto Sans KR", "Fredoka", system-ui, sans-serif;
+  --soft: #e9effd;
+  --ok: #1f9d55;
+  --bad: #d64545;
+  --font-en: "Nunito", "Noto Sans KR", system-ui, sans-serif;
+  --font-ko: "Noto Sans KR", "Nunito", system-ui, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #1e1c2a; --panel: #2a2838; --fg: #f6f2ea; --muted: #b5b0c4; --line: #3c3950;
-    --accent: #ff9a52; --accent-ink: #1e1c2a; --sky: #2f4a6b; --yes: #3ecb7a; --no: #ff6b72;
-    --star: #ffd25a; --chip: #3a3650; --shadow: 0 6px 0 #15131f; color-scheme: dark;
+    --bg: #17191d; --panel: #22252b; --fg: #eceef2; --muted: #9aa1ad; --line: #343840;
+    --accent: #5b8aff; --accent-ink: #0f1420; --soft: #243253; --ok: #3cc374; --bad: #ff6b6b; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #1e1c2a; --panel: #2a2838; --fg: #f6f2ea; --muted: #b5b0c4; --line: #3c3950;
-  --accent: #ff9a52; --accent-ink: #1e1c2a; --sky: #2f4a6b; --yes: #3ecb7a; --no: #ff6b72;
-  --star: #ffd25a; --chip: #3a3650; --shadow: 0 6px 0 #15131f; color-scheme: dark;
+  --bg: #17191d; --panel: #22252b; --fg: #eceef2; --muted: #9aa1ad; --line: #343840;
+  --accent: #5b8aff; --accent-ink: #0f1420; --soft: #243253; --ok: #3cc374; --bad: #ff6b6b; color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { height: 100%; }
-body {
-  margin: 0; background: var(--bg); color: var(--fg);
-  font-family: var(--font-body); font-size: 17px; line-height: 1.45;
-  -webkit-tap-highlight-color: transparent; user-select: none;
-}
-.wrap { max-width: 1080px; margin: 0 auto; padding-block: 14px 120px; padding-inline: 16px; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-ko); font-size: 17px; line-height: 1.5; -webkit-tap-highlight-color: transparent; user-select: none; }
+button { font: inherit; color: inherit; }
+.wrap { max-width: 780px; margin: 0 auto; padding-block: 18px 150px; padding-inline: 16px; }
 
-/* Header */
-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.7rem, 4vw, 2.5rem); margin: 0; letter-spacing: .01em; text-wrap: balance; }
-h1 .q { color: var(--accent); }
-.score { display: flex; align-items: center; gap: 6px; font-family: var(--font-display); font-weight: 600; font-size: 1.1rem; background: var(--panel); border: 2px solid var(--line); border-radius: 999px; padding: 6px 14px; font-variant-numeric: tabular-nums; }
-.score .st { color: var(--star); }
+/* Header + steps */
+header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+h1 { font-family: var(--font-en); font-weight: 800; font-size: 1.5rem; margin: 0; letter-spacing: -.01em; }
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 4px; gap: 4px; }
+.step { border: 0; background: transparent; border-radius: 10px; padding: 10px 6px; cursor: pointer; color: var(--muted); font-weight: 700; font-size: .95rem; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.step .n { font-family: var(--font-en); font-size: .8rem; opacity: .7; }
+.step[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); }
+.step[aria-selected="true"] .n { opacity: 1; }
+button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--soft); outline-offset: 2px; }
+.panel { margin-top: 18px; }
+.lead { color: var(--muted); font-size: .95rem; margin: 0 0 14px; }
 
-/* Tabs */
-.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
-.tab {
-  font-family: var(--font-display); font-weight: 600; font-size: clamp(.9rem, 2.4vw, 1.25rem);
-  background: var(--panel); color: var(--muted); border: 3px solid var(--line); border-radius: 18px;
-  padding: 12px 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;
-}
-.tab .n { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--line); color: var(--fg); font-size: .95rem; flex: none; }
-.tab[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); box-shadow: var(--shadow); }
-.tab[aria-selected="true"] .n { background: var(--accent-ink); color: var(--accent); }
-.tab:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--sky); outline-offset: 2px; }
+/* Step 1: shelf */
+.dialog { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; display: grid; gap: 6px; margin-bottom: 16px; }
+.dialog .l { display: grid; grid-template-columns: 2.2em 1fr auto; align-items: center; gap: 10px; font-family: var(--font-en); font-weight: 700; font-size: 1.2rem; }
+.dialog .who { font-family: var(--font-ko); font-size: .8rem; color: var(--muted); font-weight: 700; }
+.dialog .l em { font-style: normal; color: var(--accent); }
+.play { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: var(--panel); cursor: pointer; display: inline-grid; place-items: center; flex: none; }
+.play svg { width: 16px; height: 16px; fill: var(--fg); }
+.play:active { transform: scale(.94); }
 
-.panel { margin-top: 16px; }
-.hint { color: var(--muted); font-size: .95rem; margin: 0 0 10px; }
-.hint b { color: var(--accent); }
+.shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.item { position: relative; background: var(--panel); border: 2px solid var(--line); border-radius: 16px; padding: 14px 10px 12px; display: grid; justify-items: center; gap: 2px; cursor: grab; text-align: center; touch-action: none; }
+.item .pic { width: 84px; height: 84px; }
+.item .pic svg { width: 100%; height: 100%; display: block; }
+.item .en { font-family: var(--font-en); font-weight: 800; font-size: 1.1rem; margin-top: 4px; }
+.item .ko { color: var(--muted); font-size: .85rem; }
+.item.active { border-color: var(--accent); }
+.item.inbag { border-color: var(--ok); }
+.item .add { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; border-radius: 50%; border: 0; background: var(--soft); color: var(--accent); font-family: var(--font-en); font-weight: 800; font-size: 1.1rem; cursor: pointer; display: grid; place-items: center; line-height: 1; }
+.item.inbag .add { background: var(--ok); color: #fff; }
+.drag-ghost { position: fixed; z-index: 50; pointer-events: none; width: 84px; height: 84px; transform: translate(-50%, -50%) scale(1.1); filter: drop-shadow(0 8px 10px rgba(0,0,0,.25)); }
+.drag-ghost svg { width: 100%; height: 100%; }
 
-/* Pattern strip */
-.pattern { background: var(--panel); border: 2px solid var(--line); border-radius: 18px; padding: 14px 16px; display: grid; gap: 8px; }
-.pattern .line { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-family: var(--font-display); font-size: clamp(1.05rem, 2.6vw, 1.4rem); font-weight: 500; }
-.who { font-family: var(--font-body); font-size: .8rem; font-weight: 700; color: var(--muted); min-width: 2.6em; letter-spacing: .04em; text-transform: uppercase; }
-.blank { display: inline-block; min-width: 5.5em; border-bottom: 3px dashed var(--accent); text-align: center; color: var(--accent); font-weight: 700; padding: 0 .3em; }
-.art { display: inline-block; background: var(--chip); border-radius: 8px; padding: 0 .35em; font-weight: 700; }
-.spk { background: var(--sky); color: var(--fg); border: 0; border-radius: 999px; width: 40px; height: 40px; font-size: 1.1rem; cursor: pointer; display: inline-grid; place-items: center; flex: none; }
-.spk:active { transform: scale(.94); }
+/* Bag dock (drop target), shown on steps 1 and 2 */
+.dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background: var(--panel); border-top: 1px solid var(--line); transition: background .15s; }
+.dock .in { max-width: 780px; margin: 0 auto; display: flex; align-items: center; gap: 14px; cursor: pointer; }
+.dock .bagico { width: 64px; height: 64px; flex: none; }
+.dock .bagico svg { width: 100%; height: 100%; display: block; }
+.dock .items { display: flex; gap: 6px; flex: 1; min-width: 0; overflow: hidden; }
+.dock .items span { width: 40px; height: 40px; flex: none; }
+.dock .items svg { width: 100%; height: 100%; }
+.dock .items .more { display: grid; place-items: center; font-family: var(--font-en); font-weight: 800; color: var(--muted); font-size: .9rem; }
+.dock .txt { text-align: right; flex: none; }
+.dock .txt b { display: block; font-family: var(--font-en); font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.dock .txt small { color: var(--muted); font-size: .8rem; }
+.dock.over { background: var(--soft); }
+.dock.pop .bagico { animation: pop .3s; }
+@keyframes pop { 40% { transform: scale(1.12) rotate(-4deg); } }
 
-/* Word cards */
-.section-title { font-family: var(--font-display); font-weight: 600; font-size: 1.2rem; margin: 18px 0 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.legend { font-family: var(--font-body); font-size: .8rem; font-weight: 500; color: var(--muted); }
-.badge { display: inline-block; font-size: .7rem; font-weight: 700; background: var(--star); color: #2b2a33; border-radius: 999px; padding: 2px 8px; letter-spacing: .03em; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
-.card {
-  position: relative; background: var(--panel); border: 3px solid var(--line); border-radius: 20px; padding: 12px 10px 10px;
-  display: grid; justify-items: center; gap: 4px; cursor: grab; text-align: center; transition: transform .12s; touch-action: none;
-}
-.card:hover { transform: translateY(-2px); }
-.card.active { border-color: var(--accent); box-shadow: var(--shadow); }
-.card.inbag { border-color: var(--yes); }
-.card .pic { width: 64px; height: 64px; display: grid; place-items: center; font-size: 48px; line-height: 1; }
-.card .pic svg { width: 60px; height: 60px; }
-.card .en { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; }
-.card .ko { color: var(--muted); font-size: .9rem; }
-.card .tb { position: absolute; top: 8px; left: 8px; }
-.card .a { position: absolute; top: 8px; right: 8px; font-family: var(--font-display); font-weight: 700; font-size: .8rem; background: var(--chip); border-radius: 8px; padding: 1px 7px; }
-.card .add { margin-top: 4px; font-family: var(--font-body); font-size: .8rem; font-weight: 700; border: 0; border-radius: 999px; padding: 5px 12px; cursor: pointer; background: var(--chip); color: var(--fg); }
-.card.inbag .add { background: var(--yes); color: #fff; }
-
-/* Listening quiz */
-.quizbox { background: var(--panel); border: 2px solid var(--line); border-radius: 18px; padding: 14px 16px; display: grid; gap: 12px; }
-.row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.btn { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; border: 0; border-radius: 14px; padding: 11px 18px; cursor: pointer; background: var(--accent); color: var(--accent-ink); box-shadow: var(--shadow); }
-.btn:active { transform: translateY(2px); box-shadow: none; }
-.btn.ghost { background: var(--panel); color: var(--fg); border: 2px solid var(--line); box-shadow: none; }
-.btn.yes { background: var(--yes); color: #fff; }
-.btn.no { background: var(--no); color: #fff; }
-.btn.big { font-size: 1.25rem; padding: 14px 22px; }
-.choices { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
-.feedback { min-height: 1.6em; font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; }
-.feedback.ok { color: var(--yes); } .feedback.bad { color: var(--no); }
-
-/* Floating mini bag (drop target on tabs 1 and 2) */
-.minibag {
-  position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 40;
-  width: 96px; height: 96px; border: 0; border-radius: 40% 40% 22px 22px / 32% 32% 22px 22px; cursor: pointer;
-  background: var(--accent); box-shadow: inset 0 -8px 0 rgba(0,0,0,.12), 0 8px 18px rgba(0,0,0,.18);
-  display: grid; place-items: center; transition: transform .15s, box-shadow .15s; padding: 0;
-}
-.minibag::before { content: ""; position: absolute; left: 24%; right: 24%; top: -10px; height: 26px; border: 7px solid #a65419; border-bottom: 0; border-radius: 16px 16px 0 0; z-index: -1; }
-.minibag .mouthlet { width: 66%; height: 42%; margin-top: 2px; background: #4b2a14; border-radius: 10px; box-shadow: inset 0 5px 0 rgba(0,0,0,.35); display: flex; gap: 2px; align-items: center; justify-content: center; overflow: hidden; font-size: 16px; line-height: 1; }
-.minibag .mouthlet svg { width: 18px; height: 18px; }
-.minibag .n { position: absolute; top: -6px; right: -6px; min-width: 30px; height: 30px; padding: 0 8px; border-radius: 999px; background: var(--star); color: #2b2a33; font-family: var(--font-display); font-weight: 700; font-size: 1rem; display: grid; place-items: center; font-variant-numeric: tabular-nums; }
-.minibag .lbl { position: absolute; bottom: 8px; font-family: var(--font-body); font-size: .68rem; font-weight: 700; color: rgba(255,255,255,.9); }
-.minibag.over { transform: scale(1.12); box-shadow: inset 0 -8px 0 rgba(0,0,0,.12), 0 0 0 6px var(--sky), 0 8px 18px rgba(0,0,0,.18); }
-.minibag.pop { animation: pop .3s; }
-@keyframes pop { 40% { transform: scale(1.1) rotate(-3deg); } }
-.drag-ghost { position: fixed; z-index: 50; pointer-events: none; font-size: 48px; line-height: 1; transform: translate(-50%, -50%) scale(1.15); filter: drop-shadow(0 6px 6px rgba(0,0,0,.3)); }
-.drag-ghost svg { width: 52px; height: 52px; }
-
-/* Tab 2: sentence practice */
-.chips { display: flex; gap: 8px; flex-wrap: wrap; }
-.chip { display: inline-flex; align-items: center; gap: 6px; background: var(--panel); border: 3px solid var(--line); border-radius: 999px; padding: 6px 14px 6px 8px; font-family: var(--font-display); font-weight: 600; font-size: 1rem; cursor: pointer; }
-.chip .pic { font-size: 22px; line-height: 1; display: grid; place-items: center; }
-.chip .pic svg { width: 26px; height: 26px; }
-.chip[aria-pressed="true"] { border-color: var(--accent); background: var(--chip); }
-.chip .done { color: var(--star); }
-.practice { margin-top: 14px; background: var(--panel); border: 2px solid var(--line); border-radius: 18px; padding: 14px 16px; display: grid; gap: 14px; }
-.pline { display: grid; grid-template-columns: auto 1fr auto; gap: 10px 12px; align-items: center; padding-bottom: 12px; border-bottom: 2px dashed var(--line); }
-.pline:last-child { border-bottom: 0; padding-bottom: 0; }
-.pline .txt { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.1rem, 2.6vw, 1.4rem); min-width: 0; }
-.pline .txt .w { display: inline-block; padding: 0 .1em; border-radius: 6px; }
-.pline .txt .w.hit { background: color-mix(in srgb, var(--yes) 22%, transparent); }
-.pline .txt .w.miss { background: color-mix(in srgb, var(--no) 25%, transparent); text-decoration: underline wavy var(--no); }
-.pline .note { grid-column: 2 / 4; font-size: .85rem; color: var(--muted); }
-.pline .ctl { display: flex; gap: 8px; align-items: center; }
-.mic { background: var(--no); color: #fff; border: 0; border-radius: 999px; width: 48px; height: 48px; font-size: 1.3rem; cursor: pointer; display: inline-grid; place-items: center; flex: none; box-shadow: 0 4px 0 rgba(0,0,0,.15); }
-.mic.on { animation: pulse 1s infinite; }
-@keyframes pulse { 50% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--no) 30%, transparent); } }
-.mic:disabled { opacity: .4; cursor: default; }
-.result { grid-column: 2 / 4; display: grid; gap: 6px; }
-.meter { height: 14px; border-radius: 999px; background: var(--line); overflow: hidden; }
-.meter i { display: block; height: 100%; width: 0; border-radius: 999px; background: var(--no); transition: width .4s; }
-.meter i.mid { background: var(--star); } .meter i.good { background: var(--yes); }
-.acc { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; font-family: var(--font-display); font-weight: 600; }
-.acc .pct { font-size: 1.4rem; font-variant-numeric: tabular-nums; }
-.acc .pct.good { color: var(--yes); } .acc .pct.mid { color: #c9960a; } .acc .pct.low { color: var(--no); }
+/* Step 2: one sentence at a time */
+.empty { background: var(--panel); border: 1px dashed var(--line); border-radius: 16px; padding: 36px 16px; text-align: center; display: grid; gap: 12px; justify-items: center; color: var(--muted); }
+.empty .bagico { width: 96px; height: 96px; }
+.progress { display: flex; gap: 6px; justify-content: center; margin-bottom: 14px; flex-wrap: wrap; }
+.progress i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+.progress i.on { background: var(--accent); }
+.progress i.done { background: var(--ok); }
+.stage { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 24px 20px; display: grid; justify-items: center; gap: 14px; text-align: center; }
+.stage .pic { width: 150px; height: 150px; }
+.stage .pic svg { width: 100%; height: 100%; }
+.tag { font-size: .8rem; font-weight: 700; color: var(--muted); background: var(--bg); border-radius: 999px; padding: 4px 12px; }
+.tag.ok { color: var(--ok); } .tag.no { color: var(--bad); }
+.stage .who { font-size: .85rem; color: var(--muted); font-weight: 700; }
+.sentence { font-family: var(--font-en); font-weight: 800; font-size: clamp(1.5rem, 5vw, 2.1rem); line-height: 1.3; text-wrap: balance; max-width: 22ch; }
+.sentence .w { display: inline-block; border-radius: 6px; padding: 0 .08em; }
+.sentence .w.hit { color: var(--ok); }
+.sentence .w.miss { color: var(--bad); text-decoration: underline wavy; text-underline-offset: 4px; }
+.controls { display: flex; align-items: center; gap: 14px; margin-top: 6px; }
+.round { border: 0; border-radius: 50%; cursor: pointer; display: grid; place-items: center; }
+.round svg { fill: currentColor; }
+.listen { width: 64px; height: 64px; background: var(--soft); color: var(--accent); }
+.listen svg { width: 26px; height: 26px; }
+.mic { width: 84px; height: 84px; background: var(--accent); color: var(--accent-ink); box-shadow: 0 8px 20px rgba(36, 88, 230, .3); }
+.mic svg { width: 36px; height: 36px; }
+.mic.on { background: var(--bad); box-shadow: 0 0 0 0 rgba(214,69,69,.4); animation: pulse 1.1s infinite; }
+@keyframes pulse { 70% { box-shadow: 0 0 0 18px rgba(214,69,69,0); } 100% { box-shadow: 0 0 0 0 rgba(214,69,69,0); } }
+.mic:disabled { opacity: .35; box-shadow: none; cursor: default; }
+.lbl { font-size: .8rem; color: var(--muted); font-weight: 700; }
+.result { width: 100%; max-width: 420px; display: grid; gap: 8px; min-height: 64px; }
+.pct { font-family: var(--font-en); font-weight: 800; font-size: 2rem; line-height: 1; font-variant-numeric: tabular-nums; }
+.pct.good { color: var(--ok); } .pct.mid { color: #c48a00; } .pct.low { color: var(--bad); }
+.meter { height: 10px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.meter i { display: block; height: 100%; width: 0; background: var(--bad); border-radius: 999px; transition: width .4s; }
+.meter i.mid { background: #e6a800; } .meter i.good { background: var(--ok); }
 .heard { font-size: .9rem; color: var(--muted); }
 .heard b { color: var(--fg); font-weight: 500; }
-.empty-state { background: var(--panel); border: 2px dashed var(--line); border-radius: 18px; padding: 28px 16px; text-align: center; display: grid; gap: 12px; justify-items: center; }
-.empty-state .big { font-size: 48px; line-height: 1; }
-.warn { background: var(--chip); border-radius: 12px; padding: 10px 14px; font-size: .9rem; }
+.nav { display: flex; justify-content: space-between; gap: 10px; margin-top: 14px; }
+.btn { font-weight: 700; font-size: 1rem; border: 1px solid var(--line); border-radius: 12px; padding: 12px 20px; cursor: pointer; background: var(--panel); color: var(--fg); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.yes { background: var(--ok); color: #fff; border-color: var(--ok); }
+.btn.no { background: var(--bad); color: #fff; border-color: var(--bad); }
+.btn.big { font-family: var(--font-en); font-size: 1.2rem; padding: 14px 24px; flex: 1; }
+.warn { background: var(--soft); border-radius: 12px; padding: 10px 14px; font-size: .9rem; margin-bottom: 14px; }
 
-/* Tab 3: my bag */
-.pack { display: grid; grid-template-columns: minmax(260px, 1fr) minmax(0, 1.2fr); gap: 18px; align-items: start; }
-@media (max-width: 720px) { .pack { grid-template-columns: 1fr; } }
-.bagwrap { display: grid; justify-items: center; gap: 10px; }
-.bag {
-  position: relative; width: min(100%, 340px); aspect-ratio: 0.92; max-width: 100%;
-  background: var(--accent); border-radius: 46% 46% 26px 26px / 34% 34% 26px 26px;
-  box-shadow: inset 0 -10px 0 rgba(0,0,0,.12), 0 10px 0 rgba(0,0,0,.08);
-  transition: transform .15s, box-shadow .15s;
-}
-.bag::before { content: ""; position: absolute; left: 18%; right: 18%; top: -14px; height: 40px; border: 10px solid #a65419; border-bottom: 0; border-radius: 20px 20px 0 0; z-index: -1; }
-.bag .pocket { position: absolute; left: 14%; right: 14%; bottom: 7%; height: 22%; background: rgba(0,0,0,.14); border-radius: 18px; }
-.bag .pocket::after { content: ""; position: absolute; left: 40%; right: 40%; top: 10px; height: 8px; background: rgba(255,255,255,.55); border-radius: 4px; }
-.bag .mouth {
-  position: absolute; left: 8%; right: 8%; top: 9%; height: 58%; background: #4b2a14; border-radius: 22px;
-  box-shadow: inset 0 8px 0 rgba(0,0,0,.35); padding: 12px; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 6px; overflow: auto;
-}
-.bag.pop { animation: pop .3s; }
-.initem { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 14px; background: #fff; font-size: 34px; line-height: 1; cursor: pointer; animation: drop .35s; box-shadow: 0 3px 0 rgba(0,0,0,.25); border: 0; padding: 0; }
-.initem svg { width: 42px; height: 42px; }
-@keyframes drop { from { transform: translateY(-40px) scale(.6); opacity: 0; } }
-.bag .empty { color: rgba(255,255,255,.55); font-family: var(--font-display); font-size: 1rem; width: 100%; text-align: center; align-self: center; }
-.count { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; color: var(--muted); font-variant-numeric: tabular-nums; }
-.say { background: var(--panel); border: 2px solid var(--line); border-radius: 18px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; min-height: 64px; width: 100%; }
-.say .txt { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; flex: 1; min-width: 0; }
-.say .txt .ko { display: block; font-family: var(--font-body); font-weight: 400; font-size: .85rem; color: var(--muted); }
-.list { background: var(--panel); border: 2px solid var(--line); border-radius: 18px; padding: 14px 16px; display: grid; gap: 8px; }
-.list .li { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 600; font-size: 1.1rem; }
-.list .li .pic { font-size: 26px; line-height: 1; width: 32px; display: grid; place-items: center; }
-.list .li .pic svg { width: 28px; height: 28px; }
-.list .li .out { margin-left: auto; font-family: var(--font-body); font-size: .8rem; font-weight: 700; border: 2px solid var(--line); background: var(--panel); color: var(--muted); border-radius: 999px; padding: 4px 10px; cursor: pointer; }
-.friend { margin-top: 18px; background: var(--panel); border: 2px solid var(--line); border-radius: 18px; padding: 14px 16px; display: grid; gap: 12px; }
-.bubble { display: flex; align-items: center; gap: 12px; }
-.bubble .face { font-size: 48px; line-height: 1; flex: none; }
-.bubble .b { position: relative; background: var(--sky); border-radius: 18px; padding: 10px 14px; font-family: var(--font-display); font-weight: 600; font-size: 1.25rem; flex: 1; min-width: 0; }
-.bubble .b::before { content: ""; position: absolute; left: -10px; top: 20px; border: 8px solid transparent; border-right-color: var(--sky); border-left: 0; }
-.stars { font-size: 1.4rem; letter-spacing: .1em; min-height: 1.6em; }
+/* Step 3: the bag */
+.bagview { display: grid; justify-items: center; gap: 16px; }
+.backpack { position: relative; width: min(100%, 360px); }
+.backpack > svg { width: 100%; height: auto; display: block; }
+.inside { position: absolute; left: 18%; right: 18%; top: 18%; height: 29%; display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-end; gap: 2px; padding: 4px; overflow: hidden; }
+.inside button { width: 30%; aspect-ratio: 1; border: 0; background: transparent; padding: 0; cursor: pointer; animation: drop .4s; }
+.inside button svg { width: 100%; height: 100%; filter: drop-shadow(0 2px 2px rgba(0,0,0,.4)); }
+.inside button:hover { transform: translateY(-3px); }
+@keyframes drop { from { transform: translateY(-30px); opacity: 0; } }
+.inside .none { align-self: center; color: rgba(255,255,255,.6); font-size: .9rem; }
+.have { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; width: 100%; display: flex; align-items: center; gap: 12px; }
+.have .s { font-family: var(--font-en); font-weight: 700; font-size: 1.15rem; flex: 1; min-width: 0; }
+.have .s small { display: block; font-family: var(--font-ko); font-weight: 400; color: var(--muted); font-size: .85rem; }
+.ask { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 18px 16px; width: 100%; display: grid; gap: 14px; }
+.ask .q { display: flex; align-items: center; gap: 12px; }
+.ask .q .face { width: 48px; height: 48px; flex: none; }
+.ask .q .face svg { width: 100%; height: 100%; }
+.ask .q .t { font-family: var(--font-en); font-weight: 800; font-size: 1.4rem; flex: 1; min-width: 0; }
+.ask .row { display: flex; gap: 10px; }
+.ask .fb { min-height: 1.5em; font-family: var(--font-en); font-weight: 700; font-size: 1.05rem; }
+.ask .fb.ok { color: var(--ok); } .ask .fb.bad { color: var(--bad); }
+.rowc { display: flex; gap: 10px; justify-content: center; }
 
-@media (prefers-reduced-motion: reduce) { .bag.pop, .minibag.pop, .initem, .mic.on { animation: none; } .card:hover { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .dock.pop .bagico, .inside button, .mic.on { animation: none; } }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>What's in my <span class="q">bag</span>?</h1>
-    <div class="score" aria-live="polite"><span class="st">★</span> <span id="score">0</span></div>
+    <h1>What's in my bag?</h1>
   </header>
-
-  <div class="tabs" role="tablist">
-    <button class="tab" role="tab" id="tab-learn" aria-selected="true" aria-controls="learn"><span class="n">1</span> 단어 배우기</button>
-    <button class="tab" role="tab" id="tab-practice" aria-selected="false" aria-controls="practice"><span class="n">2</span> 문장 연습하기</button>
-    <button class="tab" role="tab" id="tab-pack" aria-selected="false" aria-controls="pack"><span class="n">3</span> 내 가방</button>
+  <div class="steps" role="tablist">
+    <button class="step" role="tab" id="t-learn" aria-selected="true" aria-controls="learn"><span class="n">1</span>단어</button>
+    <button class="step" role="tab" id="t-say" aria-selected="false" aria-controls="say"><span class="n">2</span>말하기</button>
+    <button class="step" role="tab" id="t-bag" aria-selected="false" aria-controls="bag"><span class="n">3</span>내 가방</button>
   </div>
 
-  <!-- ===== Tab 1: 단어 배우기 ===== -->
-  <section class="panel" id="learn" role="tabpanel" aria-labelledby="tab-learn">
-    <p class="hint">카드를 누르면 소리가 나요. 카드를 <b>오른쪽 아래 가방으로 끌어다 놓으면</b> 가방에 들어가고, 2번 문장 연습에 자동으로 추가돼요.</p>
-
-    <div class="pattern" id="pattern">
-      <div class="line"><span class="who">A</span><span>Do you have <span class="art" id="p-art1">a(n)</span> <span class="blank" id="p-w1">____</span>?</span><button class="spk" data-say="q" aria-label="질문 듣기">🔊</button></div>
-      <div class="line"><span class="who">B</span><span>Yes, I do. I have <span class="art" id="p-art2">a(n)</span> <span class="blank" id="p-w2">____</span>.</span><button class="spk" data-say="yes" aria-label="Yes 대답 듣기">🔊</button></div>
-      <div class="line"><span class="who">B</span><span>No, I don't. I don't have <span class="art" id="p-art3">a(n)</span> <span class="blank" id="p-w3">____</span>.</span><button class="spk" data-say="no" aria-label="No 대답 듣기">🔊</button></div>
+  <!-- 1. 단어 -->
+  <section class="panel" id="learn" role="tabpanel">
+    <p class="lead">물건을 누르면 소리가 나요. 아래 가방으로 끌어다 놓거나 + 를 누르면 가방에 들어가요.</p>
+    <div class="dialog" id="dialog">
+      <div class="l"><span class="who">친구</span><span id="d-q">Do you have <em>a pen</em>?</span><button class="play" data-k="q" aria-label="듣기"></button></div>
+      <div class="l"><span class="who">나</span><span id="d-a">Yes, I do. I have <em>a pen</em>.</span><button class="play" data-k="yes" aria-label="듣기"></button></div>
     </div>
+    <div class="shelf" id="shelf"></div>
+  </section>
 
-    <div class="section-title">학용품 단어 <span class="legend"><span class="badge">교과서</span> 표시는 교과서에 나온 단어예요</span></div>
-    <div class="grid" id="cards"></div>
-
-    <div class="section-title">듣고 고르기 <span class="legend">소리를 듣고 맞는 카드를 골라요</span></div>
-    <div class="quizbox">
-      <div class="row">
-        <button class="btn" id="lq-start">▶ 시작</button>
-        <button class="btn ghost" id="lq-again" hidden>🔊 다시 듣기</button>
-        <span class="feedback" id="lq-fb"></span>
+  <!-- 2. 말하기 -->
+  <section class="panel" id="say" role="tabpanel" hidden>
+    <div class="warn" id="sr-warn" hidden>이 브라우저는 음성 인식을 지원하지 않아요. Chrome 이나 Edge 에서 열면 따라 말하기를 할 수 있어요.</div>
+    <div class="empty" id="say-empty">
+      <div class="bagico" id="empty-bag"></div>
+      <div>가방이 비어 있어요.<br>1번에서 물건을 가방에 넣으면 그 물건으로 말하기 연습을 해요.</div>
+      <button class="btn primary" id="say-go">1번으로 가기</button>
+    </div>
+    <div id="say-body" hidden>
+      <div class="progress" id="progress"></div>
+      <div class="stage">
+        <div class="pic" id="s-pic"></div>
+        <span class="tag" id="s-tag"></span>
+        <div class="who" id="s-who"></div>
+        <div class="sentence" id="s-text"></div>
+        <div class="controls">
+          <div style="display:grid;justify-items:center;gap:6px"><button class="round listen" id="s-listen" aria-label="듣기"></button><span class="lbl">듣기</span></div>
+          <div style="display:grid;justify-items:center;gap:6px"><button class="round mic" id="s-mic" aria-label="따라 말하기"></button><span class="lbl" id="mic-lbl">따라 말하기</span></div>
+        </div>
+        <div class="result" id="s-result"></div>
       </div>
-      <div class="choices" id="lq-choices"></div>
+      <div class="nav">
+        <button class="btn" id="s-prev">← 이전</button>
+        <button class="btn primary" id="s-next">다음 →</button>
+      </div>
     </div>
   </section>
 
-  <!-- ===== Tab 2: 문장 연습하기 ===== -->
-  <section class="panel" id="practice" role="tabpanel" aria-labelledby="tab-practice" hidden>
-    <p class="hint">가방에 넣은 단어로 문장을 연습해요. 🔊 를 눌러 듣고, 🎤 를 누른 뒤 따라 말하면 정확도를 알려줘요.</p>
-    <div class="warn" id="sr-warn" hidden>이 브라우저는 음성 인식을 지원하지 않아요. Chrome 이나 Edge 에서 열어 주세요. 듣기 연습은 그대로 할 수 있어요.</div>
-    <div class="empty-state" id="pr-empty">
-      <div class="big">🎒</div>
-      <div>가방이 비어 있어요.<br>1번에서 단어 카드를 가방으로 끌어다 놓으면 여기에 연습 문장이 생겨요.</div>
-      <button class="btn" id="pr-go-learn">1번 단어 배우기로 가기</button>
-    </div>
-    <div id="pr-body" hidden>
-      <div class="section-title" style="margin-top:0">연습할 단어 <span class="legend">가방에 있는 단어예요. 눌러서 골라요</span></div>
-      <div class="chips" id="pr-chips"></div>
-      <div class="practice" id="pr-lines"></div>
-    </div>
-  </section>
-
-  <!-- ===== Tab 3: 내 가방 ===== -->
-  <section class="panel" id="pack" role="tabpanel" aria-labelledby="tab-pack" hidden>
-    <p class="hint">1번에서 넣은 물건이 여기에 들어 있어요. 물건을 누르면 가방에서 꺼내요.</p>
-
-    <div class="pack">
-      <div class="bagwrap">
-        <div class="bag" id="bag" aria-label="my bag">
-          <div class="mouth" id="mouth"></div>
-          <div class="pocket"></div>
-        </div>
-        <div class="count" id="count">0 items</div>
-        <div class="say" id="say">
-          <span class="txt" id="say-txt">What's in my bag?<span class="ko">내 가방 안에 뭐가 있을까?</span></span>
-          <button class="spk" id="say-spk" aria-label="문장 듣기">🔊</button>
-        </div>
-        <div class="row">
-          <button class="btn ghost" id="go-learn">+ 물건 더 넣기</button>
-          <button class="btn ghost" id="reset">가방 비우기</button>
-        </div>
+  <!-- 3. 내 가방 -->
+  <section class="panel" id="bag" role="tabpanel" hidden>
+    <div class="bagview">
+      <div class="backpack" id="backpack"></div>
+      <div class="have">
+        <span class="s" id="have-s"></span>
+        <button class="play" id="have-play" aria-label="듣기"></button>
       </div>
-
-      <div>
-        <div class="section-title" style="margin-top:0">In my bag, I have… <span class="legend">가방에 든 것</span></div>
-        <div class="list" id="baglist"></div>
-
-        <div class="friend">
-          <div class="section-title" style="margin:0">친구가 물어봐요 <span class="legend">가방을 보고 대답해요</span></div>
-          <div class="bubble">
-            <span class="face" id="face">🙋</span>
-            <div class="b" id="ask">Do you have a pen?</div>
-            <button class="spk" id="ask-spk" aria-label="질문 듣기">🔊</button>
-          </div>
-          <div class="row">
-            <button class="btn big yes" id="ans-yes">Yes, I do.</button>
-            <button class="btn big no" id="ans-no">No, I don't.</button>
-            <button class="btn ghost" id="ask-next">다음 질문 ▶</button>
-          </div>
-          <div class="feedback" id="ask-fb"></div>
-          <div class="stars" id="stars" aria-hidden="true"></div>
-        </div>
+      <div class="ask">
+        <div class="q"><span class="face" id="face"></span><span class="t" id="ask-t"></span><button class="play" id="ask-play" aria-label="듣기"></button></div>
+        <div class="row"><button class="btn big yes" id="ans-yes">Yes, I do.</button><button class="btn big no" id="ans-no">No, I don't.</button></div>
+        <div class="fb" id="ask-fb"></div>
+        <div class="rowc"><button class="btn" id="ask-next">다른 질문</button><button class="btn" id="bag-reset">가방 비우기</button></div>
       </div>
     </div>
   </section>
 </div>
 
-<button class="minibag" id="minibag" aria-label="내 가방 (3번 탭으로 가기)">
-  <div class="mouthlet" id="mouthlet"></div>
-  <span class="n" id="mini-n">0</span>
-  <span class="lbl">my bag</span>
-</button>
+<div class="dock" id="dock" role="button" tabindex="0" aria-label="내 가방 열기">
+  <div class="in">
+    <div class="bagico" id="dock-bag"></div>
+    <div class="items" id="dock-items"></div>
+    <div class="txt"><b id="dock-n">0</b><small>내 가방</small></div>
+  </div>
+</div>
 
 <script>
-// ---------- 단어 목록 ----------
-// tb: 교과서 단어, art: a / an ('' 이면 관사 없이), pic: 이모지 또는 SVG
-const SVG = {
-  glue: `<svg viewBox="0 0 64 64"><rect x="22" y="18" width="20" height="40" rx="5" fill="#f5c542"/><rect x="24" y="8" width="16" height="12" rx="3" fill="#e8a000"/><rect x="26" y="26" width="12" height="18" rx="2" fill="#fff6d6"/><text x="32" y="40" font-size="9" text-anchor="middle" font-family="sans-serif" font-weight="700" fill="#b07400">GLUE</text></svg>`,
-  eraser: `<svg viewBox="0 0 64 64"><g transform="rotate(-25 32 32)"><rect x="10" y="22" width="44" height="22" rx="5" fill="#ff9ab0"/><rect x="10" y="22" width="18" height="22" rx="5" fill="#5aa9ff"/><rect x="24" y="22" width="4" height="22" fill="#4a90e2"/></g></svg>`,
-  pcase: `<svg viewBox="0 0 64 64"><rect x="6" y="18" width="52" height="30" rx="10" fill="#7c6cff"/><rect x="6" y="18" width="52" height="8" rx="4" fill="#5b4bd6"/><circle cx="50" cy="22" r="3" fill="#ffd25a"/><rect x="14" y="30" width="36" height="12" rx="4" fill="#9d92ff"/></svg>`,
-  bottle: `<svg viewBox="0 0 64 64"><rect x="24" y="4" width="16" height="10" rx="3" fill="#4a90e2"/><rect x="20" y="14" width="24" height="46" rx="8" fill="#7fc4ff"/><rect x="24" y="28" width="16" height="18" rx="3" fill="#fff"/><path d="M27 37 l5-5 5 5 -5 5z" fill="#4a90e2"/></svg>`,
-  keycap: `<svg viewBox="0 0 64 64"><rect x="8" y="12" width="48" height="44" rx="9" fill="#2d2f3a"/><rect x="12" y="10" width="40" height="36" rx="8" fill="#ffd25a"/><text x="32" y="36" font-size="22" text-anchor="middle" font-family="sans-serif" font-weight="700" fill="#2d2f3a">A</text></svg>`,
-  slime: `<svg viewBox="0 0 64 64"><path d="M8 46c0-14 10-28 24-28s24 14 24 28c0 6-6 8-24 8S8 52 8 46z" fill="#7be36b"/><path d="M20 20c2-8 20-8 24 0" stroke="#5fcf4f" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="24" cy="40" r="3" fill="#2d6b25"/><circle cx="40" cy="40" r="3" fill="#2d6b25"/><ellipse cx="18" cy="36" rx="4" ry="2" fill="#b9f5b0"/></svg>`,
-  keyring: `<svg viewBox="0 0 64 64"><circle cx="20" cy="20" r="11" fill="none" stroke="#9aa0ad" stroke-width="5"/><rect x="24" y="24" width="30" height="30" rx="8" fill="#ff7bac" transform="rotate(-10 39 39)"/><circle cx="39" cy="39" r="7" fill="#fff"/><circle cx="36" cy="38" r="1.6" fill="#333"/><circle cx="42" cy="38" r="1.6" fill="#333"/><path d="M36 42q3 3 6 0" stroke="#333" stroke-width="1.5" fill="none"/></svg>`,
-  marker: `<svg viewBox="0 0 64 64"><g transform="rotate(45 32 32)"><rect x="24" y="6" width="16" height="36" rx="4" fill="#3bb4ff"/><rect x="24" y="6" width="16" height="12" rx="4" fill="#1e86cc"/><path d="M26 42h12l-4 12h-4z" fill="#eee"/><path d="M30 54h4l-2 5z" fill="#3bb4ff"/></g></svg>`,
+// ---------- 그림 (모두 같은 스타일의 SVG) ----------
+const V = (body) => `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">${body}</svg>`;
+const PIC = {
+  pen: V(`<g transform="rotate(45 40 40)"><rect x="33" y="8" width="14" height="48" rx="4" fill="#2458e6"/><rect x="33" y="8" width="14" height="10" rx="4" fill="#163a9c"/><rect x="45" y="12" width="3" height="18" rx="1.5" fill="#c9d3f5"/><path d="M33 56h14l-5 10h-4z" fill="#d9dde6"/><path d="M38 66h4l-2 6z" fill="#1f2328"/></g>`),
+  pencil: V(`<g transform="rotate(45 40 40)"><rect x="33" y="6" width="14" height="52" fill="#f6c343"/><rect x="33" y="6" width="5" height="52" fill="#e0a92a"/><rect x="33" y="6" width="14" height="8" fill="#f28b9b"/><rect x="33" y="14" width="14" height="4" fill="#b9bfc9"/><path d="M33 58h14l-7 14z" fill="#f0d9b5"/><path d="M37.5 67h5l-2.5 5z" fill="#1f2328"/></g>`),
+  glue: V(`<rect x="28" y="24" width="24" height="46" rx="6" fill="#f6c343"/><rect x="28" y="24" width="24" height="8" rx="4" fill="#e0a92a"/><rect x="30" y="10" width="20" height="14" rx="4" fill="#e0a92a"/><rect x="32" y="38" width="16" height="22" rx="3" fill="#fff8e1"/><text x="40" y="52" font-size="7" font-weight="700" text-anchor="middle" font-family="sans-serif" fill="#b57b00">GLUE</text>`),
+  ruler: V(`<g transform="rotate(-35 40 40)"><rect x="6" y="31" width="68" height="18" rx="3" fill="#f3d9a4"/><rect x="6" y="31" width="68" height="18" rx="3" fill="none" stroke="#d6b36b" stroke-width="2"/>${[...Array(13)].map((_, i) => `<rect x="${11 + i * 5}" y="31" width="1.5" height="${i % 2 ? 4 : 7}" fill="#8a6a2f"/>`).join("")}</g>`),
+  eraser: V(`<g transform="rotate(-20 40 40)"><rect x="14" y="27" width="52" height="26" rx="5" fill="#f28b9b"/><rect x="14" y="27" width="22" height="26" rx="5" fill="#5b8aff"/><rect x="31" y="27" width="5" height="26" fill="#2458e6"/><rect x="14" y="46" width="52" height="7" rx="3" fill="rgba(0,0,0,.12)"/></g>`),
+  notebook: V(`<rect x="18" y="12" width="46" height="58" rx="5" fill="#2458e6"/><rect x="26" y="26" width="30" height="20" rx="3" fill="#fff"/><rect x="30" y="32" width="22" height="2.5" fill="#c9d3f5"/><rect x="30" y="38" width="16" height="2.5" fill="#c9d3f5"/>${[...Array(6)].map((_, i) => `<circle cx="18" cy="${18 + i * 9.5}" r="3" fill="#f4f3ef" stroke="#9aa1ad" stroke-width="2"/>`).join("")}`),
+  crayon: V(`<g transform="rotate(45 40 40)"><rect x="33" y="14" width="14" height="46" rx="2" fill="#e5484d"/><rect x="33" y="22" width="14" height="26" fill="#f4f3ef"/><rect x="33" y="24" width="14" height="22" fill="#e5484d" opacity=".15"/><path d="M33 14h14l-7-10z" fill="#e5484d"/><rect x="33" y="60" width="14" height="4" fill="#b73238"/></g>`),
+  scissors: V(`<g transform="rotate(-30 40 40)"><path d="M32 42 L44 8 l6 2 -14 36z" fill="#b9bfc9"/><path d="M48 42 L36 8 l-6 2 14 36z" fill="#d9dde6"/><circle cx="40" cy="40" r="3.5" fill="#1f2328"/><ellipse cx="30" cy="58" rx="9" ry="13" transform="rotate(25 30 58)" fill="none" stroke="#e5484d" stroke-width="6"/><ellipse cx="50" cy="58" rx="9" ry="13" transform="rotate(-25 50 58)" fill="none" stroke="#e5484d" stroke-width="6"/></g>`),
+  book: V(`<rect x="16" y="12" width="50" height="58" rx="3" fill="#1f9d55"/><rect x="22" y="12" width="44" height="58" rx="3" fill="#27b665"/><rect x="16" y="12" width="8" height="58" fill="#15723d"/><rect x="34" y="24" width="24" height="16" rx="2" fill="#fff"/><rect x="38" y="30" width="16" height="2.5" fill="#9aa1ad"/>`),
+  bottle: V(`<rect x="30" y="6" width="20" height="12" rx="3" fill="#1f6fb2"/><rect x="26" y="18" width="28" height="56" rx="9" fill="#7fc4ff"/><rect x="26" y="34" width="28" height="22" fill="#fff"/><path d="M34 45l6-7 6 7-6 7z" fill="#2458e6"/><rect x="30" y="24" width="4" height="40" rx="2" fill="rgba(255,255,255,.5)"/>`),
+  pcase: V(`<rect x="8" y="26" width="64" height="32" rx="12" fill="#7c5cff"/><rect x="8" y="26" width="64" height="9" rx="4.5" fill="#5b3fd6"/><circle cx="62" cy="30.5" r="3" fill="#f6c343"/><rect x="16" y="40" width="48" height="12" rx="4" fill="#9d86ff"/>`),
+  keyring: V(`<circle cx="26" cy="22" r="12" fill="none" stroke="#9aa1ad" stroke-width="5"/><circle cx="46" cy="50" r="18" fill="#c48a52"/><circle cx="33" cy="38" r="6" fill="#c48a52"/><circle cx="59" cy="38" r="6" fill="#c48a52"/><ellipse cx="46" cy="55" rx="8" ry="6" fill="#f0d9b5"/><circle cx="40" cy="47" r="2" fill="#1f2328"/><circle cx="52" cy="47" r="2" fill="#1f2328"/><circle cx="46" cy="53" r="2" fill="#1f2328"/>`),
+  keycap: V(`<rect x="12" y="16" width="56" height="52" rx="10" fill="#2b2f38"/><rect x="16" y="12" width="48" height="44" rx="9" fill="#f6c343"/><rect x="20" y="16" width="40" height="36" rx="7" fill="#ffd45e"/><text x="40" y="42" font-size="22" font-weight="800" text-anchor="middle" font-family="sans-serif" fill="#2b2f38">A</text>`),
+  slime: V(`<rect x="12" y="30" width="56" height="40" rx="8" fill="#e8f3ff" stroke="#b6d2f2" stroke-width="2"/><path d="M14 44c6-10 14-10 20-4s14 4 18-4 10-2 14 6v18a8 8 0 0 1-8 8H22a8 8 0 0 1-8-8z" fill="#63d26f"/><ellipse cx="30" cy="52" rx="6" ry="3" fill="#b9f0bf"/><rect x="10" y="22" width="60" height="10" rx="4" fill="#7fc4ff"/>`),
+  sticker: V(`<path d="M40 8l9 18 20 3-14 14 3 20-18-9-18 9 3-20L11 29l20-3z" fill="#f6c343" stroke="#e0a92a" stroke-width="2"/><path d="M40 20l5 10 11 2-8 8 2 11-10-5-10 5 2-11-8-8 11-2z" fill="#ffd45e"/>`),
 };
+const BAG_SVG = `<svg viewBox="0 0 300 340" xmlns="http://www.w3.org/2000/svg">
+  <path d="M95 48c0-26 18-40 55-40s55 14 55 40v10h-18v-8c0-16-12-24-37-24s-37 8-37 24v8H95z" fill="#1f3f8f"/>
+  <rect x="60" y="60" width="38" height="250" rx="18" fill="#1f3f8f"/><rect x="202" y="60" width="38" height="250" rx="18" fill="#1f3f8f"/>
+  <rect x="36" y="56" width="228" height="268" rx="46" fill="#2458e6"/>
+  <path d="M36 102h228v176a46 46 0 0 1-46 46H82a46 46 0 0 1-46-46z" fill="#2458e6"/>
+  <rect x="52" y="60" width="196" height="100" rx="34" fill="#163a9c"/>
+  <rect x="52" y="122" width="196" height="6" fill="#0e2a73"/>
+  <path d="M36 150h228v128a46 46 0 0 1-46 46H82a46 46 0 0 1-46-46z" fill="#2458e6"/>
+  <path d="M36 150h228v12H36z" fill="#1a49c2"/>
+  <rect x="70" y="196" width="160" height="100" rx="24" fill="#1a49c2"/>
+  <rect x="70" y="196" width="160" height="12" rx="6" fill="#0e2a73"/>
+  <rect x="134" y="200" width="32" height="6" rx="3" fill="#c9d3f5"/>
+  <rect x="122" y="170" width="56" height="12" rx="6" fill="#0e2a73"/>
+  <rect x="44" y="230" width="16" height="60" rx="8" fill="#163a9c"/><rect x="240" y="230" width="16" height="60" rx="8" fill="#163a9c"/>
+</svg>`;
+const BAG_ICON = `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><path d="M28 18c0-8 5-12 12-12s12 4 12 12v4h-6v-3c0-4-2-7-6-7s-6 3-6 7v3h-6z" fill="#1f3f8f"/><rect x="12" y="20" width="56" height="54" rx="14" fill="#2458e6"/><rect x="16" y="22" width="48" height="22" rx="10" fill="#163a9c"/><rect x="22" y="48" width="36" height="18" rx="7" fill="#1a49c2"/><rect x="32" y="50" width="16" height="3" rx="1.5" fill="#c9d3f5"/></svg>`;
+const FACE = `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="42" r="30" fill="#f6d2b4"/><path d="M12 36c0-18 12-28 28-28s28 10 28 28c-6-6-12-8-28-8s-22 2-28 8z" fill="#3b2a20"/><circle cx="30" cy="44" r="3" fill="#1f2328"/><circle cx="50" cy="44" r="3" fill="#1f2328"/><path d="M32 56q8 6 16 0" stroke="#1f2328" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`;
+const ICON = {
+  play: `<svg viewBox="0 0 24 24"><path d="M5 3l15 9-15 9z"/></svg>`,
+  speaker: `<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 4V5L7 9zm11 3a4 4 0 0 0-2-3.5v7A4 4 0 0 0 14 12zm-2-8.8v2.1A7 7 0 0 1 19 12a7 7 0 0 1-7 6.7v2.1A9 9 0 0 0 21 12a9 9 0 0 0-9-8.8z"/></svg>`,
+  mic: `<svg viewBox="0 0 24 24"><path d="M12 15a4 4 0 0 0 4-4V6a4 4 0 0 0-8 0v5a4 4 0 0 0 4 4zm6-4h-2a4 4 0 0 1-8 0H6a6 6 0 0 0 5 5.9V20H8v2h8v-2h-3v-3.1A6 6 0 0 0 18 11z"/></svg>`,
+};
+
+// ---------- 단어 ----------
 const WORDS = [
-  { id: "pen",         en: "pen",          ko: "펜",     art: "a",  pic: "🖊️", tb: true },
-  { id: "glue",        en: "glue stick",   ko: "딱풀",   art: "a",  pic: SVG.glue, tb: true },
-  { id: "ruler",       en: "ruler",        ko: "자",     art: "a",  pic: "📏", tb: true },
-  { id: "eraser",      en: "eraser",       ko: "지우개", art: "an", pic: SVG.eraser, tb: true },
-  { id: "notebook",    en: "notebook",     ko: "공책",   art: "a",  pic: "📓", tb: true },
-  { id: "crayon",      en: "crayon",       ko: "크레용", art: "a",  pic: "🖍️", tb: true },
-  { id: "pencil",      en: "pencil",       ko: "연필",   art: "a",  pic: "✏️" },
-  { id: "pcase",       en: "pencil case",  ko: "필통",   art: "a",  pic: SVG.pcase },
-  { id: "marker",      en: "marker",       ko: "사인펜", art: "a",  pic: SVG.marker },
-  { id: "scissors",    en: "scissors",     ko: "가위",   art: "",   pic: "✂️" },
-  { id: "book",        en: "book",         ko: "책",     art: "a",  pic: "📘" },
-  { id: "bottle",      en: "water bottle", ko: "물병",   art: "a",  pic: SVG.bottle },
-  { id: "umbrella",    en: "umbrella",     ko: "우산",   art: "an", pic: "☂️" },
-  { id: "lunchbox",    en: "lunch box",    ko: "도시락", art: "a",  pic: "🍱" },
-  { id: "sticker",     en: "sticker",      ko: "스티커", art: "a",  pic: "🌟" },
-  { id: "keyring",     en: "keyring",      ko: "키링",   art: "a",  pic: SVG.keyring },
-  { id: "keycap",      en: "keycap",       ko: "키캡",   art: "a",  pic: SVG.keycap },
-  { id: "slime",       en: "slime",        ko: "슬라임", art: "",   pic: SVG.slime },
+  { id: "pen",      en: "pen",          ko: "펜",     art: "a",  tb: true },
+  { id: "glue",     en: "glue stick",   ko: "딱풀",   art: "a",  tb: true },
+  { id: "ruler",    en: "ruler",        ko: "자",     art: "a",  tb: true },
+  { id: "eraser",   en: "eraser",       ko: "지우개", art: "an", tb: true },
+  { id: "notebook", en: "notebook",     ko: "공책",   art: "a",  tb: true },
+  { id: "crayon",   en: "crayon",       ko: "크레용", art: "a",  tb: true },
+  { id: "pencil",   en: "pencil",       ko: "연필",   art: "a" },
+  { id: "pcase",    en: "pencil case",  ko: "필통",   art: "a" },
+  { id: "scissors", en: "scissors",     ko: "가위",   art: "" },
+  { id: "book",     en: "book",         ko: "책",     art: "a" },
+  { id: "bottle",   en: "water bottle", ko: "물병",   art: "a" },
+  { id: "sticker",  en: "sticker",      ko: "스티커", art: "a" },
+  { id: "keyring",  en: "keyring",      ko: "키링",   art: "a" },
+  { id: "keycap",   en: "keycap",       ko: "키캡",   art: "a" },
+  { id: "slime",    en: "slime",        ko: "슬라임", art: "" },
 ];
 const byId = Object.fromEntries(WORDS.map(w => [w.id, w]));
 const withArt = w => (w.art ? w.art + " " : "") + w.en;
-const sentences = {
+const S = {
   q:   w => `Do you have ${withArt(w)}?`,
   yes: w => `Yes, I do. I have ${withArt(w)}.`,
   no:  w => `No, I don't. I don't have ${withArt(w)}.`,
 };
-const shuffle = a => a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(p => p[1]);
 const $ = id => document.getElementById(id);
 
 // ---------- 말하기 (TTS) ----------
 let voice = null;
 function pickVoice() {
   const vs = speechSynthesis.getVoices();
-  voice = vs.find(v => /en-US/i.test(v.lang) && /Samantha|Google US|Aria|Jenny|Zira/i.test(v.name))
-       || vs.find(v => /en-US/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null;
+  voice = vs.find(v => /en-US/i.test(v.lang) && /Samantha|Google US|Aria|Jenny|Zira/i.test(v.name)) || vs.find(v => /en-US/i.test(v.lang)) || vs.find(v => /^en/i.test(v.lang)) || null;
 }
 if ("speechSynthesis" in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
 function speak(text, rate = 0.85) {
   if (!("speechSynthesis" in window)) return;
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = "en-US"; u.rate = rate; u.pitch = 1.05;
-  if (voice) u.voice = voice;
+  u.lang = "en-US"; u.rate = rate; if (voice) u.voice = voice;
   speechSynthesis.speak(u);
 }
 
-// ---------- 점수 ----------
-let score = 0;
-function addScore(n = 1) { score += n; $("score").textContent = score; }
-
-// ---------- 공유 상태: 가방 (세 탭이 모두 같은 가방을 봐요) ----------
-const bag = [];                           // 넣은 순서대로 word id
+// ---------- 가방 (세 단계가 함께 쓰는 상태) ----------
+const bag = [];
 const inBag = id => bag.includes(id);
-const listeners = [];
-function onBagChange(fn) { listeners.push(fn); }
-function bagChanged() {
-  listeners.forEach(fn => fn());
-  try { localStorage.setItem("bag-items", JSON.stringify(bag)); } catch (e) {}
-}
-function putIn(id) {
-  if (inBag(id)) return false;
-  bag.push(id); bagChanged(); return true;
-}
-function takeOut(id) {
-  const i = bag.indexOf(id); if (i < 0) return;
-  bag.splice(i, 1); bagChanged();
-}
-try { const saved = JSON.parse(localStorage.getItem("bag-items") || "[]"); saved.forEach(id => byId[id] && bag.push(id)); } catch (e) {}
+const watchers = [];
+const onBag = fn => watchers.push(fn);
+function changed() { watchers.forEach(fn => fn()); try { localStorage.setItem("bag-items", JSON.stringify(bag)); } catch (e) {} }
+function putIn(id) { if (inBag(id)) return false; bag.push(id); changed(); return true; }
+function takeOut(id) { const i = bag.indexOf(id); if (i >= 0) { bag.splice(i, 1); changed(); } }
+try { JSON.parse(localStorage.getItem("bag-items") || "[]").forEach(id => byId[id] && bag.push(id)); } catch (e) {}
 
-// ---------- 탭 ----------
-const tabs = [...document.querySelectorAll(".tab")];
-function showTab(id) {
-  tabs.forEach(t => {
-    const on = t.getAttribute("aria-controls") === id;
-    t.setAttribute("aria-selected", on);
-    $(t.getAttribute("aria-controls")).hidden = !on;
-  });
-  $("minibag").hidden = id === "pack";
-  if (id === "practice") renderPractice();
+// ---------- 단계 전환 ----------
+const steps = [...document.querySelectorAll(".step")];
+function show(id) {
+  steps.forEach(s => { const on = s.getAttribute("aria-controls") === id; s.setAttribute("aria-selected", on); $(s.getAttribute("aria-controls")).hidden = !on; });
+  $("dock").hidden = id === "bag";
+  if (id === "say") startSay();
   try { localStorage.setItem("bag-tab", id); } catch (e) {}
   window.scrollTo({ top: 0 });
 }
-tabs.forEach(t => t.addEventListener("click", () => showTab(t.getAttribute("aria-controls"))));
+steps.forEach(s => s.addEventListener("click", () => show(s.getAttribute("aria-controls"))));
+document.querySelectorAll(".play").forEach(b => b.innerHTML = ICON.speaker);
 
-// ---------- 끌어서 가방에 넣기 (마우스/터치 공통) ----------
-const minibag = $("minibag");
-function overEl(el, x, y) { const r = el.getBoundingClientRect(); return x >= r.left - 12 && x <= r.right + 12 && y >= r.top - 12 && y <= r.bottom + 12; }
-function attachDrag(el, w, onTap) {
-  let ghost = null, sx = 0, sy = 0, dragging = false;
+// ---------- 1. 단어 ----------
+const dock = $("dock");
+$("dock-bag").innerHTML = BAG_ICON; $("empty-bag").innerHTML = BAG_ICON;
+dock.addEventListener("click", () => show("bag"));
+dock.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); show("bag"); } });
+function overDock(y) { return y >= dock.getBoundingClientRect().top - 20; }
+
+let current = WORDS[0];
+function setDialog(w) {
+  current = w;
+  $("d-q").innerHTML = `Do you have <em>${withArt(w)}</em>?`;
+  $("d-a").innerHTML = inBag(w.id) ? `Yes, I do. I have <em>${withArt(w)}</em>.` : `No, I don't. I don't have <em>${withArt(w)}</em>.`;
+  [...$("shelf").children].forEach(c => c.classList.toggle("active", c.dataset.id === w.id));
+}
+document.querySelectorAll("#dialog .play").forEach(b => b.addEventListener("click", () => {
+  speak(b.dataset.k === "q" ? S.q(current) : (inBag(current.id) ? S.yes(current) : S.no(current)));
+}));
+
+WORDS.forEach(w => {
+  const el = document.createElement("div");
+  el.className = "item"; el.dataset.id = w.id; el.tabIndex = 0; el.setAttribute("role", "button");
+  el.innerHTML = `<button class="add" type="button" aria-label="가방에 넣기">+</button><div class="pic">${PIC[w.id]}</div><div class="en">${w.en}</div><div class="ko">${w.ko}</div>`;
+  const tap = () => { setDialog(w); speak(w.en); };
+  el.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tap(); } });
+  el.querySelector(".add").addEventListener("click", e => { e.stopPropagation(); if (inBag(w.id)) { takeOut(w.id); speak(`I don't have ${withArt(w)}.`); } else add(w); });
+  drag(el, w, tap);
+  $("shelf").appendChild(el);
+});
+function add(w) {
+  if (putIn(w.id)) { dock.classList.remove("pop"); void dock.offsetWidth; dock.classList.add("pop"); speak(`I have ${withArt(w)}.`); }
+  else speak(`I already have ${withArt(w)}.`);
+  setDialog(w);
+}
+function drag(el, w, onTap) {
+  let ghost = null, sx = 0, sy = 0, moving = false;
   el.addEventListener("pointerdown", e => {
-    if (e.target.closest(".add")) return;          // 버튼은 그냥 버튼
-    if (e.pointerType === "mouse" && e.button !== 0) return;
-    sx = e.clientX; sy = e.clientY; dragging = false;
-    el.setPointerCapture(e.pointerId);
+    if (e.target.closest(".add") || (e.pointerType === "mouse" && e.button !== 0)) return;
+    sx = e.clientX; sy = e.clientY; moving = false; el.setPointerCapture(e.pointerId);
   });
   el.addEventListener("pointermove", e => {
     if (!el.hasPointerCapture(e.pointerId)) return;
-    if (!dragging && Math.hypot(e.clientX - sx, e.clientY - sy) > 8) {
-      dragging = true;
-      ghost = document.createElement("div"); ghost.className = "drag-ghost"; ghost.innerHTML = w.pic;
-      document.body.appendChild(ghost);
+    if (!moving && Math.hypot(e.clientX - sx, e.clientY - sy) > 8) {
+      moving = true; ghost = document.createElement("div"); ghost.className = "drag-ghost"; ghost.innerHTML = PIC[w.id]; document.body.appendChild(ghost);
     }
-    if (dragging) {
-      ghost.style.left = e.clientX + "px"; ghost.style.top = e.clientY + "px";
-      minibag.classList.toggle("over", overEl(minibag, e.clientX, e.clientY));
-    }
+    if (moving) { ghost.style.left = e.clientX + "px"; ghost.style.top = e.clientY + "px"; dock.classList.toggle("over", overDock(e.clientY)); }
   });
   const end = e => {
     if (!el.hasPointerCapture(e.pointerId)) return;
     el.releasePointerCapture(e.pointerId);
-    if (dragging) { if (overEl(minibag, e.clientX, e.clientY)) dropIntoBag(w); }
-    else onTap();
-    if (ghost) { ghost.remove(); ghost = null; }
-    minibag.classList.remove("over"); dragging = false;
+    if (moving) { if (overDock(e.clientY)) add(w); } else onTap();
+    if (ghost) ghost.remove(); ghost = null; moving = false; dock.classList.remove("over");
   };
   el.addEventListener("pointerup", end);
-  el.addEventListener("pointercancel", () => { if (ghost) ghost.remove(); ghost = null; dragging = false; minibag.classList.remove("over"); });
+  el.addEventListener("pointercancel", () => { if (ghost) ghost.remove(); ghost = null; moving = false; dock.classList.remove("over"); });
 }
-function dropIntoBag(w) {
-  if (putIn(w.id)) {
-    minibag.classList.remove("pop"); void minibag.offsetWidth; minibag.classList.add("pop");
-    speak(`I have ${withArt(w)}.`);
-  } else {
-    speak(`I already have ${withArt(w)}.`);
-  }
-}
-minibag.addEventListener("click", () => showTab("pack"));
-
-function renderMini() {
-  $("mini-n").textContent = bag.length;
-  $("mouthlet").innerHTML = bag.slice(-3).map(id => `<span>${byId[id].pic}</span>`).join("");
-}
-onBagChange(renderMini);
-
-// ---------- 탭1: 단어 카드 + 문장 패턴 ----------
-let current = null;
-const cardsEl = $("cards");
-WORDS.forEach(w => {
-  const c = document.createElement("div");
-  c.className = "card"; c.dataset.id = w.id; c.tabIndex = 0; c.setAttribute("role", "button");
-  c.innerHTML = `${w.tb ? '<span class="tb badge">교과서</span>' : ""}${w.art ? `<span class="a">${w.art}</span>` : ""}
-    <span class="pic">${w.pic}</span><span class="en">${w.en}</span><span class="ko">${w.ko}</span>
-    <button class="add" type="button">+ 가방에 넣기</button>`;
-  const tap = () => { setPattern(w); speak(w.en); };
-  attachDrag(c, w, tap);
-  c.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tap(); } });
-  c.querySelector(".add").addEventListener("click", e => {
-    e.stopPropagation();
-    if (inBag(w.id)) { takeOut(w.id); speak(`I don't have ${withArt(w)}.`); }
-    else dropIntoBag(w);
-  });
-  cardsEl.appendChild(c);
+onBag(() => {
+  [...$("shelf").children].forEach(c => { const on = inBag(c.dataset.id); c.classList.toggle("inbag", on); c.querySelector(".add").textContent = on ? "✓" : "+"; });
+  $("dock-n").textContent = bag.length;
+  const show6 = bag.slice(0, 6);
+  $("dock-items").innerHTML = show6.map(id => `<span>${PIC[id]}</span>`).join("") + (bag.length > 6 ? `<span class="more">+${bag.length - 6}</span>` : "");
+  setDialog(current);
 });
-function renderCards() {
-  [...cardsEl.children].forEach(c => {
-    const on = inBag(c.dataset.id);
-    c.classList.toggle("inbag", on);
-    c.querySelector(".add").textContent = on ? "✓ 가방에 있음" : "+ 가방에 넣기";
-  });
-}
-onBagChange(renderCards);
-function setPattern(w) {
-  current = w;
-  [...cardsEl.children].forEach(c => c.classList.toggle("active", c.dataset.id === w.id));
-  ["p-art1", "p-art2", "p-art3"].forEach(id => { $(id).textContent = w.art; $(id).hidden = !w.art; });
-  ["p-w1", "p-w2", "p-w3"].forEach(id => $(id).textContent = w.en);
-}
-document.querySelectorAll("#pattern .spk").forEach(b => b.addEventListener("click", () => {
-  if (!current) setPattern(WORDS[0]);
-  speak(sentences[b.dataset.say](current));
-}));
 
-// ---------- 탭1: 듣고 고르기 ----------
-const lq = { target: null };
-function newListen() {
-  const choices = shuffle(WORDS).slice(0, 4);
-  lq.target = choices[Math.floor(Math.random() * 4)];
-  $("lq-fb").textContent = ""; $("lq-fb").className = "feedback"; $("lq-again").hidden = false;
-  const box = $("lq-choices"); box.innerHTML = "";
-  choices.forEach(w => {
-    const c = document.createElement("button"); c.className = "card"; c.style.cursor = "pointer";
-    c.innerHTML = `<span class="pic">${w.pic}</span><span class="en">${w.en}</span>`;
-    c.addEventListener("click", () => {
-      if (w === lq.target) {
-        $("lq-fb").textContent = "맞아요! " + withArt(w); $("lq-fb").className = "feedback ok"; addScore();
-        speak(`Great! ${withArt(w)}.`); setTimeout(newListen, 1600);
-      } else { $("lq-fb").textContent = "다시 들어 보세요!"; $("lq-fb").className = "feedback bad"; speak(lq.target.en); }
-    });
-    box.appendChild(c);
-  });
-  setTimeout(() => speak(lq.target.en), 250);
-}
-$("lq-start").addEventListener("click", newListen);
-$("lq-again").addEventListener("click", () => lq.target && speak(lq.target.en));
-
-// ---------- 탭2: 문장 연습하기 (가방 단어로 자동 생성) ----------
+// ---------- 2. 말하기: 한 번에 한 문장 ----------
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
 $("sr-warn").hidden = !!SR;
-let practiceId = null;
-const practiceDone = {};          // id -> 3줄 중 80% 넘긴 줄 수
-$("pr-go-learn").addEventListener("click", () => showTab("learn"));
-
-function renderPractice() {
+$("s-listen").innerHTML = ICON.speaker; $("s-mic").innerHTML = ICON.mic; $("s-mic").disabled = !SR;
+$("say-go").addEventListener("click", () => show("learn"));
+let plan = [], pos = 0, results = {};
+function buildPlan() {
+  plan = [];
+  bag.forEach(id => { plan.push({ w: byId[id], k: "q" }); plan.push({ w: byId[id], k: "yes" }); });
+  // 가방에 없는 물건 하나로 No 대답도 연습해요
+  const out = WORDS.filter(w => !inBag(w.id));
+  if (out.length && bag.length) { const w = out[Math.floor(Math.random() * out.length)]; plan.push({ w, k: "q" }); plan.push({ w, k: "no" }); }
+}
+function startSay() {
   const empty = bag.length === 0;
-  $("pr-empty").hidden = !empty; $("pr-body").hidden = empty;
+  $("say-empty").hidden = !empty; $("say-body").hidden = empty;
   if (empty) return;
-  if (!practiceId || !inBag(practiceId)) practiceId = bag[0];
-  const chips = $("pr-chips"); chips.innerHTML = "";
-  bag.forEach(id => {
-    const w = byId[id];
-    const b = document.createElement("button"); b.className = "chip"; b.setAttribute("aria-pressed", id === practiceId);
-    b.innerHTML = `<span class="pic">${w.pic}</span>${w.en}${(practiceDone[id] || 0) >= 3 ? ' <span class="done">★</span>' : ""}`;
-    b.addEventListener("click", () => { practiceId = id; renderPractice(); });
-    chips.appendChild(b);
-  });
-  renderLines(byId[practiceId]);
+  const key = bag.join(",");
+  if (startSay.key !== key) { startSay.key = key; buildPlan(); pos = 0; results = {}; }
+  renderStep();
 }
-onBagChange(() => { if (!$("practice").hidden) renderPractice(); });
-
-const LINES = [
-  { key: "q",   who: "A", note: "친구가 물어봐요" },
-  { key: "yes", who: "B", note: "가방에 있으니까 Yes!" },
-  { key: "no",  who: "B", note: "가방에 없을 때는 이렇게 말해요" },
-];
-function renderLines(w) {
-  const box = $("pr-lines"); box.innerHTML = "";
-  LINES.forEach(L => {
-    const text = sentences[L.key](w);
-    const row = document.createElement("div"); row.className = "pline";
-    row.innerHTML = `<span class="who">${L.who}</span>
-      <div class="txt">${text.split(" ").map(t => `<span class="w">${t}</span>`).join(" ")}</div>
-      <div class="ctl"><button class="spk" aria-label="듣기">🔊</button><button class="mic" aria-label="따라 말하기" ${SR ? "" : "disabled"}>🎤</button></div>
-      <div class="note">${L.note}</div>
-      <div class="result" hidden><div class="acc"><span>정확도</span><span class="pct">0%</span></div><div class="meter"><i></i></div><div class="heard"></div></div>`;
-    row.querySelector(".spk").addEventListener("click", () => speak(text));
-    const mic = row.querySelector(".mic");
-    mic.addEventListener("click", () => listen(text, row, mic, w, L.key));
-    box.appendChild(row);
-  });
+function renderStep() {
+  const st = plan[pos], text = S[st.k](st.w);
+  $("progress").innerHTML = plan.map((_, i) => `<i class="${i === pos ? "on" : results[i] >= 80 ? "done" : ""}"></i>`).join("");
+  $("s-pic").innerHTML = PIC[st.w.id];
+  const has = inBag(st.w.id);
+  $("s-tag").textContent = has ? "가방에 있어요" : "가방에 없어요"; $("s-tag").className = "tag " + (has ? "ok" : "no");
+  $("s-who").textContent = st.k === "q" ? "친구가 물어봐요" : "내가 대답해요";
+  $("s-text").innerHTML = text.split(" ").map(t => `<span class="w">${t}</span>`).join(" ");
+  $("s-result").innerHTML = "";
+  $("s-prev").disabled = pos === 0;
+  $("s-next").textContent = pos === plan.length - 1 ? "처음부터" : "다음 →";
+  speak(text);
 }
+$("s-listen").addEventListener("click", () => speak(S[plan[pos].k](plan[pos].w)));
+$("s-prev").addEventListener("click", () => { if (pos > 0) { pos--; renderStep(); } });
+$("s-next").addEventListener("click", () => { pos = (pos + 1) % plan.length; renderStep(); });
 
-// ---------- 음성 인식 + 정확도 ----------
-let rec = null;
-// 표시 단어 하나 = 비교 단어 하나가 되도록, 인식된 "do not" 은 "don't" 로 모아요.
+// 표시 단어 하나 = 비교 단어 하나가 되도록, 들린 "do not" 은 "don't" 로 모아요
 const norm = s => s.toLowerCase().replace(/’/g, "'").replace(/\bdo not\b/g, "don't").replace(/\bi am\b/g, "i'm").replace(/[^a-z0-9 ]/g, "").split(/\s+/).filter(Boolean);
-function align(target, heard) {
-  // 단어 단위 편집 거리 + 어떤 목표 단어가 맞았는지 되짚기
-  const n = target.length, m = heard.length;
+function align(t, h) {
+  const n = t.length, m = h.length;
   const d = Array.from({ length: n + 1 }, (_, i) => Array.from({ length: m + 1 }, (_, j) => i === 0 ? j : j === 0 ? i : 0));
-  for (let i = 1; i <= n; i++) for (let j = 1; j <= m; j++)
-    d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (target[i-1] === heard[j-1] ? 0 : 1));
-  const hit = Array(n).fill(false);
-  let i = n, j = m;
+  for (let i = 1; i <= n; i++) for (let j = 1; j <= m; j++) d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (t[i-1] === h[j-1] ? 0 : 1));
+  const hit = Array(n).fill(false); let i = n, j = m;
   while (i > 0 && j > 0) {
-    if (target[i-1] === heard[j-1] && d[i][j] === d[i-1][j-1]) { hit[i-1] = true; i--; j--; }
-    else if (d[i][j] === d[i-1][j-1] + 1) { i--; j--; }
-    else if (d[i][j] === d[i-1][j] + 1) i--;
-    else j--;
+    if (t[i-1] === h[j-1] && d[i][j] === d[i-1][j-1]) { hit[i-1] = true; i--; j--; }
+    else if (d[i][j] === d[i-1][j-1] + 1) { i--; j--; } else if (d[i][j] === d[i-1][j] + 1) i--; else j--;
   }
-  const acc = Math.max(0, Math.round(100 * (1 - d[n][m] / Math.max(n, m, 1))));
-  return { acc, hit };
+  return { acc: Math.max(0, Math.round(100 * (1 - d[n][m] / Math.max(n, m, 1)))), hit };
 }
-function listen(text, row, mic, w, key) {
+let rec = null;
+$("s-mic").addEventListener("click", () => {
   if (!SR) return;
   if (rec) { try { rec.abort(); } catch (e) {} }
   speechSynthesis.cancel();
+  const text = S[plan[pos].k](plan[pos].w), mic = $("s-mic"), res = $("s-result");
   rec = new SR(); rec.lang = "en-US"; rec.interimResults = false; rec.maxAlternatives = 5;
-  const res = row.querySelector(".result"), heardEl = row.querySelector(".heard");
-  mic.classList.add("on"); mic.textContent = "⏺";
-  res.hidden = false; heardEl.innerHTML = "듣고 있어요… 문장을 말해 보세요!";
+  mic.classList.add("on"); $("mic-lbl").textContent = "듣고 있어요";
+  res.innerHTML = `<div class="heard">문장을 말해 보세요…</div>`;
   rec.onresult = ev => {
-    const target = norm(text);
-    let best = { acc: -1, hit: [], said: "" };
-    for (const alt of ev.results[0]) {
-      const r = align(target, norm(alt.transcript));
-      if (r.acc > best.acc) best = { ...r, said: alt.transcript };
-    }
-    showResult(row, best, target, w, key);
+    const target = norm(text); let best = { acc: -1, hit: [], said: "" };
+    for (const alt of ev.results[0]) { const r = align(target, norm(alt.transcript)); if (r.acc > best.acc) best = { ...r, said: alt.transcript }; }
+    const g = best.acc >= 80 ? "good" : best.acc >= 50 ? "mid" : "low";
+    $("s-text").querySelectorAll(".w").forEach((el, i) => el.className = "w " + (best.hit[i] ? "hit" : "miss"));
+    res.innerHTML = `<div class="pct ${g}">${best.acc}%</div><div class="meter"><i class="${g}" style="width:${best.acc}%"></i></div>
+      <div class="heard">들린 말: <b>${best.said}</b><br>${g === "good" ? "Excellent!" : g === "mid" ? "Good try! 빨간 단어를 다시 들어 보세요." : "다시 한 번. 듣기를 누르고 천천히 말해요."}</div>`;
+    results[pos] = Math.max(results[pos] || 0, best.acc);
+    $("progress").children[pos].className = best.acc >= 80 ? "done" : "on";
+    if (g === "good") speak("Excellent!");
   };
   rec.onerror = ev => {
-    const msg = { "not-allowed": "마이크 사용을 허용해 주세요.", "no-speech": "소리가 안 들렸어요. 다시 눌러서 말해 보세요.", "audio-capture": "마이크를 찾을 수 없어요.", "network": "인터넷 연결을 확인해 주세요." }[ev.error] || "다시 한 번 해 보세요.";
-    heardEl.innerHTML = msg;
+    res.innerHTML = `<div class="heard">${{ "not-allowed": "마이크 사용을 허용해 주세요.", "no-speech": "소리가 안 들렸어요. 다시 눌러서 말해 보세요.", "audio-capture": "마이크를 찾을 수 없어요.", "network": "인터넷 연결을 확인해 주세요." }[ev.error] || "다시 한 번 해 보세요."}</div>`;
   };
-  rec.onend = () => { mic.classList.remove("on"); mic.textContent = "🎤"; rec = null; };
-  try { rec.start(); } catch (e) { heardEl.textContent = "다시 한 번 눌러 보세요."; }
-}
-function showResult(row, best, target, w, key) {
-  const pct = row.querySelector(".pct"), bar = row.querySelector(".meter i"), heardEl = row.querySelector(".heard");
-  const grade = best.acc >= 80 ? "good" : best.acc >= 50 ? "mid" : "low";
-  pct.textContent = best.acc + "%"; pct.className = "pct " + grade;
-  bar.style.width = best.acc + "%"; bar.className = grade;
-  const words = row.querySelectorAll(".txt .w");
-  words.forEach((el, i) => { el.className = "w " + (best.hit[i] ? "hit" : "miss"); });
-  const praise = grade === "good" ? "Excellent! 🎉" : grade === "mid" ? "Good try! 빨간 단어를 다시 들어 보세요." : "다시 한 번! 🔊 를 듣고 천천히 말해요.";
-  heardEl.innerHTML = `들린 말: <b>${best.said || "(없음)"}</b> · ${praise}`;
-  if (grade === "good") {
-    addScore();
-    if (!row.dataset.done) { row.dataset.done = "1"; practiceDone[w.id] = (practiceDone[w.id] || 0) + 1; if (practiceDone[w.id] >= 3) renderPractice(); }
-    speak("Excellent!");
-  }
-}
+  rec.onend = () => { mic.classList.remove("on"); $("mic-lbl").textContent = "따라 말하기"; rec = null; };
+  try { rec.start(); } catch (e) { res.innerHTML = `<div class="heard">다시 한 번 눌러 보세요.</div>`; }
+});
 
-// ---------- 탭3: 내 가방 ----------
-let lastSentence = "What's in my bag?";
-function say(en, ko) { lastSentence = en; $("say-txt").innerHTML = `${en}<span class="ko">${ko}</span>`; speak(en); }
-$("say-spk").addEventListener("click", () => speak(lastSentence));
-$("go-learn").addEventListener("click", () => showTab("learn"));
-$("reset").addEventListener("click", () => { bag.length = 0; bagChanged(); say("My bag is empty.", "내 가방은 비어 있어요."); });
-
-function listSentence() {
-  const parts = bag.map(id => withArt(byId[id]));
-  if (!parts.length) return "My bag is empty.";
-  if (parts.length === 1) return `I have ${parts[0]}.`;
-  return `I have ${parts.slice(0, -1).join(", ")} and ${parts.at(-1)}.`;
+// ---------- 3. 내 가방 ----------
+$("backpack").innerHTML = BAG_SVG + `<div class="inside" id="inside"></div>`;
+$("face").innerHTML = FACE;
+function haveSentence() {
+  const p = bag.map(id => withArt(byId[id]));
+  if (!p.length) return "My bag is empty.";
+  if (p.length === 1) return `I have ${p[0]}.`;
+  return `I have ${p.slice(0, -1).join(", ")} and ${p.at(-1)}.`;
 }
 function renderBag() {
-  const mouth = $("mouth"); mouth.innerHTML = "";
-  if (!bag.length) mouth.innerHTML = `<span class="empty">가방이 비어 있어요</span>`;
+  const inside = $("inside"); inside.innerHTML = "";
+  if (!bag.length) inside.innerHTML = `<span class="none">비어 있어요</span>`;
   bag.forEach(id => {
-    const w = byId[id];
-    const b = document.createElement("button"); b.className = "initem"; b.title = w.en + " 꺼내기"; b.innerHTML = w.pic;
-    b.addEventListener("click", () => { takeOut(id); say(`I don't have ${withArt(w)}.`, `나는 ${w.ko}이(가) 없어요.`); });
-    mouth.appendChild(b);
+    const b = document.createElement("button"); b.innerHTML = PIC[id]; b.title = byId[id].en + " 꺼내기"; b.setAttribute("aria-label", byId[id].en + " 꺼내기");
+    b.addEventListener("click", () => { takeOut(id); speak(`I don't have ${withArt(byId[id])}.`); });
+    inside.appendChild(b);
   });
-  $("count").textContent = `${bag.length} item${bag.length === 1 ? "" : "s"}`;
-  const list = $("baglist"); list.innerHTML = "";
-  if (!bag.length) list.innerHTML = `<div class="hint" style="margin:0">아직 아무것도 없어요. 1번에서 물건을 넣어 보세요.</div>`;
-  bag.forEach(id => {
-    const w = byId[id];
-    const li = document.createElement("div"); li.className = "li";
-    li.innerHTML = `<span class="pic">${w.pic}</span><span>I have ${withArt(w)}.</span><button class="out">꺼내기</button>`;
-    li.querySelector("span:nth-child(2)").addEventListener("click", () => speak(`I have ${withArt(w)}.`));
-    li.querySelector(".out").addEventListener("click", () => { takeOut(id); say(`I don't have ${withArt(w)}.`, `나는 ${w.ko}이(가) 없어요.`); });
-    list.appendChild(li);
-  });
-  const all = document.createElement("div"); all.className = "li";
-  all.innerHTML = `<span class="pic">🎒</span><span>${listSentence()}</span><button class="out">🔊</button>`;
-  all.querySelector(".out").addEventListener("click", () => speak(listSentence()));
-  list.appendChild(all);
+  $("have-s").innerHTML = `${haveSentence()}<small>${bag.length ? "물건을 누르면 꺼내요" : "1번에서 물건을 넣어 보세요"}</small>`;
 }
-onBagChange(renderBag);
-// 가방에 새 물건이 들어오면 3번 탭의 가방이 통통 튀어요
-onBagChange(() => { const b = $("bag"); b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop"); });
+$("have-play").addEventListener("click", () => speak(haveSentence()));
+$("bag-reset").addEventListener("click", () => { bag.length = 0; changed(); speak("My bag is empty."); });
+onBag(renderBag);
 
-// ---------- 탭3: 친구가 물어봐요 ----------
-let askWord = WORDS[0], answered = false;
-const FACES = ["🙋", "🧒", "👧", "👦", "🧑‍🎓"];
-function nextAsk(speakIt = true) {
-  const inside = WORDS.filter(w => inBag(w.id)), outside = WORDS.filter(w => !inBag(w.id));
-  const pool = inside.length && Math.random() < 0.5 ? inside : outside.length ? outside : inside;
-  askWord = pool[Math.floor(Math.random() * pool.length)];
-  answered = false;
-  $("ask").textContent = sentences.q(askWord);
-  $("ask-fb").textContent = ""; $("ask-fb").className = "feedback";
-  $("face").textContent = FACES[Math.floor(Math.random() * FACES.length)];
-  if (speakIt) speak(sentences.q(askWord));
+let askW = WORDS[0], answered = false;
+function nextAsk(sayIt = true) {
+  const ins = WORDS.filter(w => inBag(w.id)), outs = WORDS.filter(w => !inBag(w.id));
+  const pool = ins.length && Math.random() < 0.5 ? ins : outs.length ? outs : ins;
+  askW = pool[Math.floor(Math.random() * pool.length)]; answered = false;
+  $("ask-t").textContent = S.q(askW); $("ask-fb").textContent = ""; $("ask-fb").className = "fb";
+  if (sayIt) speak(S.q(askW));
 }
 function answer(yes) {
   if (answered) return;
-  const truth = inBag(askWord.id);
-  if (yes === truth) {
-    answered = true; addScore();
-    const s = yes ? sentences.yes(askWord) : sentences.no(askWord);
-    $("ask-fb").textContent = "정답! " + s; $("ask-fb").className = "feedback ok";
-    const st = $("stars"); st.textContent += "⭐"; if (st.textContent.length > 20) st.textContent = "⭐";
-    speak(s);
-  } else {
-    $("ask-fb").textContent = truth ? `가방을 다시 봐요! ${askWord.ko}이(가) 있어요.` : `가방을 다시 봐요! ${askWord.ko}이(가) 없어요.`;
-    $("ask-fb").className = "feedback bad"; speak("Look in your bag!");
-  }
+  const truth = inBag(askW.id);
+  if (yes === truth) { answered = true; const s = yes ? S.yes(askW) : S.no(askW); $("ask-fb").textContent = s; $("ask-fb").className = "fb ok"; speak(s); }
+  else { $("ask-fb").textContent = truth ? `가방을 다시 봐요. ${askW.ko}이(가) 있어요.` : `가방을 다시 봐요. ${askW.ko}이(가) 없어요.`; $("ask-fb").className = "fb bad"; speak("Look in your bag."); }
 }
 $("ans-yes").addEventListener("click", () => answer(true));
 $("ans-no").addEventListener("click", () => answer(false));
 $("ask-next").addEventListener("click", () => nextAsk());
-$("ask-spk").addEventListener("click", () => speak(sentences.q(askWord)));
+$("ask-play").addEventListener("click", () => speak(S.q(askW)));
 
 // ---------- 시작 ----------
-renderMini(); renderCards(); renderBag(); nextAsk(false);
-let startTab = "learn";
-try { const t = localStorage.getItem("bag-tab"); if (["learn", "practice", "pack"].includes(t)) startTab = t; } catch (e) {}
-showTab(startTab);
+watchers.forEach(fn => fn());
+nextAsk(false);
+let first = "learn";
+try { const t = localStorage.getItem("bag-tab"); if (["learn", "say", "bag"].includes(t)) first = t; } catch (e) {}
+show(first);
 </script>
 </body>
 </html>
