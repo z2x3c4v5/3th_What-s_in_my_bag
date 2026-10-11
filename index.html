@@ -157,15 +157,15 @@ button:focus-visible, [tabindex]:focus-visible { outline: 4px solid var(--sun); 
 .bagstage .holder { position: relative; }
 .bagstage svg.back { width: 100%; height: auto; }
 .bagstage svg.front { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-.bagstage svg.front .hit { pointer-events: visiblePainted; cursor: pointer; }
-.bagstage .items { position: absolute; inset: 0; }
+.bagstage svg.back .hit { cursor: pointer; }
+.bagstage .items { position: absolute; left: 17.333%; top: 42.941%; width: 65.333%; height: 48.824%; border-radius: 17.35% / 20.48%; overflow: hidden; }
 /* 버튼 상자는 클릭을 받지 않고, 그림의 칠해진 부분만 눌려요 (겹친 물건도 보이는 곳을 누르면 돼요) */
-.bagstage .it { position: absolute; aspect-ratio: 1; padding: 0; border: 0; background: transparent; transform: rotate(var(--r)); transform-origin: 50% 90%; pointer-events: none; }
-.bagstage .it svg { width: 100%; height: 100%; filter: drop-shadow(0 5px 4px rgba(40,20,10,.35)); }
+.bagstage .it { position: absolute; aspect-ratio: 1; padding: 0; border: 0; background: transparent; transform: rotate(var(--r)); transform-origin: 50% 80%; pointer-events: none; }
+.bagstage .it svg { width: 100%; height: 100%; filter: drop-shadow(0 4px 3px rgba(58,46,92,.3)); }
 .bagstage .it svg * { pointer-events: visiblePainted; cursor: pointer; }
 .bagstage .it.new { animation: fall .75s cubic-bezier(.3,1.4,.5,1) both; }
 .bagstage .it.wig { animation: shake .5s; }
-@keyframes fall { 0% { transform: translateY(-160%) rotate(calc(var(--r) - 30deg)); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(0) rotate(var(--r)); } }
+@keyframes fall { 0% { transform: translateY(-240%) rotate(calc(var(--r) - 25deg)); } 100% { transform: translateY(0) rotate(var(--r)); } }
 @keyframes shake { 25% { transform: translateY(-12%) rotate(calc(var(--r) - 10deg)) scale(1.08); } 75% { transform: translateY(-12%) rotate(calc(var(--r) + 10deg)) scale(1.08); } }
 .bagstage.squish .holder { animation: squish .5s; transform-origin: 50% 100%; }
 .bag-count { position: absolute; top: 2px; left: 2%; z-index: 5; font-family: var(--font-en); font-weight: 700; font-size: 1.3rem; color: #fff; background: var(--pink); border-radius: 999px; padding: 4px 14px; box-shadow: 0 4px 0 var(--pink-d); font-variant-numeric: tabular-nums; }
@@ -348,33 +348,44 @@ const PIC = { ...FLUENT, ...CUSTOM };
 // ---------- 곰돌이 백팩: 뒷판 / (물건) / 앞판 세 겹 ----------
 // 색은 CSS 변수 --bag-1..5 를 따라가요 (가방 색 고르기)
 const GV = (id, a, b, x2 = 0, y2 = 1) => `<linearGradient id="${id}" x1="0" y1="0" x2="${x2}" y2="${y2}"><stop offset="0" style="stop-color:${a}"/><stop offset="1" style="stop-color:${b}"/></linearGradient>`;
-const BAG_DEFS = GV("bagM", "var(--bag-1)", "var(--bag-2)") + GV("bagF", "var(--bag-1)", "var(--bag-2)", .3, 1) + GV("bagD", "var(--bag-2)", "var(--bag-5)")
-  + GV("bagIn", "var(--bag-3)", "#1d1220") + GV("bagFace", "#ffffff", "var(--bag-4)");
+const BAG_DEFS = GV("bagM", "var(--bag-1)", "var(--bag-2)") + GV("bagD", "var(--bag-2)", "var(--bag-5)")
+  + GV("bagWin", "var(--bag-4)", "#ffffff")
+  + `<linearGradient id="winShade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a2e5c" stop-opacity=".22"/><stop offset="1" stop-color="#3a2e5c" stop-opacity="0"/></linearGradient>`
+  + `<linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset=".4" stop-color="#fff" stop-opacity=".06"/><stop offset=".75" stop-color="#fff" stop-opacity=".03"/><stop offset="1" stop-color="#fff" stop-opacity=".22"/></linearGradient>`;
+// 투명 창 위치 (viewBox 300 x 340 기준). 물건은 이 창 안에 들어가요.
+const WIN = { x: 52, y: 146, w: 196, h: 166, r: 34 };
 const BAG_BACK = `
-  <rect x="16" y="214" width="34" height="84" rx="17" style="fill:var(--bag-5)"/><rect x="250" y="214" width="34" height="84" rx="17" style="fill:var(--bag-5)"/>
-  <rect x="21" y="226" width="24" height="10" rx="5" fill="rgba(255,255,255,.35)"/><rect x="255" y="226" width="24" height="10" rx="5" fill="rgba(255,255,255,.35)"/>
-  <path d="M114 70c0-30 16-48 36-48s36 18 36 48" fill="none" stroke="url(#bagD)" stroke-width="16" stroke-linecap="round"/>
-  <circle cx="68" cy="76" r="34" fill="url(#bagM)"/><circle cx="68" cy="76" r="18" style="fill:var(--bag-4)"/>
-  <circle cx="232" cy="76" r="34" fill="url(#bagM)"/><circle cx="232" cy="76" r="18" style="fill:var(--bag-4)"/>
-  <rect x="34" y="54" width="232" height="266" rx="76" fill="url(#bagM)"/>
-  <path d="M72 108c12-24 34-38 62-42" stroke="rgba(255,255,255,.55)" stroke-width="9" fill="none" stroke-linecap="round"/>
-  <ellipse cx="150" cy="176" rx="110" ry="36" fill="url(#bagIn)"/>
-  <path d="M40 176a110 36 0 0 1 220 0" fill="none" stroke="url(#bagD)" stroke-width="7"/>`;
+  <rect x="14" y="196" width="34" height="104" rx="17" style="fill:var(--bag-5)"/><rect x="252" y="196" width="34" height="104" rx="17" style="fill:var(--bag-5)"/>
+  <rect x="19" y="210" width="24" height="10" rx="5" fill="rgba(255,255,255,.35)"/><rect x="257" y="210" width="24" height="10" rx="5" fill="rgba(255,255,255,.35)"/>
+  <path d="M112 72c0-32 17-52 38-52s38 20 38 52" fill="none" stroke="url(#bagD)" stroke-width="16" stroke-linecap="round"/>
+  <circle cx="70" cy="74" r="32" fill="url(#bagM)"/><circle cx="70" cy="74" r="17" style="fill:var(--bag-4)"/>
+  <circle cx="230" cy="74" r="32" fill="url(#bagM)"/><circle cx="230" cy="74" r="17" style="fill:var(--bag-4)"/>
+  <rect x="30" y="52" width="240" height="282" rx="72" fill="url(#bagM)"/>
+  <path d="M64 100c10-22 30-36 56-40" stroke="rgba(255,255,255,.55)" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <g class="hit">
+    <rect x="86" y="76" width="128" height="62" rx="28" fill="transparent"/>
+    <circle cx="123" cy="102" r="8.5" fill="#3a2a2a"/><circle cx="177" cy="102" r="8.5" fill="#3a2a2a"/>
+    <circle cx="126" cy="99" r="3" fill="#fff"/><circle cx="180" cy="99" r="3" fill="#fff"/>
+    <ellipse cx="150" cy="114" rx="9" ry="6.2" fill="#3a2a2a"/><ellipse cx="147.5" cy="112" rx="2.6" ry="1.6" fill="rgba(255,255,255,.6)"/>
+    <path d="M138.5 123q5.75 7 11.5 0q5.75 7 11.5 0" stroke="#3a2a2a" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+    <ellipse cx="104" cy="118" rx="11" ry="7" fill="#ff8fab" opacity=".6"/><ellipse cx="196" cy="118" rx="11" ry="7" fill="#ff8fab" opacity=".6"/>
+  </g>
+  <rect x="42" y="136" width="216" height="186" rx="42" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="2.5" stroke-dasharray="7 7"/>
+  <rect x="${WIN.x}" y="${WIN.y}" width="${WIN.w}" height="${WIN.h}" rx="${WIN.r}" fill="url(#bagWin)"/>
+  ${[[78,176],[124,168],[176,172],[222,182],[96,214],[150,206],[206,220],[74,256],[128,250],[184,258],[228,262],[104,292],[160,290],[214,296]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="4" style="fill:var(--bag-2)" opacity=".18"/>`).join("")}
+  <path d="M${WIN.x} ${WIN.y + 44}V${WIN.y + WIN.r}a${WIN.r} ${WIN.r} 0 0 1 ${WIN.r} -${WIN.r}H${WIN.x + WIN.w - WIN.r}a${WIN.r} ${WIN.r} 0 0 1 ${WIN.r} ${WIN.r}V${WIN.y + 44}z" fill="url(#winShade)"/>`;
+// 앞판 = 투명 비닐 창: 살짝 비치는 막, 반짝이는 줄, 두꺼운 테두리. 물건 위에 겹쳐져요.
 const BAG_FRONT = `
-  <path class="hit" d="M34 190 Q150 228 266 190 V244 a76 76 0 0 1 -76 76 H110 a76 76 0 0 1 -76 -76 Z" fill="url(#bagF)"/>
-  <path d="M36 193 Q150 231 264 193" fill="none" stroke="url(#bagD)" stroke-width="9" stroke-linecap="round"/>
-  <path d="M46 206 Q150 242 254 206" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="3" stroke-dasharray="7 7" stroke-linecap="round"/>
-  <rect x="232" y="198" width="9" height="18" rx="4.5" fill="#c9c3d6"/>
-  <path d="M236.5 242c-11-7.5-16-13-16-18.5a8 8 0 0 1 16-2.3 8 8 0 0 1 16 2.3c0 5.5-5 11-16 18.5z" fill="#ff6fa8" stroke="#fff" stroke-width="2.5"/>
-  <path d="M60 238l3.6 7.2 8 1.2-5.8 5.6 1.4 8-7.2-3.8-7.2 3.8 1.4-8-5.8-5.6 8-1.2z" fill="#ffc93c" stroke="#fff" stroke-width="2"/>
-  <ellipse class="hit" cx="150" cy="272" rx="76" ry="40" fill="url(#bagFace)" style="stroke:var(--bag-2)" stroke-width="4"/>
-  <circle cx="124" cy="266" r="8.5" fill="#3a2a2a"/><circle cx="176" cy="266" r="8.5" fill="#3a2a2a"/>
-  <circle cx="127" cy="263" r="3" fill="#fff"/><circle cx="179" cy="263" r="3" fill="#fff"/>
-  <ellipse cx="150" cy="278" rx="9" ry="6.2" fill="#3a2a2a"/><ellipse cx="147.5" cy="276" rx="2.6" ry="1.6" fill="rgba(255,255,255,.6)"/>
-  <path d="M138.5 287q5.75 7 11.5 0q5.75 7 11.5 0" stroke="#3a2a2a" stroke-width="3.2" fill="none" stroke-linecap="round"/>
-  <ellipse cx="106" cy="282" rx="11" ry="7" fill="#ff8fab" opacity=".55"/><ellipse cx="194" cy="282" rx="11" ry="7" fill="#ff8fab" opacity=".55"/>
-  <path d="M50 262c2 16 8 30 20 40" stroke="rgba(255,255,255,.4)" stroke-width="8" fill="none" stroke-linecap="round"/>`;
-const BAG_ICON = `<svg viewBox="0 0 300 330" xmlns="http://www.w3.org/2000/svg">${BAG_BACK}${BAG_FRONT}</svg>`;
+  <rect x="${WIN.x}" y="${WIN.y}" width="${WIN.w}" height="${WIN.h}" rx="${WIN.r}" fill="url(#glass)"/>
+  <path d="M66 298 L138 152 H164 L92 298 Z" fill="#fff" opacity=".16"/>
+  <path d="M112 298 L160 202 H174 L126 298 Z" fill="#fff" opacity=".12"/>
+  <path d="M206 160 q26 4 34 30" stroke="#fff" stroke-width="7" stroke-linecap="round" fill="none" opacity=".8"/>
+  <path d="M232 204 v14" stroke="#fff" stroke-width="7" stroke-linecap="round" opacity=".6"/>
+  <rect x="${WIN.x}" y="${WIN.y}" width="${WIN.w}" height="${WIN.h}" rx="${WIN.r}" fill="none" stroke="url(#bagD)" stroke-width="10"/>
+  <rect x="140" y="138" width="20" height="10" rx="5" fill="#c9c3d6"/>
+  <path d="M150 168c-11-7.5-16-13-16-18.5a8 8 0 0 1 16-2.3 8 8 0 0 1 16 2.3c0 5.5-5 11-16 18.5z" fill="#ff6fa8" stroke="#fff" stroke-width="2.5"/>
+  <path d="M42 300l3.6 7.2 8 1.2-5.8 5.6 1.4 8-7.2-3.8-7.2 3.8 1.4-8-5.8-5.6 8-1.2z" fill="#ffc93c" stroke="#fff" stroke-width="2"/>`;
+const BAG_ICON = `<svg viewBox="0 0 300 340" xmlns="http://www.w3.org/2000/svg">${BAG_BACK}${BAG_FRONT}</svg>`;
 const BAG_COLORS = {
   yellow: ["#ffd75e", "#f5a623", "#6b3f1f", "#fff4d6", "#e08a12"],
   pink:   ["#ffb6d0", "#ff7aa8", "#6e2343", "#fff0f5", "#ec5f93"],
@@ -555,15 +566,14 @@ onBag(() => {
 });
 
 // ---------- 2. 내 가방 ----------
-$("holder").innerHTML = `<svg class="back" viewBox="0 0 300 330" xmlns="http://www.w3.org/2000/svg">${BAG_BACK}</svg><div class="items" id="items"></div><svg class="front" viewBox="0 0 300 330" xmlns="http://www.w3.org/2000/svg">${BAG_FRONT}</svg>`;
-// 물건 자리: [가운데 x, 바닥 y, 기울기, 크기(가방 폭의 %), 앞줄이면 1]
-// 4~5개일 때는 뒷줄을 높이, 앞줄을 낮게 세워서 모든 물건이 보이게 해요. 아랫부분은 가방 앞판에 가려져요.
+$("holder").innerHTML = `<svg class="back" viewBox="0 0 300 340" xmlns="http://www.w3.org/2000/svg">${BAG_BACK}</svg><div class="items" id="items"></div><svg class="front" viewBox="0 0 300 340" xmlns="http://www.w3.org/2000/svg">${BAG_FRONT}</svg>`;
+// 물건 자리: [가운데 x, 바닥 y, 기울기, 크기] (viewBox 단위). 투명 창 바닥부터 쌓여요: 아랫줄 3개, 그 위에 2개.
 const LAYOUT = {
-  1: [[150, 222, -4, 40, 1]],
-  2: [[108, 222, -12, 37, 1], [192, 222, 12, 37, 1]],
-  3: [[150, 190, 0, 34, 0], [92, 228, -15, 34, 1], [208, 228, 15, 34, 1]],
-  4: [[84, 190, -18, 31, 0], [216, 190, 18, 31, 0], [118, 234, -7, 31, 1], [182, 234, 7, 31, 1]],
-  5: [[78, 190, -20, 30, 0], [150, 176, 0, 30, 0], [222, 190, 20, 30, 0], [112, 236, -8, 30, 1], [188, 236, 8, 30, 1]],
+  1: [[150, 304, -6, 104]],
+  2: [[106, 304, -8, 84], [194, 304, 8, 84]],
+  3: [[98, 304, -6, 74], [202, 304, 6, 74], [150, 246, 4, 74]],
+  4: [[102, 304, -6, 72], [198, 304, 6, 72], [102, 238, 8, 72], [198, 238, -8, 72]],
+  5: [[87, 306, -6, 68], [150, 306, 4, 68], [213, 306, -4, 68], [118, 244, 10, 68], [182, 244, -10, 68]],
 };
 const SWATCH_KO = { yellow: "노란 가방!", pink: "분홍 가방!", mint: "초록 가방!", sky: "파란 가방!", purple: "보라 가방!" };
 let sayTimer = null;
@@ -572,16 +582,16 @@ function bearSay(text, ko = false) {
   clearTimeout(sayTimer); sayTimer = setTimeout(() => b.classList.add("hide"), 2200);
 }
 function squish() { const s = $("bagstage"); s.classList.remove("squish"); void s.offsetWidth; s.classList.add("squish"); }
-$("holder").querySelectorAll(".front .hit").forEach(h => h.addEventListener("click", () => {
+$("holder").querySelectorAll(".back .hit").forEach(h => h.addEventListener("click", () => {
   bearSay(bag.length ? `물건이 ${bag.length}개 들어 있어요!` : "가방이 비어 있어요!", true); squish();
 }));
 function sayWord(w) { speak(w.en); bearSay(`${w.en}!`); }
 function renderBag() {
   const slots = LAYOUT[bag.length] || [];
   $("items").innerHTML = bag.map((id, i) => {
-    const [x, bottom, r, size, front] = slots[i], u = size * 3;          // 크기를 viewBox 단위로
-    const left = (x - u / 2) / 300 * 100, top = (bottom - u) / 330 * 100;
-    return `<button class="it${id === lastAdded ? " new" : ""}" data-id="${id}" style="left:${left}%;top:${top}%;width:${size}%;--r:${r}deg;z-index:${front ? 3 : 1}" aria-label="${byId[id].en} 듣기">${PIC[id]}</button>`;
+    const [x, bottom, r, u] = slots[i];
+    const left = (x - u / 2 - WIN.x) / WIN.w * 100, top = (bottom - u - WIN.y) / WIN.h * 100, width = u / WIN.w * 100;
+    return `<button class="it${id === lastAdded ? " new" : ""}" data-id="${id}" style="left:${left}%;top:${top}%;width:${width}%;--r:${r}deg;z-index:${i}" aria-label="${byId[id].en} 듣기">${PIC[id]}</button>`;
   }).join("");
   $("items").querySelectorAll(".it").forEach(b => {
     b.addEventListener("animationend", () => b.classList.remove("new", "wig"));
