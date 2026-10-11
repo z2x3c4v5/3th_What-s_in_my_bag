@@ -6,7 +6,7 @@
 <title>What's in my bag?</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800&family=Noto+Sans+KR:wght@400;500;700&display=swap">
 <style>
-/* Layout: one centered column, three steps. Each step shows one thing: the shelf of items, one sentence to say, the bag. */
+/* Layout: one centered column, three steps (words → my bag → speaking). One bag with five slots is shared by all three. */
 :root {
   --bg: #f4f3ef;
   --panel: #ffffff;
@@ -37,9 +37,9 @@
 html, body { height: 100%; }
 body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-ko); font-size: 17px; line-height: 1.5; -webkit-tap-highlight-color: transparent; user-select: none; }
 button { font: inherit; color: inherit; }
-.wrap { max-width: 780px; margin: 0 auto; padding-block: 18px 150px; padding-inline: 16px; }
+svg { display: block; }
+.wrap { max-width: 820px; margin: 0 auto; padding-block: 18px 150px; padding-inline: 16px; }
 
-/* Header + steps */
 header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
 h1 { font-family: var(--font-en); font-weight: 800; font-size: 1.5rem; margin: 0; letter-spacing: -.01em; }
 .steps { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 4px; gap: 4px; }
@@ -51,177 +51,176 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--soft);
 .panel { margin-top: 18px; }
 .lead { color: var(--muted); font-size: .95rem; margin: 0 0 14px; }
 
-/* Step 1: shelf */
-.dialog { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; display: grid; gap: 6px; margin-bottom: 16px; }
-.dialog .l { display: grid; grid-template-columns: 2.2em 1fr auto; align-items: center; gap: 10px; font-family: var(--font-en); font-weight: 700; font-size: 1.2rem; }
-.dialog .who { font-family: var(--font-ko); font-size: .8rem; color: var(--muted); font-weight: 700; }
-.dialog .l em { font-style: normal; color: var(--accent); }
+/* shared bits */
 .play { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: var(--panel); cursor: pointer; display: inline-grid; place-items: center; flex: none; }
 .play svg { width: 16px; height: 16px; fill: var(--fg); }
 .play:active { transform: scale(.94); }
-
-.shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-.item { position: relative; background: var(--panel); border: 2px solid var(--line); border-radius: 16px; padding: 14px 10px 12px; display: grid; justify-items: center; gap: 2px; cursor: grab; text-align: center; touch-action: none; }
-.item .pic { width: 84px; height: 84px; }
-.item .pic svg { width: 100%; height: 100%; display: block; }
-.item .en { font-family: var(--font-en); font-weight: 800; font-size: 1.1rem; margin-top: 4px; }
-.item .ko { color: var(--muted); font-size: .85rem; }
-.item.active { border-color: var(--accent); }
-.item.inbag { border-color: var(--ok); }
-.item .add { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; border-radius: 50%; border: 0; background: var(--soft); color: var(--accent); font-family: var(--font-en); font-weight: 800; font-size: 1.1rem; cursor: pointer; display: grid; place-items: center; line-height: 1; }
-.item.inbag .add { background: var(--ok); color: #fff; }
-.drag-ghost { position: fixed; z-index: 50; pointer-events: none; width: 84px; height: 84px; transform: translate(-50%, -50%) scale(1.1); filter: drop-shadow(0 8px 10px rgba(0,0,0,.25)); }
-.drag-ghost svg { width: 100%; height: 100%; }
-
-/* Bag dock (drop target), shown on steps 1 and 2 */
-.dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background: var(--panel); border-top: 1px solid var(--line); transition: background .15s; }
-.dock .in { max-width: 780px; margin: 0 auto; display: flex; align-items: center; gap: 14px; cursor: pointer; }
-.dock .bagico { width: 64px; height: 64px; flex: none; }
-.dock .bagico svg { width: 100%; height: 100%; display: block; }
-.dock .items { display: flex; gap: 6px; flex: 1; min-width: 0; overflow: hidden; }
-.dock .items span { width: 40px; height: 40px; flex: none; }
-.dock .items svg { width: 100%; height: 100%; }
-.dock .items .more { display: grid; place-items: center; font-family: var(--font-en); font-weight: 800; color: var(--muted); font-size: .9rem; }
-.dock .txt { text-align: right; flex: none; }
-.dock .txt b { display: block; font-family: var(--font-en); font-size: 1.1rem; font-variant-numeric: tabular-nums; }
-.dock .txt small { color: var(--muted); font-size: .8rem; }
-.dock.over { background: var(--soft); }
-.dock.pop .bagico { animation: pop .3s; }
-@keyframes pop { 40% { transform: scale(1.12) rotate(-4deg); } }
-
-/* Step 2: one sentence at a time */
-.empty { background: var(--panel); border: 1px dashed var(--line); border-radius: 16px; padding: 36px 16px; text-align: center; display: grid; gap: 12px; justify-items: center; color: var(--muted); }
-.empty .bagico { width: 96px; height: 96px; }
-.progress { display: flex; gap: 6px; justify-content: center; margin-bottom: 14px; flex-wrap: wrap; }
-.progress i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
-.progress i.on { background: var(--accent); }
-.progress i.done { background: var(--ok); }
-.stage { background: var(--panel); border: 1px solid var(--line); border-radius: 20px; padding: 24px 20px; display: grid; justify-items: center; gap: 14px; text-align: center; }
-.stage .pic { width: 150px; height: 150px; }
-.stage .pic svg { width: 100%; height: 100%; }
-.tag { font-size: .8rem; font-weight: 700; color: var(--muted); background: var(--bg); border-radius: 999px; padding: 4px 12px; }
-.tag.ok { color: var(--ok); } .tag.no { color: var(--bad); }
-.stage .who { font-size: .85rem; color: var(--muted); font-weight: 700; }
-.sentence { font-family: var(--font-en); font-weight: 800; font-size: clamp(1.5rem, 5vw, 2.1rem); line-height: 1.3; text-wrap: balance; max-width: 22ch; }
-.sentence .w { display: inline-block; border-radius: 6px; padding: 0 .08em; }
-.sentence .w.hit { color: var(--ok); }
-.sentence .w.miss { color: var(--bad); text-decoration: underline wavy; text-underline-offset: 4px; }
-.controls { display: flex; align-items: center; gap: 14px; margin-top: 6px; }
-.round { border: 0; border-radius: 50%; cursor: pointer; display: grid; place-items: center; }
-.round svg { fill: currentColor; }
-.listen { width: 64px; height: 64px; background: var(--soft); color: var(--accent); }
-.listen svg { width: 26px; height: 26px; }
-.mic { width: 84px; height: 84px; background: var(--accent); color: var(--accent-ink); box-shadow: 0 8px 20px rgba(36, 88, 230, .3); }
-.mic svg { width: 36px; height: 36px; }
-.mic.on { background: var(--bad); box-shadow: 0 0 0 0 rgba(214,69,69,.4); animation: pulse 1.1s infinite; }
-@keyframes pulse { 70% { box-shadow: 0 0 0 18px rgba(214,69,69,0); } 100% { box-shadow: 0 0 0 0 rgba(214,69,69,0); } }
-.mic:disabled { opacity: .35; box-shadow: none; cursor: default; }
-.lbl { font-size: .8rem; color: var(--muted); font-weight: 700; }
-.result { width: 100%; max-width: 420px; display: grid; gap: 8px; min-height: 64px; }
-.pct { font-family: var(--font-en); font-weight: 800; font-size: 2rem; line-height: 1; font-variant-numeric: tabular-nums; }
-.pct.good { color: var(--ok); } .pct.mid { color: #c48a00; } .pct.low { color: var(--bad); }
-.meter { height: 10px; border-radius: 999px; background: var(--line); overflow: hidden; }
-.meter i { display: block; height: 100%; width: 0; background: var(--bad); border-radius: 999px; transition: width .4s; }
-.meter i.mid { background: #e6a800; } .meter i.good { background: var(--ok); }
-.heard { font-size: .9rem; color: var(--muted); }
-.heard b { color: var(--fg); font-weight: 500; }
-.nav { display: flex; justify-content: space-between; gap: 10px; margin-top: 14px; }
 .btn { font-weight: 700; font-size: 1rem; border: 1px solid var(--line); border-radius: 12px; padding: 12px 20px; cursor: pointer; background: var(--panel); color: var(--fg); }
 .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .btn.yes { background: var(--ok); color: #fff; border-color: var(--ok); }
 .btn.no { background: var(--bad); color: #fff; border-color: var(--bad); }
 .btn.big { font-family: var(--font-en); font-size: 1.2rem; padding: 14px 24px; flex: 1; }
-.warn { background: var(--soft); border-radius: 12px; padding: 10px 14px; font-size: .9rem; margin-bottom: 14px; }
+.btn:disabled { opacity: .45; cursor: default; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; }
 
-/* Step 3: the bag */
+/* 1. words */
+.dialog { display: grid; gap: 6px; margin-bottom: 16px; }
+.dialog .l { display: grid; grid-template-columns: 2.2em 1fr auto; align-items: center; gap: 10px; font-family: var(--font-en); font-weight: 700; font-size: 1.2rem; }
+.dialog .who { font-family: var(--font-ko); font-size: .8rem; color: var(--muted); font-weight: 700; }
+.dialog em { font-style: normal; color: var(--accent); }
+.shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.item { background: var(--panel); border: 2px solid var(--line); border-radius: 16px; padding: 14px 10px 10px; display: grid; justify-items: center; gap: 2px; cursor: grab; text-align: center; touch-action: none; }
+.item .pic { width: 84px; height: 84px; }
+.item .pic svg { width: 100%; height: 100%; }
+.item .en { font-family: var(--font-en); font-weight: 800; font-size: 1.1rem; margin-top: 4px; }
+.item .ko { color: var(--muted); font-size: .85rem; }
+.item.active { border-color: var(--accent); }
+.item.inbag { border-color: var(--ok); }
+.item .put { margin-top: 8px; width: 100%; border: 0; border-radius: 10px; padding: 9px 8px; font-weight: 700; font-size: .9rem; cursor: pointer; background: var(--soft); color: var(--accent); }
+.item.inbag .put { background: var(--ok); color: #fff; }
+.item .put:disabled { background: var(--line); color: var(--muted); cursor: default; }
+.drag-ghost { position: fixed; z-index: 50; pointer-events: none; width: 84px; height: 84px; transform: translate(-50%, -50%) scale(1.1); filter: drop-shadow(0 8px 10px rgba(0,0,0,.25)); }
+.drag-ghost svg { width: 100%; height: 100%; }
+
+/* bag dock, shown on steps 1 and 3 */
+.dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); background: var(--panel); border-top: 1px solid var(--line); transition: background .15s; }
+.dock .in { max-width: 820px; margin: 0 auto; display: flex; align-items: center; gap: 14px; cursor: pointer; }
+.dock .bagico { width: 60px; height: 60px; flex: none; }
+.dock .bagico svg { width: 100%; height: 100%; }
+.slots { display: flex; gap: 6px; flex: 1; min-width: 0; }
+.slot { width: 46px; height: 46px; border-radius: 12px; border: 2px dashed var(--line); display: grid; place-items: center; flex: none; }
+.slot.filled { border: 2px solid var(--line); background: var(--bg); }
+.slot svg { width: 36px; height: 36px; }
+.dock .txt { text-align: right; flex: none; }
+.dock .txt b { display: block; font-family: var(--font-en); font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.dock .txt small { color: var(--muted); font-size: .8rem; }
+.dock.over { background: var(--soft); }
+.dock.pop .bagico { animation: pop .3s; }
+.dock.full .txt b { color: var(--ok); }
+@keyframes pop { 40% { transform: scale(1.12) rotate(-4deg); } }
+
+/* 2. my bag */
 .bagview { display: grid; justify-items: center; gap: 16px; }
-.backpack { position: relative; width: min(100%, 360px); }
-.backpack > svg { width: 100%; height: auto; display: block; }
-.inside { position: absolute; left: 18%; right: 18%; top: 18%; height: 29%; display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-end; gap: 2px; padding: 4px; overflow: hidden; }
-.inside button { width: 30%; aspect-ratio: 1; border: 0; background: transparent; padding: 0; cursor: pointer; animation: drop .4s; }
-.inside button svg { width: 100%; height: 100%; filter: drop-shadow(0 2px 2px rgba(0,0,0,.4)); }
-.inside button:hover { transform: translateY(-3px); }
+.backpack { position: relative; width: min(100%, 380px); }
+.backpack > svg { width: 100%; height: auto; }
+.inside { position: absolute; left: 12%; right: 12%; top: 20%; height: 42%; display: grid; grid-template-columns: repeat(6, 1fr); gap: 3% 2%; padding: 3% 5%; align-content: space-evenly; }
+.inside .s { aspect-ratio: 1; border-radius: 14px; border: 2px dashed rgba(255,255,255,.35); display: grid; place-items: center; }
+.inside .s:nth-child(1) { grid-column: 1 / 3; } .inside .s:nth-child(2) { grid-column: 3 / 5; } .inside .s:nth-child(3) { grid-column: 5 / 7; }
+.inside .s:nth-child(4) { grid-column: 2 / 4; } .inside .s:nth-child(5) { grid-column: 4 / 6; }
+.inside .s button { width: 100%; height: 100%; border: 0; background: transparent; padding: 6%; cursor: pointer; animation: drop .4s; }
+.inside .s button svg { width: 100%; height: 100%; filter: drop-shadow(0 3px 3px rgba(0,0,0,.45)); }
+.inside .s button:hover { transform: translateY(-3px); }
 @keyframes drop { from { transform: translateY(-30px); opacity: 0; } }
-.inside .none { align-self: center; color: rgba(255,255,255,.6); font-size: .9rem; }
-.have { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; width: 100%; display: flex; align-items: center; gap: 12px; }
+.have { width: 100%; display: flex; align-items: center; gap: 12px; }
 .have .s { font-family: var(--font-en); font-weight: 700; font-size: 1.15rem; flex: 1; min-width: 0; }
 .have .s small { display: block; font-family: var(--font-ko); font-weight: 400; color: var(--muted); font-size: .85rem; }
-.ask { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 18px 16px; width: 100%; display: grid; gap: 14px; }
+.ask { width: 100%; display: grid; gap: 14px; padding: 18px 16px; }
 .ask .q { display: flex; align-items: center; gap: 12px; }
 .ask .q .face { width: 48px; height: 48px; flex: none; }
 .ask .q .face svg { width: 100%; height: 100%; }
 .ask .q .t { font-family: var(--font-en); font-weight: 800; font-size: 1.4rem; flex: 1; min-width: 0; }
-.ask .row { display: flex; gap: 10px; }
-.ask .fb { min-height: 1.5em; font-family: var(--font-en); font-weight: 700; font-size: 1.05rem; }
-.ask .fb.ok { color: var(--ok); } .ask .fb.bad { color: var(--bad); }
-.rowc { display: flex; gap: 10px; justify-content: center; }
+.row { display: flex; gap: 10px; }
+.rowc { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.fb { min-height: 1.5em; font-family: var(--font-en); font-weight: 700; font-size: 1.05rem; }
+.fb.ok { color: var(--ok); } .fb.bad { color: var(--bad); }
 
-@media (prefers-reduced-motion: reduce) { .dock.pop .bagico, .inside button, .mic.on { animation: none; } }
+/* 3. speaking */
+.warn { background: var(--soft); border-radius: 12px; padding: 10px 14px; font-size: .9rem; margin-bottom: 14px; }
+.empty { border-style: dashed; padding: 36px 16px; text-align: center; display: grid; gap: 12px; justify-items: center; color: var(--muted); }
+.empty .bagico { width: 96px; height: 96px; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; background: var(--panel); border: 2px solid var(--line); border-radius: 999px; padding: 6px 14px 6px 8px; font-family: var(--font-en); font-weight: 800; font-size: 1rem; cursor: pointer; }
+.chip svg { width: 28px; height: 28px; }
+.chip[aria-pressed="true"] { border-color: var(--accent); background: var(--soft); }
+.chip .done { color: var(--ok); }
+.stage { display: grid; gap: 0; padding: 0; overflow: hidden; }
+.stage .head { display: flex; align-items: center; gap: 14px; padding: 16px; border-bottom: 1px solid var(--line); }
+.stage .head .pic { width: 72px; height: 72px; flex: none; }
+.stage .head .pic svg { width: 100%; height: 100%; }
+.stage .head .t { font-family: var(--font-en); font-weight: 800; font-size: 1.3rem; }
+.stage .head .t small { display: block; font-family: var(--font-ko); font-weight: 400; color: var(--muted); font-size: .85rem; }
+.line { display: grid; grid-template-columns: 1fr auto; gap: 8px 14px; align-items: center; padding: 16px; border-bottom: 1px solid var(--line); }
+.line:last-child { border-bottom: 0; }
+.line .who { font-size: .8rem; color: var(--muted); font-weight: 700; grid-column: 1 / 3; }
+.sentence { font-family: var(--font-en); font-weight: 800; font-size: clamp(1.2rem, 3.6vw, 1.6rem); line-height: 1.3; min-width: 0; }
+.sentence .w { display: inline-block; border-radius: 6px; }
+.sentence .w.hit { color: var(--ok); }
+.sentence .w.miss { color: var(--bad); text-decoration: underline wavy; text-underline-offset: 4px; }
+.ctl { display: flex; align-items: center; gap: 10px; }
+.round { border: 0; border-radius: 50%; cursor: pointer; display: grid; place-items: center; }
+.round svg { fill: currentColor; }
+.listen { width: 48px; height: 48px; background: var(--soft); color: var(--accent); }
+.listen svg { width: 20px; height: 20px; }
+.mic { width: 60px; height: 60px; background: var(--accent); color: var(--accent-ink); box-shadow: 0 6px 16px rgba(36, 88, 230, .3); }
+.mic svg { width: 26px; height: 26px; }
+.mic.on { background: var(--bad); box-shadow: 0 0 0 0 rgba(214,69,69,.4); animation: pulse 1.1s infinite; }
+@keyframes pulse { 70% { box-shadow: 0 0 0 16px rgba(214,69,69,0); } 100% { box-shadow: 0 0 0 0 rgba(214,69,69,0); } }
+.mic:disabled { opacity: .35; box-shadow: none; cursor: default; }
+.result { grid-column: 1 / 3; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; align-items: center; }
+.result:empty { display: none; }
+.pct { font-family: var(--font-en); font-weight: 800; font-size: 1.5rem; line-height: 1; font-variant-numeric: tabular-nums; grid-row: span 2; }
+.pct.good { color: var(--ok); } .pct.mid { color: #c48a00; } .pct.low { color: var(--bad); }
+.meter { height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.meter i { display: block; height: 100%; width: 0; background: var(--bad); border-radius: 999px; transition: width .4s; }
+.meter i.mid { background: #e6a800; } .meter i.good { background: var(--ok); }
+.heard { font-size: .85rem; color: var(--muted); }
+.heard b { color: var(--fg); font-weight: 500; }
+.heard.only { grid-column: 1 / 3; }
+.credit { margin-top: 28px; font-size: .75rem; color: var(--muted); text-align: center; }
+
+@media (max-width: 480px) { .line { grid-template-columns: 1fr; } .ctl { justify-content: flex-end; } .line .who, .result { grid-column: 1; } }
+@media (prefers-reduced-motion: reduce) { .dock.pop .bagico, .inside .s button, .mic.on { animation: none; } }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <h1>What's in my bag?</h1>
-  </header>
+  <header><h1>What's in my bag?</h1></header>
   <div class="steps" role="tablist">
     <button class="step" role="tab" id="t-learn" aria-selected="true" aria-controls="learn"><span class="n">1</span>단어</button>
-    <button class="step" role="tab" id="t-say" aria-selected="false" aria-controls="say"><span class="n">2</span>말하기</button>
-    <button class="step" role="tab" id="t-bag" aria-selected="false" aria-controls="bag"><span class="n">3</span>내 가방</button>
+    <button class="step" role="tab" id="t-bag" aria-selected="false" aria-controls="bag"><span class="n">2</span>내 가방</button>
+    <button class="step" role="tab" id="t-say" aria-selected="false" aria-controls="say"><span class="n">3</span>말하기</button>
   </div>
 
   <!-- 1. 단어 -->
   <section class="panel" id="learn" role="tabpanel">
-    <p class="lead">물건을 누르면 소리가 나요. 아래 가방으로 끌어다 놓거나 + 를 누르면 가방에 들어가요.</p>
-    <div class="dialog" id="dialog">
-      <div class="l"><span class="who">친구</span><span id="d-q">Do you have <em>a pen</em>?</span><button class="play" data-k="q" aria-label="듣기"></button></div>
-      <div class="l"><span class="who">나</span><span id="d-a">Yes, I do. I have <em>a pen</em>.</span><button class="play" data-k="yes" aria-label="듣기"></button></div>
+    <p class="lead">물건을 누르면 소리가 나요. "가방에 넣기"를 누르거나 아래 가방으로 끌어다 놓으면 들어가요. 가방에는 <b>5개</b>까지 넣을 수 있어요.</p>
+    <div class="card dialog" id="dialog">
+      <div class="l"><span class="who">친구</span><span id="d-q"></span><button class="play" data-k="q" aria-label="듣기"></button></div>
+      <div class="l"><span class="who">나</span><span id="d-a"></span><button class="play" data-k="a" aria-label="듣기"></button></div>
     </div>
     <div class="shelf" id="shelf"></div>
+    <p class="credit">그림: Fluent Emoji (Microsoft, MIT)</p>
   </section>
 
-  <!-- 2. 말하기 -->
+  <!-- 2. 내 가방 -->
+  <section class="panel" id="bag" role="tabpanel" hidden>
+    <div class="bagview">
+      <div class="backpack" id="backpack"></div>
+      <div class="card have">
+        <span class="s" id="have-s"></span>
+        <button class="play" id="have-play" aria-label="듣기"></button>
+      </div>
+      <div class="card ask">
+        <div class="q"><span class="face" id="face"></span><span class="t" id="ask-t"></span><button class="play" id="ask-play" aria-label="듣기"></button></div>
+        <div class="row"><button class="btn big yes" id="ans-yes">Yes, I do.</button><button class="btn big no" id="ans-no">No, I don't.</button></div>
+        <div class="fb" id="ask-fb"></div>
+        <div class="rowc"><button class="btn" id="ask-next">다른 질문</button><button class="btn" id="bag-more">물건 더 넣기</button><button class="btn" id="bag-reset">가방 비우기</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 말하기 -->
   <section class="panel" id="say" role="tabpanel" hidden>
     <div class="warn" id="sr-warn" hidden>이 브라우저는 음성 인식을 지원하지 않아요. Chrome 이나 Edge 에서 열면 따라 말하기를 할 수 있어요.</div>
-    <div class="empty" id="say-empty">
+    <div class="card empty" id="say-empty">
       <div class="bagico" id="empty-bag"></div>
       <div>가방이 비어 있어요.<br>1번에서 물건을 가방에 넣으면 그 물건으로 말하기 연습을 해요.</div>
       <button class="btn primary" id="say-go">1번으로 가기</button>
     </div>
     <div id="say-body" hidden>
-      <div class="progress" id="progress"></div>
-      <div class="stage">
-        <div class="pic" id="s-pic"></div>
-        <span class="tag" id="s-tag"></span>
-        <div class="who" id="s-who"></div>
-        <div class="sentence" id="s-text"></div>
-        <div class="controls">
-          <div style="display:grid;justify-items:center;gap:6px"><button class="round listen" id="s-listen" aria-label="듣기"></button><span class="lbl">듣기</span></div>
-          <div style="display:grid;justify-items:center;gap:6px"><button class="round mic" id="s-mic" aria-label="따라 말하기"></button><span class="lbl" id="mic-lbl">따라 말하기</span></div>
-        </div>
-        <div class="result" id="s-result"></div>
-      </div>
-      <div class="nav">
-        <button class="btn" id="s-prev">← 이전</button>
-        <button class="btn primary" id="s-next">다음 →</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- 3. 내 가방 -->
-  <section class="panel" id="bag" role="tabpanel" hidden>
-    <div class="bagview">
-      <div class="backpack" id="backpack"></div>
-      <div class="have">
-        <span class="s" id="have-s"></span>
-        <button class="play" id="have-play" aria-label="듣기"></button>
-      </div>
-      <div class="ask">
-        <div class="q"><span class="face" id="face"></span><span class="t" id="ask-t"></span><button class="play" id="ask-play" aria-label="듣기"></button></div>
-        <div class="row"><button class="btn big yes" id="ans-yes">Yes, I do.</button><button class="btn big no" id="ans-no">No, I don't.</button></div>
-        <div class="fb" id="ask-fb"></div>
-        <div class="rowc"><button class="btn" id="ask-next">다른 질문</button><button class="btn" id="bag-reset">가방 비우기</button></div>
-      </div>
+      <p class="lead">가방에 있는 물건을 골라요. 문장을 듣고, 🎤 를 누른 뒤 따라 말하면 정확도를 알려줘요.</p>
+      <div class="chips" id="chips"></div>
+      <div class="card stage" id="stage"></div>
     </div>
   </section>
 </div>
@@ -229,62 +228,79 @@ button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--soft);
 <div class="dock" id="dock" role="button" tabindex="0" aria-label="내 가방 열기">
   <div class="in">
     <div class="bagico" id="dock-bag"></div>
-    <div class="items" id="dock-items"></div>
-    <div class="txt"><b id="dock-n">0</b><small>내 가방</small></div>
+    <div class="slots" id="slots"></div>
+    <div class="txt"><b id="dock-n">0 / 5</b><small>내 가방</small></div>
   </div>
 </div>
 
 <script>
-// ---------- 그림 (모두 같은 스타일의 SVG) ----------
-const V = (body) => `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">${body}</svg>`;
-const PIC = {
-  pen: V(`<g transform="rotate(45 40 40)"><rect x="33" y="8" width="14" height="48" rx="4" fill="#2458e6"/><rect x="33" y="8" width="14" height="10" rx="4" fill="#163a9c"/><rect x="45" y="12" width="3" height="18" rx="1.5" fill="#c9d3f5"/><path d="M33 56h14l-5 10h-4z" fill="#d9dde6"/><path d="M38 66h4l-2 6z" fill="#1f2328"/></g>`),
-  pencil: V(`<g transform="rotate(45 40 40)"><rect x="33" y="6" width="14" height="52" fill="#f6c343"/><rect x="33" y="6" width="5" height="52" fill="#e0a92a"/><rect x="33" y="6" width="14" height="8" fill="#f28b9b"/><rect x="33" y="14" width="14" height="4" fill="#b9bfc9"/><path d="M33 58h14l-7 14z" fill="#f0d9b5"/><path d="M37.5 67h5l-2.5 5z" fill="#1f2328"/></g>`),
-  glue: V(`<rect x="28" y="24" width="24" height="46" rx="6" fill="#f6c343"/><rect x="28" y="24" width="24" height="8" rx="4" fill="#e0a92a"/><rect x="30" y="10" width="20" height="14" rx="4" fill="#e0a92a"/><rect x="32" y="38" width="16" height="22" rx="3" fill="#fff8e1"/><text x="40" y="52" font-size="7" font-weight="700" text-anchor="middle" font-family="sans-serif" fill="#b57b00">GLUE</text>`),
-  ruler: V(`<g transform="rotate(-35 40 40)"><rect x="6" y="31" width="68" height="18" rx="3" fill="#f3d9a4"/><rect x="6" y="31" width="68" height="18" rx="3" fill="none" stroke="#d6b36b" stroke-width="2"/>${[...Array(13)].map((_, i) => `<rect x="${11 + i * 5}" y="31" width="1.5" height="${i % 2 ? 4 : 7}" fill="#8a6a2f"/>`).join("")}</g>`),
-  eraser: V(`<g transform="rotate(-20 40 40)"><rect x="14" y="27" width="52" height="26" rx="5" fill="#f28b9b"/><rect x="14" y="27" width="22" height="26" rx="5" fill="#5b8aff"/><rect x="31" y="27" width="5" height="26" fill="#2458e6"/><rect x="14" y="46" width="52" height="7" rx="3" fill="rgba(0,0,0,.12)"/></g>`),
-  notebook: V(`<rect x="18" y="12" width="46" height="58" rx="5" fill="#2458e6"/><rect x="26" y="26" width="30" height="20" rx="3" fill="#fff"/><rect x="30" y="32" width="22" height="2.5" fill="#c9d3f5"/><rect x="30" y="38" width="16" height="2.5" fill="#c9d3f5"/>${[...Array(6)].map((_, i) => `<circle cx="18" cy="${18 + i * 9.5}" r="3" fill="#f4f3ef" stroke="#9aa1ad" stroke-width="2"/>`).join("")}`),
-  crayon: V(`<g transform="rotate(45 40 40)"><rect x="33" y="14" width="14" height="46" rx="2" fill="#e5484d"/><rect x="33" y="22" width="14" height="26" fill="#f4f3ef"/><rect x="33" y="24" width="14" height="22" fill="#e5484d" opacity=".15"/><path d="M33 14h14l-7-10z" fill="#e5484d"/><rect x="33" y="60" width="14" height="4" fill="#b73238"/></g>`),
-  scissors: V(`<g transform="rotate(-30 40 40)"><path d="M32 42 L44 8 l6 2 -14 36z" fill="#b9bfc9"/><path d="M48 42 L36 8 l-6 2 14 36z" fill="#d9dde6"/><circle cx="40" cy="40" r="3.5" fill="#1f2328"/><ellipse cx="30" cy="58" rx="9" ry="13" transform="rotate(25 30 58)" fill="none" stroke="#e5484d" stroke-width="6"/><ellipse cx="50" cy="58" rx="9" ry="13" transform="rotate(-25 50 58)" fill="none" stroke="#e5484d" stroke-width="6"/></g>`),
-  book: V(`<rect x="16" y="12" width="50" height="58" rx="3" fill="#1f9d55"/><rect x="22" y="12" width="44" height="58" rx="3" fill="#27b665"/><rect x="16" y="12" width="8" height="58" fill="#15723d"/><rect x="34" y="24" width="24" height="16" rx="2" fill="#fff"/><rect x="38" y="30" width="16" height="2.5" fill="#9aa1ad"/>`),
-  bottle: V(`<rect x="30" y="6" width="20" height="12" rx="3" fill="#1f6fb2"/><rect x="26" y="18" width="28" height="56" rx="9" fill="#7fc4ff"/><rect x="26" y="34" width="28" height="22" fill="#fff"/><path d="M34 45l6-7 6 7-6 7z" fill="#2458e6"/><rect x="30" y="24" width="4" height="40" rx="2" fill="rgba(255,255,255,.5)"/>`),
-  pcase: V(`<rect x="8" y="26" width="64" height="32" rx="12" fill="#7c5cff"/><rect x="8" y="26" width="64" height="9" rx="4.5" fill="#5b3fd6"/><circle cx="62" cy="30.5" r="3" fill="#f6c343"/><rect x="16" y="40" width="48" height="12" rx="4" fill="#9d86ff"/>`),
-  keyring: V(`<circle cx="26" cy="22" r="12" fill="none" stroke="#9aa1ad" stroke-width="5"/><circle cx="46" cy="50" r="18" fill="#c48a52"/><circle cx="33" cy="38" r="6" fill="#c48a52"/><circle cx="59" cy="38" r="6" fill="#c48a52"/><ellipse cx="46" cy="55" rx="8" ry="6" fill="#f0d9b5"/><circle cx="40" cy="47" r="2" fill="#1f2328"/><circle cx="52" cy="47" r="2" fill="#1f2328"/><circle cx="46" cy="53" r="2" fill="#1f2328"/>`),
-  keycap: V(`<rect x="12" y="16" width="56" height="52" rx="10" fill="#2b2f38"/><rect x="16" y="12" width="48" height="44" rx="9" fill="#f6c343"/><rect x="20" y="16" width="40" height="36" rx="7" fill="#ffd45e"/><text x="40" y="42" font-size="22" font-weight="800" text-anchor="middle" font-family="sans-serif" fill="#2b2f38">A</text>`),
-  slime: V(`<rect x="12" y="30" width="56" height="40" rx="8" fill="#e8f3ff" stroke="#b6d2f2" stroke-width="2"/><path d="M14 44c6-10 14-10 20-4s14 4 18-4 10-2 14 6v18a8 8 0 0 1-8 8H22a8 8 0 0 1-8-8z" fill="#63d26f"/><ellipse cx="30" cy="52" rx="6" ry="3" fill="#b9f0bf"/><rect x="10" y="22" width="60" height="10" rx="4" fill="#7fc4ff"/>`),
-  sticker: V(`<path d="M40 8l9 18 20 3-14 14 3 20-18-9-18 9 3-20L11 29l20-3z" fill="#f6c343" stroke="#e0a92a" stroke-width="2"/><path d="M40 20l5 10 11 2-8 8 2 11-10-5-10 5 2-11-8-8 11-2z" fill="#ffd45e"/>`),
+const MAX = 5;
+// ---------- 그림: Fluent Emoji 3D (Microsoft, MIT) + 같은 질감으로 그린 6개 ----------
+const FLUENT = {"pen": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 32 32\"><g fill=\"none\"><g filter=\"url(#pen-iEn8s1b)\"><rect width=\"1.286\" height=\"3.333\" fill=\"#827E85\" rx=\".643\" transform=\"matrix(.72825 .6853 -.6892 .72457 4.54 26.342)\"/><rect width=\"1.286\" height=\"3.333\" fill=\"url(#pen-iiMPESc)\" rx=\".643\" transform=\"matrix(.72825 .6853 -.6892 .72457 4.54 26.342)\"/></g><g filter=\"url(#pen-iDhDnke)\"><path stroke=\"#FFD350\" stroke-linecap=\"round\" stroke-width=\"1.4\" d=\"m28.245 6.862l.87.825a1.5 1.5 0 0 1 .024 2.154l-4.838 4.795\"/></g><g filter=\"url(#pen-iMyykdd)\"><path stroke=\"url(#pen-iJdHf3b)\" stroke-linecap=\"round\" stroke-width=\".45\" d=\"m28.495 6.773l.87.825a1.5 1.5 0 0 1 .024 2.154l-4.838 4.795\"/></g><g filter=\"url(#pen-iTSpXze)\"><path fill=\"#2E71B9\" d=\"M9.192 17.185c-2.469 3.62-3.933 6.18-4.672 7.413l2.672 2.875c1.156-.705 5.018-3 7.422-4.631c4.718-3.202 8.421-7.647 9.921-9.885c.925-1.379 3.113-4.486 4.712-6.794a2.45 2.45 0 0 0-.393-3.229a2.43 2.43 0 0 0-2.99-.213c-2.754 1.874-7.168 5.048-9.297 6.662c-1.49 1.13-5.18 4.582-7.375 7.802\"/></g><path fill=\"url(#pen-iX677Fe)\" d=\"M9.192 17.185c-2.469 3.62-3.933 6.18-4.672 7.413l2.672 2.875c1.156-.705 5.018-3 7.422-4.631c4.718-3.202 8.421-7.647 9.921-9.885c.925-1.379 3.113-4.486 4.712-6.794a2.45 2.45 0 0 0-.393-3.229a2.43 2.43 0 0 0-2.99-.213c-2.754 1.874-7.168 5.048-9.297 6.662c-1.49 1.13-5.18 4.582-7.375 7.802\"/><path fill=\"url(#pen-iyXpT9c)\" d=\"M9.192 17.185c-2.469 3.62-3.933 6.18-4.672 7.413l2.672 2.875c1.156-.705 5.018-3 7.422-4.631c4.718-3.202 8.421-7.647 9.921-9.885c.925-1.379 3.113-4.486 4.712-6.794a2.45 2.45 0 0 0-.393-3.229a2.43 2.43 0 0 0-2.99-.213c-2.754 1.874-7.168 5.048-9.297 6.662c-1.49 1.13-5.18 4.582-7.375 7.802\"/><g filter=\"url(#pen-iycqElb)\"><path fill=\"#DCAC34\" d=\"M7.585 27.065L4.758 24.39a.2.2 0 0 0-.306.036l-.864 1.338a1.82 1.82 0 0 0 .317 2.341a1.84 1.84 0 0 0 2.213.182l1.437-.911a.198.198 0 0 0 .03-.312\"/></g><g filter=\"url(#pen-iZLW6Lg)\"><rect width=\"1.405\" height=\"29.551\" x=\"28.019\" y=\"3.257\" fill=\"url(#pen-iUDEXie)\" rx=\".703\" transform=\"rotate(45 28.019 3.257)\"/></g><path fill=\"url(#pen-ieTZ7sc)\" d=\"m28.27 7.843l-4.14-4.162a.2.2 0 0 1 .03-.308l.651-.431a.4.4 0 0 1 .503.05l3.673 3.639a.4.4 0 0 1 .05.509l-.459.675a.2.2 0 0 1-.307.028\"/><path fill=\"url(#pen-iUflTPb)\" d=\"m28.27 7.843l-4.14-4.162a.2.2 0 0 1 .03-.308l.651-.431a.4.4 0 0 1 .503.05l3.673 3.639a.4.4 0 0 1 .05.509l-.459.675a.2.2 0 0 1-.307.028\"/><path fill=\"url(#pen-iIxJrce)\" d=\"m17.93 20.123l-6.077-6.117a.246.246 0 0 1-.011-.336a64 64 0 0 1 1.675-1.791a.25.25 0 0 1 .354-.004l6.274 6.197a.25.25 0 0 1-.007.362c-.547.498-1.37 1.247-1.863 1.698a.25.25 0 0 1-.346-.01\"/><path fill=\"url(#pen-iFekbNe)\" d=\"m17.93 20.123l-6.077-6.117a.246.246 0 0 1-.011-.336a64 64 0 0 1 1.675-1.791a.25.25 0 0 1 .354-.004l6.274 6.197a.25.25 0 0 1-.007.362c-.547.498-1.37 1.247-1.863 1.698a.25.25 0 0 1-.346-.01\"/><path fill=\"url(#pen-iQYvQcd)\" d=\"m17.93 20.123l-6.077-6.117a.246.246 0 0 1-.011-.336a64 64 0 0 1 1.675-1.791a.25.25 0 0 1 .354-.004l6.274 6.197a.25.25 0 0 1-.007.362c-.547.498-1.37 1.247-1.863 1.698a.25.25 0 0 1-.346-.01\"/><defs><filter id=\"pen-iEn8s1b\" width=\"2.7\" height=\"3.166\" x=\"2.51\" y=\"26.207\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dy=\"-.4\"/><feGaussianBlur stdDeviation=\".2\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.462745 0 0 0 0 0.384314 0 0 0 0 0.541176 0 0 0 1 0\"/><feBlend in2=\"shape\" result=\"effect1_innerShadow_18_22342\"/></filter><filter id=\"pen-iDhDnke\" width=\"6.982\" height=\"9.174\" x=\"23.601\" y=\"6.162\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dx=\".3\"/><feGaussianBlur stdDeviation=\".375\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.803922 0 0 0 0 0.6 0 0 0 0 0.227451 0 0 0 1 0\"/><feBlend in2=\"shape\" result=\"effect1_innerShadow_18_22342\"/></filter><filter id=\"pen-iMyykdd\" width=\"6.632\" height=\"9.124\" x=\"23.876\" y=\"6.098\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feGaussianBlur result=\"effect1_foregroundBlur_18_22342\" stdDeviation=\".225\"/></filter><filter id=\"pen-iTSpXze\" width=\"26.663\" height=\"26.668\" x=\"3.52\" y=\"1.305\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dx=\"-1\" dy=\"-1\"/><feGaussianBlur stdDeviation=\"1\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.223529 0 0 0 0 0.384314 0 0 0 0 0.74902 0 0 0 1 0\"/><feBlend in2=\"shape\" result=\"effect1_innerShadow_18_22342\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dx=\".5\" dy=\".5\"/><feGaussianBlur stdDeviation=\".5\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.341176 0 0 0 0 0.458824 0 0 0 0 0.635294 0 0 0 1 0\"/><feBlend in2=\"effect1_innerShadow_18_22342\" result=\"effect2_innerShadow_18_22342\"/></filter><filter id=\"pen-iycqElb\" width=\"4.349\" height=\"4.489\" x=\"3.298\" y=\"24.086\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dy=\"-.25\"/><feGaussianBlur stdDeviation=\".375\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.737255 0 0 0 0 0.545098 0 0 0 0 0.458824 0 0 0 1 0\"/><feBlend in2=\"shape\" result=\"effect1_innerShadow_18_22342\"/></filter><filter id=\"pen-iZLW6Lg\" width=\"24.307\" height=\"24.307\" x=\"5.914\" y=\"2.048\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feGaussianBlur result=\"effect1_foregroundBlur_18_22342\" stdDeviation=\".75\"/></filter><radialGradient id=\"pen-iiMPESc\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(.0003 1.92159 -.34546 .00005 .643 1.411)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".215\" stop-color=\"#8C8492\"/><stop offset=\"1\" stop-color=\"#8C8492\" stop-opacity=\"0\"/></radialGradient><radialGradient id=\"pen-iX677Fe\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"rotate(136.273 12.18 8.163)scale(1.12348 4.92979)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".185\" stop-color=\"#3555A2\"/><stop offset=\"1\" stop-color=\"#3555A2\" stop-opacity=\"0\"/></radialGradient><radialGradient id=\"pen-iyXpT9c\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(-1.09345 1.0639 -6.26589 -6.43998 15.52 17.241)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".105\" stop-color=\"#345DBB\"/><stop offset=\"1\" stop-color=\"#345DBB\" stop-opacity=\"0\"/></radialGradient><radialGradient id=\"pen-ieTZ7sc\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"rotate(133.668 12.749 8.445)scale(1.90086 3.10302)\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#FFDA6A\"/><stop offset=\"1\" stop-color=\"#EDA92F\"/></radialGradient><radialGradient id=\"pen-iIxJrce\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(-2.04475 2.4111 -3.6184 -3.06863 17.58 15.783)\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#FFD846\"/><stop offset=\"1\" stop-color=\"#E9B64B\"/></radialGradient><linearGradient id=\"pen-iJdHf3b\" x1=\"29.833\" x2=\"27.442\" y1=\"7.336\" y2=\"9.961\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#FFED6F\"/><stop offset=\"1\" stop-color=\"#FFED6F\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"pen-iUDEXie\" x1=\"28.721\" x2=\"28.721\" y1=\"3.257\" y2=\"32.808\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#6F9ED9\"/><stop offset=\".588\" stop-color=\"#5386CE\"/><stop offset=\"1\" stop-color=\"#5386CE\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"pen-iUflTPb\" x1=\"26.098\" x2=\"26.588\" y1=\"5.93\" y2=\"5.389\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#EDA836\"/><stop offset=\"1\" stop-color=\"#EDA836\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"pen-iFekbNe\" x1=\"14.833\" x2=\"15.35\" y1=\"16.913\" y2=\"16.422\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#EDA836\"/><stop offset=\"1\" stop-color=\"#EDA836\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"pen-iQYvQcd\" x1=\"12.452\" x2=\"13.917\" y1=\"12.609\" y2=\"13.799\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#D6A85B\"/><stop offset=\"1\" stop-color=\"#D6A85B\" stop-opacity=\"0\"/></linearGradient></defs></g></svg>", "pencil": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 32 32\"><g fill=\"none\"><path fill=\"url(#pencil-iqpswMS)\" d=\"M23.037 2.506a1.5 1.5 0 0 1 2.121 0l4.363 4.363a1.5 1.5 0 0 1 0 2.121L9.464 29.048l-6.485-6.485z\"/><path fill=\"url(#pencil-iRAj20H)\" d=\"M23.037 2.506a1.5 1.5 0 0 1 2.121 0l4.363 4.363a1.5 1.5 0 0 1 0 2.121L9.464 29.048l-6.485-6.485z\"/><path fill=\"url(#pencil-iCQ4oXd)\" d=\"M23.037 2.506a1.5 1.5 0 0 1 2.121 0l4.363 4.363a1.5 1.5 0 0 1 0 2.121L9.464 29.048l-6.485-6.485z\"/><path fill=\"url(#pencil-iaOgR4g)\" d=\"M23.037 2.506a1.5 1.5 0 0 1 2.121 0l4.363 4.363a1.5 1.5 0 0 1 0 2.121L9.464 29.048l-6.485-6.485z\"/><path fill=\"url(#pencil-ixIPiUd)\" d=\"M2.034 29.782a.2.2 0 0 0 .219.218l6.54-.629a1 1 0 0 0 .518-.205l.153-.118l-6.484-6.485l-.101.122a1 1 0 0 0-.224.543z\"/><path fill=\"url(#pencil-iLomexe)\" d=\"M2.034 29.782a.2.2 0 0 0 .219.218l6.54-.629a1 1 0 0 0 .518-.205l.153-.118l-6.484-6.485l-.101.122a1 1 0 0 0-.224.543z\"/><path fill=\"url(#pencil-iLKFBOe)\" d=\"M2.034 29.782a.2.2 0 0 0 .219.218l6.54-.629a1 1 0 0 0 .518-.205l.153-.118l-6.484-6.485l-.101.122a1 1 0 0 0-.224.543z\"/><path fill=\"url(#pencil-i3Gq0mb)\" d=\"m26.34 12.172l3.18-3.182a1.5 1.5 0 0 0 0-2.121l-4.363-4.363a1.5 1.5 0 0 0-2.121 0l-3.182 3.182z\"/><path fill=\"url(#pencil-iByxKAd)\" d=\"m26.34 12.172l3.18-3.182a1.5 1.5 0 0 0 0-2.121l-4.363-4.363a1.5 1.5 0 0 0-2.121 0l-3.182 3.182z\"/><path fill=\"url(#pencil-iR8IWHb)\" d=\"m26.34 12.172l3.18-3.182a1.5 1.5 0 0 0 0-2.121l-4.363-4.363a1.5 1.5 0 0 0-2.121 0l-3.182 3.182z\"/><path fill=\"url(#pencil-i5F8UHt)\" d=\"m16.666 8.877l3.19-3.19l6.484 6.485l-3.19 3.19z\"/><path fill=\"url(#pencil-ixftiIe)\" d=\"m16.666 8.877l3.19-3.19l6.484 6.485l-3.19 3.19z\"/><path fill=\"url(#pencil-iEB001d)\" d=\"M2.253 30a.2.2 0 0 1-.219-.218l.218-2.3l2.296 2.297z\"/><defs><linearGradient id=\"pencil-iRAj20H\" x1=\"10.136\" x2=\"11.699\" y1=\"14.875\" y2=\"16.375\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#EE9B6A\"/><stop offset=\"1\" stop-color=\"#EE9B6A\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"pencil-iCQ4oXd\" x1=\"20.637\" x2=\"18.762\" y1=\"18.5\" y2=\"16.938\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#E66A62\"/><stop offset=\"1\" stop-color=\"#E66A62\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"pencil-ixIPiUd\" x1=\"3.887\" x2=\"6.512\" y1=\"26.094\" y2=\"30.219\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#D8A587\"/><stop offset=\"1\" stop-color=\"#CE7A98\"/></linearGradient><linearGradient id=\"pencil-iLomexe\" x1=\"6.98\" x2=\"6.457\" y1=\"26.282\" y2=\"26.812\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".207\" stop-color=\"#FFC09F\"/><stop offset=\"1\" stop-color=\"#FCB196\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"pencil-iLKFBOe\" x1=\"1.512\" x2=\"3.637\" y1=\"25.937\" y2=\"26.125\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#DEBCA3\"/><stop offset=\"1\" stop-color=\"#DEBCA3\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"pencil-i3Gq0mb\" x1=\"28.074\" x2=\"23.949\" y1=\"4.938\" y2=\"9\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#FF6153\"/><stop offset=\"1\" stop-color=\"#FF6154\"/></linearGradient><linearGradient id=\"pencil-iByxKAd\" x1=\"20.762\" x2=\"24.012\" y1=\"4.563\" y2=\"7.563\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#F1553E\"/><stop offset=\"1\" stop-color=\"#F1553E\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"pencil-i5F8UHt\" x1=\"18.324\" x2=\"22.449\" y1=\"7.375\" y2=\"11.125\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#C5C4CB\"/><stop offset=\"1\" stop-color=\"#E8DEFA\"/></linearGradient><linearGradient id=\"pencil-ixftiIe\" x1=\"24.824\" x2=\"22.512\" y1=\"14.375\" y2=\"12.125\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#C9B9E0\"/><stop offset=\"1\" stop-color=\"#C9B9E0\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"pencil-iEB001d\" x1=\"2.23\" x2=\"3.291\" y1=\"28.531\" y2=\"30.001\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#461E49\"/><stop offset=\"1\" stop-color=\"#450F51\"/></linearGradient><radialGradient id=\"pencil-iqpswMS\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(13.74998 -14.06245 8.72293 8.5291 6.199 26)\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#FF9130\"/><stop offset=\"1\" stop-color=\"#F3633D\"/></radialGradient><radialGradient id=\"pencil-iaOgR4g\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(12.87503 -12.81253 2.8651 2.87908 5.949 25.813)\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#FF994D\"/><stop offset=\"1\" stop-color=\"#FF994D\" stop-opacity=\"0\"/></radialGradient><radialGradient id=\"pencil-iR8IWHb\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"rotate(135 12.398 8.577)scale(1.37002 3.11227)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".177\" stop-color=\"#FF786D\"/><stop offset=\"1\" stop-color=\"#FF786D\" stop-opacity=\"0\"/></radialGradient></defs></g></svg>", "ruler": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 32 32\"><g fill=\"none\"><g filter=\"url(#ruler-iD7uXDd)\"><rect width=\"31.576\" height=\"10.482\" x=\"8.542\" y=\"1.201\" fill=\"url(#ruler-iV0559c)\" rx=\"2.25\" transform=\"rotate(45 8.542 1.2)\"/></g><path fill=\"#9D73E8\" d=\"M11.117 3.776L9.172 5.72a.544.544 0 0 1-.77-.77l1.945-1.945zm1.492 1.491l.77.77l-1.112 1.11a.544.544 0 1 1-.77-.769zm2.216 2.217l.77.77l-1.875 1.875a.545.545 0 0 1-.77-.77zm2.281 2.28l.77.77l-1.15 1.15a.544.544 0 0 1-.77-.77zm2.248 2.249l.77.77l-1.87 1.868a.544.544 0 1 1-.769-.77zm2.268 2.267l.77.77l-1.143 1.143a.544.544 0 1 1-.77-.77zm2.212 2.212l.77.77l-1.9 1.9a.544.544 0 0 1-.77-.77zm2.253 2.253l.77.77l-1.162 1.162a.544.544 0 1 1-.77-.77zm2.273 2.274l.77.77l-1.881 1.88a.544.544 0 0 1-.77-.77z\"/><defs><linearGradient id=\"ruler-iV0559c\" x1=\"24.33\" x2=\"24.33\" y1=\"1.201\" y2=\"11.682\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#CAC8D1\"/><stop offset=\"1\" stop-color=\"#BAB8C0\"/></linearGradient><filter id=\"ruler-iD7uXDd\" width=\"28.475\" height=\"28.475\" x=\"1.762\" y=\"1.833\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dx=\".3\" dy=\"-.3\"/><feGaussianBlur stdDeviation=\".3\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.611765 0 0 0 0 0.596078 0 0 0 0 0.658824 0 0 0 1 0\"/><feBlend in2=\"shape\" result=\"effect1_innerShadow_18_23242\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dx=\"-.3\" dy=\".3\"/><feGaussianBlur stdDeviation=\".3\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.913725 0 0 0 0 0.909804 0 0 0 0 0.92549 0 0 0 1 0\"/><feBlend in2=\"effect1_innerShadow_18_23242\" result=\"effect2_innerShadow_18_23242\"/></filter></defs></g></svg>", "notebook": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 32 32\"><g fill=\"none\"><path fill=\"url(#notebook-i29fAGd)\" d=\"M8 2h17a2 2 0 0 1 2 2v22H8z\"/><path fill=\"url(#notebook-iA32I8C)\" d=\"M8 2h17a2 2 0 0 1 2 2v22H8z\"/><path fill=\"url(#notebook-i8YTSGh)\" d=\"M6.5 2A1.5 1.5 0 0 0 5 3.5V28h1a1 1 0 0 1 1-1h1V2z\"/><path fill=\"url(#notebook-iVRx6pD)\" d=\"M6.5 2A1.5 1.5 0 0 0 5 3.5V28h1a1 1 0 0 1 1-1h1V2z\"/><g filter=\"url(#notebook-i9HoRlb)\"><path fill=\"url(#notebook-i4ZrgSu)\" d=\"M6.5 26A1.5 1.5 0 0 0 5 27.5v1A1.5 1.5 0 0 0 6.5 30h19.408C26.56 30 27 29.666 27 29H7a1 1 0 1 1 0-2h20v-1z\"/></g><g filter=\"url(#notebook-iV9kxmd)\"><path fill=\"#3B2D4A\" d=\"M22.815 2.328h.732v23.594h-.732z\"/></g><g filter=\"url(#notebook-ineSkXk)\"><path fill=\"#42215F\" d=\"M22.815 29.86h1v-3.938h-1z\"/></g><path fill=\"#DED7E6\" d=\"M12.438 6.969a1 1 0 0 1 1-1h5.25a1 1 0 0 1 1 1V9.03a1 1 0 0 1-1 1h-5.25a1 1 0 0 1-1-1z\"/><path fill=\"url(#notebook-i1yRmGb)\" d=\"M27 29v-2H7a1 1 0 1 0 0 2z\"/><path fill=\"url(#notebook-i4IiRxc)\" d=\"M27 29v-2H7a1 1 0 1 0 0 2z\"/><path fill=\"url(#notebook-iSXSP2b)\" d=\"M27 29v-2H7a1 1 0 1 0 0 2z\"/><path fill=\"url(#notebook-ifLrXcd)\" d=\"M0 0h1v4.078H0z\" transform=\"matrix(1 0 0 -1 23.047 30)\"/><path fill=\"url(#notebook-iGmmSUd)\" d=\"M23.047 2h1v23.922h-1z\"/><defs><linearGradient id=\"notebook-i29fAGd\" x1=\"17.5\" x2=\"17.5\" y1=\"2\" y2=\"26\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#5D4573\"/><stop offset=\"1\" stop-color=\"#4B3E59\"/></linearGradient><linearGradient id=\"notebook-iA32I8C\" x1=\"28.69\" x2=\"25.98\" y1=\"5.382\" y2=\"5.479\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".409\" stop-color=\"#7B698D\"/><stop offset=\"1\" stop-color=\"#7B698D\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"notebook-i8YTSGh\" x1=\"5.205\" x2=\"8\" y1=\"16.738\" y2=\"16.738\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#50475B\"/><stop offset=\"1\" stop-color=\"#453C4F\"/></linearGradient><linearGradient id=\"notebook-i4ZrgSu\" x1=\"6.431\" x2=\"27\" y1=\"28.964\" y2=\"28.932\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#512F70\"/><stop offset=\"1\" stop-color=\"#4F2D6D\"/></linearGradient><linearGradient id=\"notebook-i1yRmGb\" x1=\"6.721\" x2=\"26.819\" y1=\"28.416\" y2=\"28.416\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#D5BCEB\"/><stop offset=\"1\" stop-color=\"#DCCCED\"/><stop offset=\"1\" stop-color=\"#E3D3F2\"/></linearGradient><linearGradient id=\"notebook-i4IiRxc\" x1=\"16.25\" x2=\"16.25\" y1=\"26.738\" y2=\"28.157\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#9F84AE\"/><stop offset=\"1\" stop-color=\"#C5B1D6\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"notebook-ifLrXcd\" x1=\"0\" x2=\"1\" y1=\"1.81\" y2=\"1.81\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".339\" stop-color=\"#7D56C2\"/><stop offset=\".788\" stop-color=\"#8C6CCC\"/></linearGradient><linearGradient id=\"notebook-iGmmSUd\" x1=\"23.047\" x2=\"24.284\" y1=\"13.198\" y2=\"13.198\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".373\" stop-color=\"#8168B6\"/><stop offset=\".868\" stop-color=\"#A38AD4\"/></linearGradient><filter id=\"notebook-i9HoRlb\" width=\"22\" height=\"4.1\" x=\"5\" y=\"26\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dy=\".1\"/><feGaussianBlur stdDeviation=\".15\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.294118 0 0 0 0 0.133333 0 0 0 0 0.419608 0 0 0 1 0\"/><feBlend in2=\"shape\" result=\"effect1_innerShadow_18_20913\"/></filter><filter id=\"notebook-iV9kxmd\" width=\"1.732\" height=\"24.594\" x=\"22.315\" y=\"1.828\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feGaussianBlur result=\"effect1_foregroundBlur_18_20913\" stdDeviation=\".25\"/></filter><filter id=\"notebook-ineSkXk\" width=\"2\" height=\"4.938\" x=\"22.315\" y=\"25.422\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feGaussianBlur result=\"effect1_foregroundBlur_18_20913\" stdDeviation=\".25\"/></filter><radialGradient id=\"notebook-iVRx6pD\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(0 -6.6454 1.17096 0 5.399 26.674)\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#51475C\"/><stop offset=\"1\" stop-color=\"#51475C\" stop-opacity=\"0\"/></radialGradient><radialGradient id=\"notebook-iSXSP2b\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(0 3.03125 -.75 0 23.156 27.219)\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#937BAD\"/><stop offset=\"1\" stop-color=\"#B9A2C9\" stop-opacity=\"0\"/></radialGradient></defs></g></svg>", "crayon": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 32 32\"><g fill=\"none\"><path fill=\"url(#crayon-iil5GEc)\" d=\"m5.797 19.836l6.453 6.453l-1.203 1.125l-7.226 2.111a1 1 0 0 1-1.24-1.243l1.981-6.712z\"/><path fill=\"url(#crayon-iuGGJ1r)\" d=\"m5.797 19.836l6.453 6.453l-1.203 1.125l-7.226 2.111a1 1 0 0 1-1.24-1.243l1.981-6.712z\"/><path fill=\"url(#crayon-iTa8Lje)\" d=\"m5.797 19.836l6.453 6.453l-1.203 1.125l-7.226 2.111a1 1 0 0 1-1.24-1.243l1.981-6.712z\"/><rect width=\"9.126\" height=\"28.351\" x=\"24.188\" y=\"1.445\" fill=\"url(#crayon-ip76wLd)\" rx=\".75\" transform=\"rotate(45 24.188 1.445)\"/><rect width=\"9.126\" height=\"28.351\" x=\"24.188\" y=\"1.445\" fill=\"url(#crayon-iB3LAbc)\" rx=\".75\" transform=\"rotate(45 24.188 1.445)\"/><rect width=\"9.126\" height=\"28.351\" x=\"24.188\" y=\"1.445\" fill=\"url(#crayon-ieIMQzb)\" rx=\".75\" transform=\"rotate(45 24.188 1.445)\"/><path fill=\"url(#crayon-iuIVYjc)\" d=\"m29.14 9.398l-6.453-6.453l.97-.97a.75.75 0 0 1 1.06 0l5.393 5.393a.75.75 0 0 1 0 1.06z\"/><path fill=\"url(#crayon-isdOwdc)\" d=\"m29.14 9.398l-6.453-6.453l.97-.97a.75.75 0 0 1 1.06 0l5.393 5.393a.75.75 0 0 1 0 1.06z\"/><path fill=\"url(#crayon-iq1Rykq)\" d=\"m29.14 9.398l-6.453-6.453l.97-.97a.75.75 0 0 1 1.06 0l5.393 5.393a.75.75 0 0 1 0 1.06z\"/><path fill=\"url(#crayon-i8JlvFc)\" d=\"m20.984 4.648l.868-.868l6.454 6.453l-.869.868z\"/><path fill=\"url(#crayon-iQR7Vge)\" d=\"m6.353 19.28l.868-.868l6.453 6.453l-.868.868z\"/><g filter=\"url(#crayon-i0Cu6fd)\"><path fill=\"url(#crayon-io8kb6v)\" d=\"m11.945 26.594l-.82.821a.75.75 0 0 1-1.062 0l-5.392-5.392a.75.75 0 0 1 0-1.061l.821-.821z\"/></g><ellipse cx=\"17.328\" cy=\"14.953\" fill=\"url(#crayon-ic4VDte)\" rx=\"6.999\" ry=\"2.083\" transform=\"rotate(-45.082 17.328 14.953)\"/><ellipse cx=\"17.328\" cy=\"14.953\" fill=\"url(#crayon-iYFLwnc)\" rx=\"6.999\" ry=\"2.083\" transform=\"rotate(-45.082 17.328 14.953)\"/><defs><radialGradient id=\"crayon-iTa8Lje\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(2.02368 .1875 -.19086 2.06 2.539 28.82)\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#4AB480\"/><stop offset=\"1\" stop-color=\"#4AB480\" stop-opacity=\"0\"/></radialGradient><radialGradient id=\"crayon-ip76wLd\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(.09944 15.93199 -4.11624 .0257 28.651 13.864)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".186\" stop-color=\"#DEF352\"/><stop offset=\"1\" stop-color=\"#D4DB4A\"/></radialGradient><radialGradient id=\"crayon-isdOwdc\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(-.26563 .28125 -2.10545 -1.98852 27.844 5.758)\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#6AFDA4\"/><stop offset=\"1\" stop-color=\"#6AFDA4\" stop-opacity=\"0\"/></radialGradient><radialGradient id=\"crayon-i8JlvFc\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(-1.34375 1.25 -3.17752 -3.41583 25 6.476)\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#554962\"/><stop offset=\"1\" stop-color=\"#4F4659\"/></radialGradient><radialGradient id=\"crayon-iQR7Vge\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"rotate(136.744 1 12.61)scale(2.17928 4.83397)\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#6E518D\"/><stop offset=\"1\" stop-color=\"#593E74\"/></radialGradient><radialGradient id=\"crayon-io8kb6v\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"rotate(134.49 -.37 13.89)scale(2.09588 3.87398)\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#50D89F\"/><stop offset=\"1\" stop-color=\"#41BE77\"/></radialGradient><radialGradient id=\"crayon-ic4VDte\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(0 2.08256 -6.99919 0 17.328 14.953)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".215\" stop-color=\"#594A69\"/><stop offset=\"1\" stop-color=\"#473F51\"/></radialGradient><radialGradient id=\"crayon-iYFLwnc\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(5.56757 .62668 -.30242 2.6868 10.957 16.298)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".221\" stop-color=\"#6C508B\"/><stop offset=\"1\" stop-color=\"#6C508B\" stop-opacity=\"0\"/></radialGradient><linearGradient id=\"crayon-iil5GEc\" x1=\"4.08\" x2=\"6.026\" y1=\"24.701\" y2=\"29.022\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#3FB171\"/><stop offset=\"1\" stop-color=\"#449B8E\"/></linearGradient><linearGradient id=\"crayon-iuGGJ1r\" x1=\"7.797\" x2=\"7.078\" y1=\"24.701\" y2=\"25.555\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".246\" stop-color=\"#35B27D\"/><stop offset=\"1\" stop-color=\"#35B27D\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"crayon-iB3LAbc\" x1=\"23.922\" x2=\"27.767\" y1=\"16.383\" y2=\"16.074\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#B7D44E\"/><stop offset=\"1\" stop-color=\"#B7D44E\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"crayon-ieIMQzb\" x1=\"33.667\" x2=\"32.297\" y1=\"15.786\" y2=\"15.831\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#C1CF60\"/><stop offset=\"1\" stop-color=\"#C1CF60\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"crayon-iuIVYjc\" x1=\"23.125\" x2=\"29.781\" y1=\"2.383\" y2=\"8.82\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#2DDE77\"/><stop offset=\".654\" stop-color=\"#42E994\"/><stop offset=\"1\" stop-color=\"#4FCB88\"/></linearGradient><linearGradient id=\"crayon-iq1Rykq\" x1=\"23.25\" x2=\"24.156\" y1=\"2.258\" y2=\"3.133\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#56C675\"/><stop offset=\"1\" stop-color=\"#56C675\" stop-opacity=\"0\"/></linearGradient><filter id=\"crayon-i0Cu6fd\" width=\"7.644\" height=\"7.644\" x=\"4.451\" y=\"19.991\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dx=\".15\" dy=\"-.15\"/><feGaussianBlur stdDeviation=\".25\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.215686 0 0 0 0 0.737255 0 0 0 0 0.556863 0 0 0 1 0\"/><feBlend in2=\"shape\" result=\"effect1_innerShadow_18_22399\"/></filter></defs></g></svg>", "scissors": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 32 32\"><g fill=\"none\"><g filter=\"url(#scissors-iQSSONo)\"><path fill=\"url(#scissors-ixvg80c)\" d=\"m6.02 29.7l15.22-15.22l-3.07-3.07L5.32 24.25a3.36 3.36 0 0 0 0 4.75z\"/><path fill=\"url(#scissors-iyjSfOd)\" d=\"m6.02 29.7l15.22-15.22l-3.07-3.07L5.32 24.25a3.36 3.36 0 0 0 0 4.75z\"/></g><g filter=\"url(#scissors-io1K2Zd)\"><path fill=\"url(#scissors-igTTqee)\" d=\"M15.792 13.652a.4.4 0 0 0-.002.568l2.809 2.809a.4.4 0 0 0 .568-.003l1.135-1.157a.42.42 0 0 1 .465-.086c4.037 1.714 8.813-1.994 8.813-6.223c0-3.6-2.9-6.52-6.5-6.52s-6.52 2.92-6.52 6.52c0 .897.162 1.707.491 2.47a.42.42 0 0 1-.084.464zM20.04 9.56c0-1.67 1.36-3.03 3.03-3.03s3.03 1.36 3.03 3.03s-1.36 3.03-3.03 3.03s-3.03-1.35-3.03-3.03\"/></g><g filter=\"url(#scissors-ic5iZSy)\"><path fill=\"url(#scissors-iDeNeHb)\" d=\"M25.16 29.7L9.94 14.48l3-3.13l12.84 12.84c1.32 1.32 1.33 3.57.02 4.88z\"/></g><g filter=\"url(#scissors-iHvZk6d)\"><path fill=\"#A79AAC\" d=\"M15.56 18.14a1.07 1.07 0 1 0 0-2.14a1.07 1.07 0 0 0 0 2.14\"/><path fill=\"url(#scissors-ixiQ3fd)\" d=\"M15.56 18.14a1.07 1.07 0 1 0 0-2.14a1.07 1.07 0 0 0 0 2.14\"/><path fill=\"url(#scissors-iGbX5Zd)\" d=\"M15.56 18.14a1.07 1.07 0 1 0 0-2.14a1.07 1.07 0 0 0 0 2.14\"/><path fill=\"url(#scissors-iLRtGRd)\" d=\"M15.56 18.14a1.07 1.07 0 1 0 0-2.14a1.07 1.07 0 0 0 0 2.14\"/><path fill=\"url(#scissors-ib2Dmgd)\" d=\"M15.56 18.14a1.07 1.07 0 1 0 0-2.14a1.07 1.07 0 0 0 0 2.14\"/></g><g filter=\"url(#scissors-iMFOD4c)\"><path fill=\"url(#scissors-ixMZgYU)\" d=\"M14.387 12.37a.42.42 0 0 1-.088-.444C16.164 7.144 12.334 3.04 8.08 3.04c-3.6 0-6.5 2.92-6.5 6.52s2.9 6.52 6.5 6.52c.896 0 1.543-.004 2.271-.3a.43.43 0 0 1 .461.084L12 17.036a.4.4 0 0 0 .563-.001l2.969-2.953a.4.4 0 0 0 0-.567zm-6.297.22c-1.67 0-3.03-1.36-3.03-3.03s1.36-3.03 3.03-3.03s3.03 1.36 3.03 3.03c0 1.68-1.36 3.03-3.03 3.03\"/></g><g filter=\"url(#scissors-iuf87pb)\"><circle cx=\"9.008\" cy=\"9.268\" r=\"4.933\" stroke=\"url(#scissors-iIr68rd)\" stroke-width=\".75\"/><circle cx=\"9.008\" cy=\"9.268\" r=\"4.933\" stroke=\"url(#scissors-ikhkgEc)\" stroke-width=\".75\"/></g><g filter=\"url(#scissors-igNMboF)\"><circle cx=\"23.693\" cy=\"9.321\" r=\"4.982\" stroke=\"url(#scissors-iolsV5b)\" stroke-width=\".75\" transform=\"rotate(-4.455 23.693 9.32)\"/><circle cx=\"23.693\" cy=\"9.321\" r=\"4.982\" stroke=\"url(#scissors-iFKWO4o)\" stroke-width=\".75\" transform=\"rotate(-4.455 23.693 9.32)\"/></g><g filter=\"url(#scissors-i2vuadd)\"><path stroke=\"#FF683C\" stroke-width=\".75\" d=\"M10.901 14.872c.498-.327 1.714-1.255 2.592-2.349\"/></g><g filter=\"url(#scissors-iZUOn3c)\"><path stroke=\"url(#scissors-ipouUCc)\" stroke-width=\".75\" d=\"M20.284 15.142c-.479-.355-1.639-1.351-2.453-2.493\"/></g><defs><linearGradient id=\"scissors-ixvg80c\" x1=\"8.643\" x2=\"11.924\" y1=\"21.009\" y2=\"24.134\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#877697\"/><stop offset=\"1\" stop-color=\"#BDA7D4\"/></linearGradient><linearGradient id=\"scissors-iyjSfOd\" x1=\"14.908\" x2=\"14.315\" y1=\"19.087\" y2=\"19.634\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".607\" stop-color=\"#7C549C\"/><stop offset=\"1\" stop-color=\"#7C549C\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"scissors-igTTqee\" x1=\"29.58\" x2=\"18.904\" y1=\"10.177\" y2=\"10.177\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#FF7415\"/><stop offset=\"1\" stop-color=\"#F63178\"/></linearGradient><linearGradient id=\"scissors-iDeNeHb\" x1=\"18.088\" x2=\"20.923\" y1=\"22.384\" y2=\"19.276\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#B59FCA\"/><stop offset=\"1\" stop-color=\"#879\"/></linearGradient><linearGradient id=\"scissors-ixMZgYU\" x1=\"15.815\" x2=\"5.018\" y1=\"10.177\" y2=\"10.177\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#FF7415\"/><stop offset=\"1\" stop-color=\"#F63178\"/></linearGradient><linearGradient id=\"scissors-iIr68rd\" x1=\"14.236\" x2=\"9.948\" y1=\"5.856\" y2=\"8.899\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#FF8C72\"/><stop offset=\"1\" stop-color=\"#FF8C72\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"scissors-ikhkgEc\" x1=\"4.075\" x2=\"6.398\" y1=\"11.251\" y2=\"10.375\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#FF638F\"/><stop offset=\"1\" stop-color=\"#FF638F\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"scissors-iolsV5b\" x1=\"28.973\" x2=\"24.642\" y1=\"5.875\" y2=\"8.948\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#FF8C72\"/><stop offset=\"1\" stop-color=\"#FF8C72\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"scissors-iFKWO4o\" x1=\"18.711\" x2=\"21.057\" y1=\"11.323\" y2=\"10.438\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#FF638F\"/><stop offset=\"1\" stop-color=\"#FF638F\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"scissors-ipouUCc\" x1=\"18.048\" x2=\"20.328\" y1=\"12.661\" y2=\"17.076\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#DB236E\"/><stop offset=\"1\" stop-color=\"#DB236E\" stop-opacity=\"0\"/></linearGradient><filter id=\"scissors-iQSSONo\" width=\"16.953\" height=\"18.34\" x=\"4.338\" y=\"11.36\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dx=\".05\" dy=\"-.05\"/><feGaussianBlur stdDeviation=\".05\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.631373 0 0 0 0 0.521569 0 0 0 0 0.733333 0 0 0 1 0\"/><feBlend in2=\"shape\" result=\"effect1_innerShadow_18_23328\"/></filter><filter id=\"scissors-io1K2Zd\" width=\"14.308\" height=\"14.106\" x=\"15.672\" y=\"3.04\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dx=\".4\"/><feGaussianBlur stdDeviation=\".4\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.690196 0 0 0 0 0.211765 0 0 0 0 0.341176 0 0 0 1 0\"/><feBlend in2=\"shape\" result=\"effect1_innerShadow_18_23328\"/></filter><filter id=\"scissors-ic5iZSy\" width=\"16.936\" height=\"18.45\" x=\"9.89\" y=\"11.3\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dx=\"-.05\" dy=\".05\"/><feGaussianBlur stdDeviation=\".05\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.627451 0 0 0 0 0.592157 0 0 0 0 0.658824 0 0 0 1 0\"/><feBlend in2=\"shape\" result=\"effect1_innerShadow_18_23328\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dx=\".05\" dy=\"-.05\"/><feGaussianBlur stdDeviation=\".05\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.643137 0 0 0 0 0.52549 0 0 0 0 0.74902 0 0 0 1 0\"/><feBlend in2=\"effect1_innerShadow_18_23328\" result=\"effect2_innerShadow_18_23328\"/></filter><filter id=\"scissors-iHvZk6d\" width=\"2.54\" height=\"2.54\" x=\"14.19\" y=\"15.9\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dx=\"-.1\" dy=\".1\"/><feGaussianBlur stdDeviation=\".1\"/><feComposite in2=\"hardAlpha\" operator=\"out\"/><feColorMatrix values=\"0 0 0 0 0.54902 0 0 0 0 0.419608 0 0 0 0 0.658824 0 0 0 1 0\"/><feBlend in2=\"BackgroundImageFix\" result=\"effect1_dropShadow_18_23328\"/><feBlend in=\"SourceGraphic\" in2=\"effect1_dropShadow_18_23328\" result=\"shape\"/></filter><filter id=\"scissors-iMFOD4c\" width=\"14.469\" height=\"14.111\" x=\"1.58\" y=\"3.04\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dx=\".4\"/><feGaussianBlur stdDeviation=\".4\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.690196 0 0 0 0 0.211765 0 0 0 0 0.341176 0 0 0 1 0\"/><feBlend in2=\"shape\" result=\"effect1_innerShadow_18_23328\"/></filter><filter id=\"scissors-iuf87pb\" width=\"11.616\" height=\"11.616\" x=\"3.2\" y=\"3.46\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feGaussianBlur result=\"effect1_foregroundBlur_18_23328\" stdDeviation=\".25\"/></filter><filter id=\"scissors-igNMboF\" width=\"11.715\" height=\"11.715\" x=\"17.836\" y=\"3.463\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feGaussianBlur result=\"effect1_foregroundBlur_18_23328\" stdDeviation=\".25\"/></filter><filter id=\"scissors-i2vuadd\" width=\"4.09\" height=\"3.897\" x=\"10.195\" y=\"11.789\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feGaussianBlur result=\"effect1_foregroundBlur_18_23328\" stdDeviation=\".25\"/></filter><filter id=\"scissors-iZUOn3c\" width=\"3.982\" height=\"4.012\" x=\"17.026\" y=\"11.931\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feGaussianBlur result=\"effect1_foregroundBlur_18_23328\" stdDeviation=\".25\"/></filter><radialGradient id=\"scissors-ixiQ3fd\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(-1.03125 1.04688 -.9606 -.94625 15.643 16.946)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".518\" stop-color=\"#988098\" stop-opacity=\"0\"/><stop offset=\".86\" stop-color=\"#988098\"/></radialGradient><radialGradient id=\"scissors-iGbX5Zd\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"rotate(-68.142 21.066 -1.984)scale(1.33134 1.18753)\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#926BB4\"/><stop offset=\"1\" stop-color=\"#926BB4\" stop-opacity=\"0\"/></radialGradient><radialGradient id=\"scissors-iLRtGRd\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"rotate(139.617 4.867 11.391)scale(.5185)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".259\" stop-color=\"#B9AEC4\"/><stop offset=\"1\" stop-color=\"#B9AEC4\" stop-opacity=\"0\"/></radialGradient><radialGradient id=\"scissors-ib2Dmgd\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"rotate(-65.859 21.426 -3.06)scale(1.91019)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".7\" stop-color=\"#A49EA6\" stop-opacity=\"0\"/><stop offset=\"1\" stop-color=\"#A49EA6\"/></radialGradient></defs></g></svg>", "book": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 32 32\"><g fill=\"none\"><g filter=\"url(#book-iya3RZd)\"><path fill=\"url(#book-iEleNrb)\" d=\"M6.625 2H25a2 2 0 0 1 2 2v22H6.625z\"/><path fill=\"url(#book-ieVB4yd)\" d=\"M6.625 2H25a2 2 0 0 1 2 2v22H6.625z\"/></g><path fill=\"url(#book-i1yRmGb)\" d=\"M5.5 26.5H27V29h-.5l-.5.5H5.5z\"/><path fill=\"url(#book-i4IiRxc)\" d=\"M5.5 26.5H27V29h-.5l-.5.5H5.5z\"/><path fill=\"url(#book-iCSUlpc)\" d=\"M6.5 2A1.5 1.5 0 0 0 5 3.5V28h1a1 1 0 0 1 1-1h1V2z\"/><g filter=\"url(#book-izW3FEd)\"><path fill=\"url(#book-iQSjWhe)\" d=\"M6.5 26A1.5 1.5 0 0 0 5 27.5v1A1.5 1.5 0 0 0 6.5 30h19.408C26.56 30 27 29.666 27 29H7a1 1 0 1 1 0-2h20v-1z\"/></g><defs><linearGradient id=\"book-iEleNrb\" x1=\"17.5\" x2=\"17.5\" y1=\"2\" y2=\"26\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#56D1F3\"/><stop offset=\"1\" stop-color=\"#39ADF1\"/></linearGradient><linearGradient id=\"book-ieVB4yd\" x1=\"27.156\" x2=\"25.188\" y1=\"5.531\" y2=\"5.813\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".014\" stop-color=\"#7FECFF\"/><stop offset=\"1\" stop-color=\"#60DEFF\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"book-i1yRmGb\" x1=\"6.721\" x2=\"26.819\" y1=\"28.416\" y2=\"28.416\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#D5BCEB\"/><stop offset=\"1\" stop-color=\"#DCCCED\"/><stop offset=\"1\" stop-color=\"#E3D3F2\"/></linearGradient><linearGradient id=\"book-i4IiRxc\" x1=\"16.25\" x2=\"16.25\" y1=\"26.738\" y2=\"28.157\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#9F84AE\"/><stop offset=\"1\" stop-color=\"#C5B1D6\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"book-iCSUlpc\" x1=\"5.205\" x2=\"7.563\" y1=\"16.738\" y2=\"16.75\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#44A3D2\"/><stop offset=\"1\" stop-color=\"#3C8FCC\"/></linearGradient><linearGradient id=\"book-iQSjWhe\" x1=\"6.431\" x2=\"27\" y1=\"28.964\" y2=\"28.932\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#3769C5\"/><stop offset=\"1\" stop-color=\"#3666C3\"/></linearGradient><filter id=\"book-iya3RZd\" width=\"20.375\" height=\"24.1\" x=\"6.625\" y=\"2\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dy=\".1\"/><feGaussianBlur stdDeviation=\".25\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.32549 0 0 0 0 0.807843 0 0 0 0 0.933333 0 0 0 1 0\"/><feBlend in2=\"shape\" result=\"effect1_innerShadow_18_20823\"/></filter><filter id=\"book-izW3FEd\" width=\"22\" height=\"4.1\" x=\"5\" y=\"26\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dy=\".1\"/><feGaussianBlur stdDeviation=\".15\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.168627 0 0 0 0 0.388235 0 0 0 0 0.74902 0 0 0 1 0\"/><feBlend in2=\"shape\" result=\"effect1_innerShadow_18_20823\"/></filter></defs></g></svg>", "sticker": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 32 32\"><g fill=\"none\"><g filter=\"url(#sticker-iycMXqn)\"><path fill=\"url(#sticker-iEvtg7b)\" d=\"m18.605 3.744l2.203 4.62c.34.686.963 1.169 1.685 1.276l4.928.696c2.538.376 3.496 3.101 1.527 5.086l-3.453 3.562a2.49 2.49 0 0 0-.682 2.187l.776 5.063c.441 2.626-1.77 4.49-4.008 3.29l-4.536-2.413a2.14 2.14 0 0 0-2.006 0l-4.536 2.412c-2.238 1.19-4.586-.617-3.93-3.351l.766-4.953a2.49 2.49 0 0 0-.682-2.187l-3.521-3.688c-1.985-1.961-1.011-4.632 1.527-5.007L9.41 9.64c.723-.107 1.552-.579 1.883-1.276l2.248-4.62c1.144-2.325 3.93-2.325 5.065 0\"/><path fill=\"url(#sticker-iGAM1ho)\" d=\"m18.605 3.744l2.203 4.62c.34.686.963 1.169 1.685 1.276l4.928.696c2.538.376 3.496 3.101 1.527 5.086l-3.453 3.562a2.49 2.49 0 0 0-.682 2.187l.776 5.063c.441 2.626-1.77 4.49-4.008 3.29l-4.536-2.413a2.14 2.14 0 0 0-2.006 0l-4.536 2.412c-2.238 1.19-4.586-.617-3.93-3.351l.766-4.953a2.49 2.49 0 0 0-.682-2.187l-3.521-3.688c-1.985-1.961-1.011-4.632 1.527-5.007L9.41 9.64c.723-.107 1.552-.579 1.883-1.276l2.248-4.62c1.144-2.325 3.93-2.325 5.065 0\"/></g><path fill=\"url(#sticker-ieN0Cle)\" d=\"m18.605 3.744l2.203 4.62c.34.686.963 1.169 1.685 1.276l4.928.696c2.538.376 3.496 3.101 1.527 5.086l-3.453 3.562a2.49 2.49 0 0 0-.682 2.187l.776 5.063c.441 2.626-1.77 4.49-4.008 3.29l-4.536-2.413a2.14 2.14 0 0 0-2.006 0l-4.536 2.412c-2.238 1.19-4.586-.617-3.93-3.351l.766-4.953a2.49 2.49 0 0 0-.682-2.187l-3.521-3.688c-1.985-1.961-1.011-4.632 1.527-5.007L9.41 9.64c.723-.107 1.552-.579 1.883-1.276l2.248-4.62c1.144-2.325 3.93-2.325 5.065 0\"/><path fill=\"url(#sticker-i9PUN5i)\" d=\"m18.605 3.744l2.203 4.62c.34.686.963 1.169 1.685 1.276l4.928.696c2.538.376 3.496 3.101 1.527 5.086l-3.453 3.562a2.49 2.49 0 0 0-.682 2.187l.776 5.063c.441 2.626-1.77 4.49-4.008 3.29l-4.536-2.413a2.14 2.14 0 0 0-2.006 0l-4.536 2.412c-2.238 1.19-4.586-.617-3.93-3.351l.766-4.953a2.49 2.49 0 0 0-.682-2.187l-3.521-3.688c-1.985-1.961-1.011-4.632 1.527-5.007L9.41 9.64c.723-.107 1.552-.579 1.883-1.276l2.248-4.62c1.144-2.325 3.93-2.325 5.065 0\"/><path fill=\"url(#sticker-i8N0h7d)\" d=\"m18.605 3.744l2.203 4.62c.34.686.963 1.169 1.685 1.276l4.928.696c2.538.376 3.496 3.101 1.527 5.086l-3.453 3.562a2.49 2.49 0 0 0-.682 2.187l.776 5.063c.441 2.626-1.77 4.49-4.008 3.29l-4.536-2.413a2.14 2.14 0 0 0-2.006 0l-4.536 2.412c-2.238 1.19-4.586-.617-3.93-3.351l.766-4.953a2.49 2.49 0 0 0-.682-2.187l-3.521-3.688c-1.985-1.961-1.011-4.632 1.527-5.007L9.41 9.64c.723-.107 1.552-.579 1.883-1.276l2.248-4.62c1.144-2.325 3.93-2.325 5.065 0\"/><path fill=\"url(#sticker-iReInnd)\" d=\"m18.605 3.744l2.203 4.62c.34.686.963 1.169 1.685 1.276l4.928.696c2.538.376 3.496 3.101 1.527 5.086l-3.453 3.562a2.49 2.49 0 0 0-.682 2.187l.776 5.063c.441 2.626-1.77 4.49-4.008 3.29l-4.536-2.413a2.14 2.14 0 0 0-2.006 0l-4.536 2.412c-2.238 1.19-4.586-.617-3.93-3.351l.766-4.953a2.49 2.49 0 0 0-.682-2.187l-3.521-3.688c-1.985-1.961-1.011-4.632 1.527-5.007L9.41 9.64c.723-.107 1.552-.579 1.883-1.276l2.248-4.62c1.144-2.325 3.93-2.325 5.065 0\"/><defs><radialGradient id=\"sticker-iEvtg7b\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"rotate(132.939 10.318 9.828)scale(19.9803 19.7731)\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#FAC632\"/><stop offset=\"1\" stop-color=\"#F7C632\"/></radialGradient><radialGradient id=\"sticker-iGAM1ho\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(0 13.9478 -13.9614 0 16.039 15.948)\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#DDBA38\"/><stop offset=\"1\" stop-color=\"#DDBA38\" stop-opacity=\"0\"/></radialGradient><radialGradient id=\"sticker-ieN0Cle\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(.62228 2.178 -7.26854 2.07673 7.06 10.082)\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#DDBA38\"/><stop offset=\"1\" stop-color=\"#DDBA38\" stop-opacity=\"0\"/></radialGradient><radialGradient id=\"sticker-i9PUN5i\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(3.77717 1.089 -1.09006 3.78086 2.077 11.52)\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#B5953A\"/><stop offset=\"1\" stop-color=\"#B5953A\" stop-opacity=\"0\"/></radialGradient><radialGradient id=\"sticker-i8N0h7d\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(1.47791 -2.41136 2.41371 1.47936 8.888 30.811)\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#C47E42\"/><stop offset=\"1\" stop-color=\"#C47E42\" stop-opacity=\"0\"/></radialGradient><radialGradient id=\"sticker-iReInnd\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"rotate(150.751 14.005 9.89)scale(2.2288 2.93061)\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#FFF246\"/><stop offset=\"1\" stop-color=\"#FFF246\" stop-opacity=\"0\"/></radialGradient><filter id=\"sticker-iycMXqn\" width=\"30.673\" height=\"29.645\" x=\".827\" y=\"1.5\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dy=\"-.5\"/><feGaussianBlur stdDeviation=\"1.5\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.772549 0 0 0 0 0.494118 0 0 0 0 0.282353 0 0 0 1 0\"/><feBlend in2=\"shape\" result=\"effect1_innerShadow_18_14837\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dx=\"-1.25\" dy=\"1.25\"/><feGaussianBlur stdDeviation=\".75\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 1 0 0 0 0 0.952941 0 0 0 0 0.286275 0 0 0 1 0\"/><feBlend in2=\"effect1_innerShadow_18_14837\" result=\"effect2_innerShadow_18_14837\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dx=\"1.5\" dy=\"-.5\"/><feGaussianBlur stdDeviation=\".75\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.698039 0 0 0 0 0.537255 0 0 0 0 0.192157 0 0 0 1 0\"/><feBlend in2=\"effect2_innerShadow_18_14837\" result=\"effect3_innerShadow_18_14837\"/></filter></defs></g></svg>", "keyring": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 32 32\"><g fill=\"none\"><g filter=\"url(#keyring-izTzgOT)\"><path fill=\"url(#keyring-iJjwehc)\" fill-rule=\"evenodd\" d=\"M19.064 17.393a7.952 7.952 0 0 0 8.611-12.99a7.95 7.95 0 0 0-12.98 8.638l-3.447 3.448a1.37 1.37 0 0 0-.402.948l-.018 1.032a1.23 1.23 0 0 1-1.11 1.204l-.536.052a1.16 1.16 0 0 0-1.042 1.029l-.058.532a1.276 1.276 0 0 1-1.317 1.136l-.8-.03a1.37 1.37 0 0 0-1.022.401l-1.859 1.859a3.084 3.084 0 0 0 4.361 4.36zm7.16-9.018a1.783 1.783 0 1 1-2.52-2.522a1.783 1.783 0 0 1 2.52 2.522\" clip-rule=\"evenodd\"/></g><path fill=\"url(#keyring-iXHJeHe)\" fill-rule=\"evenodd\" d=\"M19.064 17.393a7.952 7.952 0 0 0 8.611-12.99a7.95 7.95 0 0 0-12.98 8.638l-3.447 3.448a1.37 1.37 0 0 0-.402.948l-.018 1.032a1.23 1.23 0 0 1-1.11 1.204l-.536.052a1.16 1.16 0 0 0-1.042 1.029l-.058.532a1.276 1.276 0 0 1-1.317 1.136l-.8-.03a1.37 1.37 0 0 0-1.022.401l-1.859 1.859a3.084 3.084 0 0 0 4.361 4.36zm7.16-9.018a1.783 1.783 0 1 1-2.52-2.522a1.783 1.783 0 0 1 2.52 2.522\" clip-rule=\"evenodd\"/><defs><radialGradient id=\"keyring-iXHJeHe\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(-16.24995 15.50005 -7.89314 -8.27501 19.328 13.719)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".935\" stop-color=\"#F18849\" stop-opacity=\"0\"/><stop offset=\"1\" stop-color=\"#CC6946\"/></radialGradient><linearGradient id=\"keyring-iJjwehc\" x1=\"17.864\" x2=\"17.493\" y1=\"7.457\" y2=\"29.939\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#FFDC46\"/><stop offset=\"1\" stop-color=\"#F38E4A\"/></linearGradient><filter id=\"keyring-izTzgOT\" width=\"28.573\" height=\"28.392\" x=\"1.781\" y=\"1.924\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dx=\".35\" dy=\"-.1\"/><feGaussianBlur stdDeviation=\".3\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.803922 0 0 0 0 0.623529 0 0 0 0 0.294118 0 0 0 1 0\"/><feBlend in2=\"shape\" result=\"effect1_innerShadow_18_23714\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dy=\"-.15\"/><feGaussianBlur stdDeviation=\".3\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.796078 0 0 0 0 0.505882 0 0 0 0 0.411765 0 0 0 1 0\"/><feBlend in2=\"effect1_innerShadow_18_23714\" result=\"effect2_innerShadow_18_23714\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dx=\"-.4\" dy=\".4\"/><feGaussianBlur stdDeviation=\".2\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.996078 0 0 0 0 0.996078 0 0 0 0 0.423529 0 0 0 1 0\"/><feBlend in2=\"effect2_innerShadow_18_23714\" result=\"effect3_innerShadow_18_23714\"/></filter></defs></g></svg>", "backpack": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 32 32\"><g fill=\"none\"><rect width=\"8.188\" height=\"12.375\" x=\"11.734\" y=\"2.875\" stroke=\"url(#backpack-iiUee4d)\" stroke-width=\"1.65\" rx=\"4.094\"/><g filter=\"url(#backpack-iqCxdNc)\"><rect width=\"8.188\" height=\"12.375\" x=\"12.063\" y=\"2.875\" stroke=\"url(#backpack-id9azOb)\" stroke-width=\".65\" rx=\"4.094\"/></g><path fill=\"#C4C4C4\" fill-opacity=\".5\" d=\"M4.75 16.094c0-6.075 4.925-11 11-11s11 4.925 11 11v9.851a4 4 0 0 1-4 4h-14a4 4 0 0 1-4-4z\"/><g filter=\"url(#backpack-ibtmMGq)\"><path fill=\"url(#backpack-iF3y6FS)\" d=\"M4.75 16.094c0-6.075 4.925-11 11-11s11 4.925 11 11v9.851a4 4 0 0 1-4 4h-14a4 4 0 0 1-4-4z\"/><path fill=\"url(#backpack-ia5EZyc)\" d=\"M4.75 16.094c0-6.075 4.925-11 11-11s11 4.925 11 11v9.851a4 4 0 0 1-4 4h-14a4 4 0 0 1-4-4z\"/><path fill=\"url(#backpack-iG2ziVb)\" d=\"M4.75 16.094c0-6.075 4.925-11 11-11s11 4.925 11 11v9.851a4 4 0 0 1-4 4h-14a4 4 0 0 1-4-4z\"/></g><g filter=\"url(#backpack-il6LBTb)\"><path stroke=\"url(#backpack-iSPsbPc)\" stroke-linecap=\"round\" d=\"M7.082 12.088a9.51 9.51 0 0 1 8.467-5.182a9.51 9.51 0 0 1 8.467 5.182\"/></g><g stroke-linecap=\"round\" filter=\"url(#backpack-iNJWOYb)\"><path stroke=\"url(#backpack-i0dytzd)\" d=\"M7.082 12.088a9.74 9.74 0 0 1 8.668-5.291a9.74 9.74 0 0 1 8.668 5.29\"/><path stroke=\"url(#backpack-i1x864b)\" d=\"M7.082 12.088a9.74 9.74 0 0 1 8.668-5.291a9.74 9.74 0 0 1 8.668 5.29\"/></g><g stroke-linecap=\"round\" stroke-width=\".25\" filter=\"url(#backpack-iEwn68b)\"><path stroke=\"url(#backpack-ilHFQfd)\" d=\"M7.332 12.088A9.74 9.74 0 0 1 16 6.797a9.74 9.74 0 0 1 8.668 5.29\"/><path stroke=\"url(#backpack-icGS52c)\" d=\"M7.332 12.088A9.74 9.74 0 0 1 16 6.797a9.74 9.74 0 0 1 8.668 5.29\"/></g><g filter=\"url(#backpack-iS9xo5w)\"><rect width=\"5.953\" height=\"2.978\" x=\"12.797\" y=\"9.109\" fill=\"#FFC442\" rx=\"1.25\"/><rect width=\"5.953\" height=\"2.978\" x=\"12.797\" y=\"9.109\" fill=\"url(#backpack-iKIcGsc)\" rx=\"1.25\"/></g><g filter=\"url(#backpack-iSAXeic)\"><path fill=\"url(#backpack-id7e8cw)\" d=\"M21.573 29.945c1.078 0 2.113-.566 2.448-1.59a8.703 8.703 0 1 0-16.543 0c.336 1.024 1.372 1.59 2.45 1.59z\"/><path fill=\"url(#backpack-ihaRFNd)\" d=\"M21.573 29.945c1.078 0 2.113-.566 2.448-1.59a8.703 8.703 0 1 0-16.543 0c.336 1.024 1.372 1.59 2.45 1.59z\"/><path fill=\"url(#backpack-i6cBlTL)\" d=\"M21.573 29.945c1.078 0 2.113-.566 2.448-1.59a8.703 8.703 0 1 0-16.543 0c.336 1.024 1.372 1.59 2.45 1.59z\"/></g><path fill=\"url(#backpack-i1IsW3d)\" d=\"M7.057 25.219a8.703 8.703 0 0 1 17.386 0q.01-.21.01-.422a8.703 8.703 0 1 0-17.396.422\"/><g filter=\"url(#backpack-i9ouDZd)\"><path fill=\"url(#backpack-i2HY0UR)\" fill-rule=\"evenodd\" d=\"M7.523 22.768a.79.79 0 0 0-.792.732l-.276 1.89a.653.653 0 0 0 .652.743h.82c.4 0 .708-.349.653-.74l-.264-1.865c-.036-.426-.362-.76-.793-.76m-.015 1.236a.453.453 0 1 0 0-.906a.453.453 0 0 0 0 .906\" clip-rule=\"evenodd\"/></g><defs><linearGradient id=\"backpack-id9azOb\" x1=\"19.953\" x2=\"14.609\" y1=\"5.281\" y2=\"3.406\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#D85773\"/><stop offset=\"1\" stop-color=\"#BD385C\"/></linearGradient><linearGradient id=\"backpack-ia5EZyc\" x1=\"26.063\" x2=\"15.438\" y1=\"30.563\" y2=\"23.188\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#F63659\"/><stop offset=\"1\" stop-color=\"#F63659\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"backpack-iG2ziVb\" x1=\"5.375\" x2=\"11.375\" y1=\"29.563\" y2=\"21.188\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".035\" stop-color=\"#D64456\"/><stop offset=\"1\" stop-color=\"#D64456\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"backpack-iSPsbPc\" x1=\"24.016\" x2=\"12.008\" y1=\"10.288\" y2=\"10.288\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#FF2274\"/><stop offset=\"1\" stop-color=\"#DA2D56\"/></linearGradient><linearGradient id=\"backpack-i0dytzd\" x1=\"7.082\" x2=\"15.313\" y1=\"11.469\" y2=\"11.469\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#E98832\"/><stop offset=\"1\" stop-color=\"#FFC349\"/></linearGradient><linearGradient id=\"backpack-i1x864b\" x1=\"24.418\" x2=\"18.875\" y1=\"11.813\" y2=\"6.797\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#FFC74B\"/><stop offset=\"1\" stop-color=\"#FFC24C\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"backpack-ilHFQfd\" x1=\"25.344\" x2=\"16.938\" y1=\"11.625\" y2=\"5.688\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#FFEF6F\"/><stop offset=\"1\" stop-color=\"#FFEF6F\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"backpack-icGS52c\" x1=\"7.5\" x2=\"11.188\" y1=\"11.906\" y2=\"8.219\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#F78843\"/><stop offset=\"1\" stop-color=\"#F78843\" stop-opacity=\"0\"/></linearGradient><linearGradient id=\"backpack-ihaRFNd\" x1=\"16.688\" x2=\"16.688\" y1=\"30.438\" y2=\"26.563\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#E41863\"/><stop offset=\"1\" stop-color=\"#E41863\" stop-opacity=\"0\"/></linearGradient><filter id=\"backpack-iqCxdNc\" width=\"9.637\" height=\"13.825\" x=\"11.338\" y=\"2.15\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feGaussianBlur result=\"effect1_foregroundBlur_18_17138\" stdDeviation=\".2\"/></filter><filter id=\"backpack-ibtmMGq\" width=\"22.25\" height=\"25.102\" x=\"4.75\" y=\"5.094\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dx=\".25\" dy=\".25\"/><feGaussianBlur stdDeviation=\".5\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.784314 0 0 0 0 0.329412 0 0 0 0 0.498039 0 0 0 1 0\"/><feBlend in2=\"shape\" result=\"effect1_innerShadow_18_17138\"/></filter><filter id=\"backpack-il6LBTb\" width=\"18.934\" height=\"7.182\" x=\"6.082\" y=\"5.906\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feGaussianBlur result=\"effect1_foregroundBlur_18_17138\" stdDeviation=\".25\"/></filter><filter id=\"backpack-iNJWOYb\" width=\"18.336\" height=\"6.391\" x=\"6.582\" y=\"6.197\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dy=\"-.1\"/><feGaussianBlur stdDeviation=\".25\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.909804 0 0 0 0 0.380392 0 0 0 0 0.141176 0 0 0 1 0\"/><feBlend in2=\"shape\" result=\"effect1_innerShadow_18_17138\"/></filter><filter id=\"backpack-iEwn68b\" width=\"18.386\" height=\"6.341\" x=\"6.807\" y=\"6.272\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feGaussianBlur result=\"effect1_foregroundBlur_18_17138\" stdDeviation=\".2\"/></filter><filter id=\"backpack-iS9xo5w\" width=\"7.953\" height=\"4.978\" x=\"11.697\" y=\"8.209\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dx=\"-.1\" dy=\".1\"/><feGaussianBlur stdDeviation=\".5\"/><feComposite in2=\"hardAlpha\" operator=\"out\"/><feColorMatrix values=\"0 0 0 0 0.890196 0 0 0 0 0.176471 0 0 0 0 0.447059 0 0 0 1 0\"/><feBlend in2=\"BackgroundImageFix\" result=\"effect1_dropShadow_18_17138\"/><feBlend in=\"SourceGraphic\" in2=\"effect1_dropShadow_18_17138\" result=\"shape\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dx=\".25\" dy=\"-.25\"/><feGaussianBlur stdDeviation=\".3\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.945098 0 0 0 0 0.521569 0 0 0 0 0.188235 0 0 0 1 0\"/><feBlend in2=\"shape\" result=\"effect2_innerShadow_18_17138\"/></filter><filter id=\"backpack-iSAXeic\" width=\"17.606\" height=\"13.008\" x=\"7.047\" y=\"16.938\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dx=\".2\"/><feGaussianBlur stdDeviation=\".25\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 0.894969 0 0 0 0 0.370192 0 0 0 0 0.466334 0 0 0 1 0\"/><feBlend in2=\"shape\" result=\"effect1_innerShadow_18_17138\"/></filter><filter id=\"backpack-i9ouDZd\" width=\"2.238\" height=\"3.364\" x=\"6.348\" y=\"22.768\" color-interpolation-filters=\"sRGB\" filterUnits=\"userSpaceOnUse\"><feFlood flood-opacity=\"0\" result=\"BackgroundImageFix\"/><feBlend in=\"SourceGraphic\" in2=\"BackgroundImageFix\" result=\"shape\"/><feColorMatrix in=\"SourceAlpha\" result=\"hardAlpha\" values=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"/><feOffset dx=\"-.1\"/><feGaussianBlur stdDeviation=\".05\"/><feComposite in2=\"hardAlpha\" k2=\"-1\" k3=\"1\" operator=\"arithmetic\"/><feColorMatrix values=\"0 0 0 0 1 0 0 0 0 0.694118 0 0 0 0 0.270588 0 0 0 1 0\"/><feBlend in2=\"shape\" result=\"effect1_innerShadow_18_17138\"/></filter><radialGradient id=\"backpack-iiUee4d\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"rotate(141.554 9.155 4.805)scale(5.22698 8.81171)\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#CE4767\"/><stop offset=\"1\" stop-color=\"#AF3349\"/></radialGradient><radialGradient id=\"backpack-iF3y6FS\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(-5.75002 13.93747 -13.108 -5.40781 19.688 10.5)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".216\" stop-color=\"#FF5AAC\"/><stop offset=\"1\" stop-color=\"#E02E7A\"/></radialGradient><radialGradient id=\"backpack-iKIcGsc\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(5.09375 0 0 4.62022 13.813 10.598)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".791\" stop-color=\"#FFEB6D\" stop-opacity=\"0\"/><stop offset=\"1\" stop-color=\"#FFEB6D\"/></radialGradient><radialGradient id=\"backpack-id7e8cw\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(-6.8125 7.62499 -7.84632 -7.01025 21.875 20.563)\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#FF56A6\"/><stop offset=\"1\" stop-color=\"#F02779\"/></radialGradient><radialGradient id=\"backpack-i6cBlTL\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(14.70305 4.0626 -4.1608 15.05844 9.75 24.438)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".904\" stop-color=\"#F55178\" stop-opacity=\"0\"/><stop offset=\"1\" stop-color=\"#F55178\"/></radialGradient><radialGradient id=\"backpack-i1IsW3d\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"rotate(127.129 6.447 14.118)scale(9.68135 18.4675)\" gradientUnits=\"userSpaceOnUse\"><stop offset=\".522\" stop-color=\"#CB184D\"/><stop offset=\"1\" stop-color=\"#AA2743\"/></radialGradient><radialGradient id=\"backpack-i2HY0UR\" cx=\"0\" cy=\"0\" r=\"1\" gradientTransform=\"matrix(0 -1.64062 1.0426 0 7.517 25.156)\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#FFB54E\"/><stop offset=\"1\" stop-color=\"#FFAF4D\"/></radialGradient></defs></g></svg>"};
+const G = (id, a, b, x1 = 0, y1 = 0, x2 = 0, y2 = 1) => `<linearGradient id="${id}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>`;
+const V = body => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">${body}</svg>`;
+const CUSTOM = {
+  glue: V(`<defs>${G("gl1","#ffd868","#e8a21a",0,0,1,0)}${G("gl2","#f0a62a","#b86d00",0,0,1,0)}${G("gl3","#fff7df","#f1dca8",0,0,1,0)}</defs>
+    <rect x="11" y="9" width="10" height="20" rx="2.5" fill="url(#gl1)"/><rect x="11" y="9" width="10" height="3.5" rx="1.5" fill="url(#gl2)"/>
+    <rect x="12" y="3" width="8" height="6" rx="2" fill="url(#gl2)"/><rect x="12.5" y="15" width="7" height="9" rx="1.2" fill="url(#gl3)"/>
+    <text x="16" y="21" font-size="3.2" font-weight="800" text-anchor="middle" font-family="Nunito, sans-serif" fill="#b57b00">GLUE</text>
+    <rect x="12" y="10" width="1.5" height="18" rx=".75" fill="rgba(255,255,255,.45)"/><ellipse cx="16" cy="30" rx="7" ry="1.2" fill="rgba(0,0,0,.15)"/>`),
+  eraser: V(`<defs>${G("er1","#ffb3c3","#f27a93",0,0,0,1)}${G("er2","#7fb0ff","#3f78e8",0,0,0,1)}${G("er3","#d8e6ff","#9fbdf5",0,0,0,1)}</defs>
+    <g transform="rotate(-22 16 16)"><rect x="5" y="10" width="22" height="12" rx="2.5" fill="url(#er1)"/><path d="M5 12.5A2.5 2.5 0 0 1 7.5 10H15v12H7.5A2.5 2.5 0 0 1 5 19.5z" fill="url(#er2)"/>
+    <rect x="13" y="10" width="2" height="12" fill="url(#er3)"/><rect x="5" y="19" width="22" height="3" rx="1.5" fill="rgba(0,0,0,.12)"/><rect x="6" y="11" width="18" height="1.2" rx=".6" fill="rgba(255,255,255,.5)"/></g>
+    <ellipse cx="16" cy="27" rx="9" ry="1.3" fill="rgba(0,0,0,.15)"/>`),
+  pcase: V(`<defs>${G("pc1","#a08cff","#6a4fe6",0,0,0,1)}${G("pc2","#5b3fd6","#3b2596",0,0,0,1)}${G("pc3","#c2b4ff","#9d86ff",0,0,0,1)}</defs>
+    <rect x="3" y="10" width="26" height="14" rx="5" fill="url(#pc1)"/><rect x="3" y="10" width="26" height="4" rx="2" fill="url(#pc2)"/>
+    <rect x="6" y="16" width="20" height="5.5" rx="2" fill="url(#pc3)"/><circle cx="25.5" cy="12" r="1.6" fill="#ffd45e"/><rect x="4" y="15" width="1.2" height="7" rx=".6" fill="rgba(255,255,255,.35)"/>
+    <ellipse cx="16" cy="26.5" rx="11" ry="1.3" fill="rgba(0,0,0,.15)"/>`),
+  bottle: V(`<defs>${G("bt1","#a7dcff","#5cb3f5",0,0,1,0)}${G("bt2","#2f7fd0","#1b4f9c",0,0,1,0)}${G("bt3","#ffffff","#dbe8f7",0,0,0,1)}</defs>
+    <rect x="12" y="2.5" width="8" height="4.5" rx="1.5" fill="url(#bt2)"/><rect x="10" y="7" width="12" height="22" rx="4" fill="url(#bt1)"/>
+    <rect x="10" y="13" width="12" height="9" fill="url(#bt3)"/><path d="M14 17.5l2-2.5 2 2.5-2 2.5z" fill="#2458e6"/>
+    <rect x="11.5" y="9" width="1.6" height="17" rx=".8" fill="rgba(255,255,255,.55)"/><ellipse cx="16" cy="30" rx="6" ry="1.2" fill="rgba(0,0,0,.15)"/>`),
+  keycap: V(`<defs>${G("kc1","#3a3f4c","#1e222b",0,0,0,1)}${G("kc2","#ffd45e","#f0b228",0,0,0,1)}${G("kc3","#ffe48c","#ffd45e",0,0,0,1)}</defs>
+    <rect x="5" y="7" width="22" height="21" rx="4" fill="url(#kc1)"/><rect x="6.5" y="5" width="19" height="18" rx="3.5" fill="url(#kc2)"/><rect x="8" y="6.5" width="16" height="14" rx="3" fill="url(#kc3)"/>
+    <text x="16" y="17.5" font-size="9" font-weight="800" text-anchor="middle" font-family="Nunito, sans-serif" fill="#2b2f38">A</text>
+    <ellipse cx="16" cy="30" rx="10" ry="1.3" fill="rgba(0,0,0,.15)"/>`),
+  slime: V(`<defs>${G("sl1","#9df08f","#4fc45a",0,0,0,1)}${G("sl2","#f3f9ff","#cfe1f5",0,0,0,1)}${G("sl3","#8ed0ff","#4a9de0",0,0,0,1)}</defs>
+    <rect x="4" y="11" width="24" height="17" rx="3.5" fill="url(#sl2)" stroke="#b6d2f2" stroke-width=".8"/>
+    <path d="M5 17c3-5 7-5 10-2s7 2 9-2 4-1 7 2v9.5A3.5 3.5 0 0 1 27.5 28h-20A3.5 3.5 0 0 1 4 24.5z" fill="url(#sl1)"/>
+    <ellipse cx="11" cy="21" rx="2.8" ry="1.3" fill="rgba(255,255,255,.6)"/><rect x="3" y="7.5" width="26" height="4.5" rx="2" fill="url(#sl3)"/>
+    <rect x="5" y="8.3" width="22" height="1" rx=".5" fill="rgba(255,255,255,.5)"/><ellipse cx="16" cy="30" rx="12" ry="1.2" fill="rgba(0,0,0,.15)"/>`),
 };
-const BAG_SVG = `<svg viewBox="0 0 300 340" xmlns="http://www.w3.org/2000/svg">
-  <path d="M95 48c0-26 18-40 55-40s55 14 55 40v10h-18v-8c0-16-12-24-37-24s-37 8-37 24v8H95z" fill="#1f3f8f"/>
-  <rect x="60" y="60" width="38" height="250" rx="18" fill="#1f3f8f"/><rect x="202" y="60" width="38" height="250" rx="18" fill="#1f3f8f"/>
-  <rect x="36" y="56" width="228" height="268" rx="46" fill="#2458e6"/>
-  <path d="M36 102h228v176a46 46 0 0 1-46 46H82a46 46 0 0 1-46-46z" fill="#2458e6"/>
-  <rect x="52" y="60" width="196" height="100" rx="34" fill="#163a9c"/>
-  <rect x="52" y="122" width="196" height="6" fill="#0e2a73"/>
-  <path d="M36 150h228v128a46 46 0 0 1-46 46H82a46 46 0 0 1-46-46z" fill="#2458e6"/>
-  <path d="M36 150h228v12H36z" fill="#1a49c2"/>
-  <rect x="70" y="196" width="160" height="100" rx="24" fill="#1a49c2"/>
-  <rect x="70" y="196" width="160" height="12" rx="6" fill="#0e2a73"/>
-  <rect x="134" y="200" width="32" height="6" rx="3" fill="#c9d3f5"/>
-  <rect x="122" y="170" width="56" height="12" rx="6" fill="#0e2a73"/>
-  <rect x="44" y="230" width="16" height="60" rx="8" fill="#163a9c"/><rect x="240" y="230" width="16" height="60" rx="8" fill="#163a9c"/>
+const PIC = { ...FLUENT, ...CUSTOM };
+// 그라데이션/필터 정의는 숨겨진 탭 안에 있으면 깨지므로, 항상 보이는 스프라이트 하나로 모아요
+const SPRITE = [];
+const hoist = svg => svg.replace(/<defs>[\s\S]*?<\/defs>/g, m => { SPRITE.push(m.slice(6, -7)); return ""; });
+for (const k in PIC) PIC[k] = hoist(PIC[k]);
+// 열린 백팩 (물건 5칸)
+let BAG_SVG = `<svg viewBox="0 0 300 320" xmlns="http://www.w3.org/2000/svg">
+  <defs>${G("bg1","#3d78ff","#1f49c8")}${G("bg2","#2a56d9","#163a9c")}${G("bg3","#2b2f3a","#14161c")}${G("bg4","#1e3c8f","#122566")}</defs>
+  <path d="M100 44c0-26 20-40 50-40s50 14 50 40v8h-16v-7c0-16-12-24-34-24s-34 8-34 24v7h-16z" fill="url(#bg4)"/>
+  <rect x="58" y="56" width="36" height="236" rx="18" fill="url(#bg4)"/><rect x="206" y="56" width="36" height="236" rx="18" fill="url(#bg4)"/>
+  <rect x="30" y="50" width="240" height="258" rx="44" fill="url(#bg1)"/>
+  <path d="M40 58h220a12 12 0 0 1 12 12v140H28V70a12 12 0 0 1 12-12z" fill="url(#bg2)"/>
+  <path d="M40 62h220a8 8 0 0 1 8 8v134H32V70a8 8 0 0 1 8-8z" fill="url(#bg3)"/>
+  <rect x="32" y="202" width="236" height="8" fill="#1a49c2"/>
+  <rect x="70" y="226" width="160" height="66" rx="20" fill="url(#bg2)"/><rect x="70" y="226" width="160" height="10" rx="5" fill="#122566"/>
+  <rect x="134" y="228.5" width="32" height="5" rx="2.5" fill="#c9d3f5"/><rect x="122" y="212" width="56" height="10" rx="5" fill="#122566"/>
+  <rect x="42" y="244" width="14" height="44" rx="7" fill="#1e3c8f"/><rect x="244" y="244" width="14" height="44" rx="7" fill="#1e3c8f"/>
 </svg>`;
-const BAG_ICON = `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><path d="M28 18c0-8 5-12 12-12s12 4 12 12v4h-6v-3c0-4-2-7-6-7s-6 3-6 7v3h-6z" fill="#1f3f8f"/><rect x="12" y="20" width="56" height="54" rx="14" fill="#2458e6"/><rect x="16" y="22" width="48" height="22" rx="10" fill="#163a9c"/><rect x="22" y="48" width="36" height="18" rx="7" fill="#1a49c2"/><rect x="32" y="50" width="16" height="3" rx="1.5" fill="#c9d3f5"/></svg>`;
-const FACE = `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="42" r="30" fill="#f6d2b4"/><path d="M12 36c0-18 12-28 28-28s28 10 28 28c-6-6-12-8-28-8s-22 2-28 8z" fill="#3b2a20"/><circle cx="30" cy="44" r="3" fill="#1f2328"/><circle cx="50" cy="44" r="3" fill="#1f2328"/><path d="M32 56q8 6 16 0" stroke="#1f2328" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`;
+let FACE = V(`<defs>${G("fc1","#ffe3c9","#f2c6a0")}${G("fc2","#4a3426","#2b1c14")}</defs><circle cx="16" cy="17" r="12" fill="url(#fc1)"/><path d="M5 15c0-8 5-12 11-12s11 4 11 12c-3-3-5-4-11-4S8 12 5 15z" fill="url(#fc2)"/><circle cx="12" cy="17.5" r="1.3" fill="#1f2328"/><circle cx="20" cy="17.5" r="1.3" fill="#1f2328"/><path d="M12.5 22q3.5 2.6 7 0" stroke="#1f2328" stroke-width="1.2" fill="none" stroke-linecap="round"/>`);
+BAG_SVG = hoist(BAG_SVG); FACE = hoist(FACE);
+document.body.insertAdjacentHTML("afterbegin", `<svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden"><defs>${SPRITE.join("")}</defs></svg>`);
 const ICON = {
-  play: `<svg viewBox="0 0 24 24"><path d="M5 3l15 9-15 9z"/></svg>`,
   speaker: `<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 4V5L7 9zm11 3a4 4 0 0 0-2-3.5v7A4 4 0 0 0 14 12zm-2-8.8v2.1A7 7 0 0 1 19 12a7 7 0 0 1-7 6.7v2.1A9 9 0 0 0 21 12a9 9 0 0 0-9-8.8z"/></svg>`,
   mic: `<svg viewBox="0 0 24 24"><path d="M12 15a4 4 0 0 0 4-4V6a4 4 0 0 0-8 0v5a4 4 0 0 0 4 4zm6-4h-2a4 4 0 0 1-8 0H6a6 6 0 0 0 5 5.9V20H8v2h8v-2h-3v-3.1A6 6 0 0 0 18 11z"/></svg>`,
 };
 
 // ---------- 단어 ----------
 const WORDS = [
-  { id: "pen",      en: "pen",          ko: "펜",     art: "a",  tb: true },
-  { id: "glue",     en: "glue stick",   ko: "딱풀",   art: "a",  tb: true },
-  { id: "ruler",    en: "ruler",        ko: "자",     art: "a",  tb: true },
-  { id: "eraser",   en: "eraser",       ko: "지우개", art: "an", tb: true },
-  { id: "notebook", en: "notebook",     ko: "공책",   art: "a",  tb: true },
-  { id: "crayon",   en: "crayon",       ko: "크레용", art: "a",  tb: true },
+  { id: "pen",      en: "pen",          ko: "펜",     art: "a" },
+  { id: "glue",     en: "glue stick",   ko: "딱풀",   art: "a" },
+  { id: "ruler",    en: "ruler",        ko: "자",     art: "a" },
+  { id: "eraser",   en: "eraser",       ko: "지우개", art: "an" },
+  { id: "notebook", en: "notebook",     ko: "공책",   art: "a" },
+  { id: "crayon",   en: "crayon",       ko: "크레용", art: "a" },
   { id: "pencil",   en: "pencil",       ko: "연필",   art: "a" },
   { id: "pcase",    en: "pencil case",  ko: "필통",   art: "a" },
   { id: "scissors", en: "scissors",     ko: "가위",   art: "" },
@@ -319,22 +335,23 @@ function speak(text, rate = 0.85) {
   speechSynthesis.speak(u);
 }
 
-// ---------- 가방 (세 단계가 함께 쓰는 상태) ----------
+// ---------- 가방: 세 단계가 함께 쓰는 상태 (최대 5개) ----------
 const bag = [];
 const inBag = id => bag.includes(id);
+const isFull = () => bag.length >= MAX;
 const watchers = [];
 const onBag = fn => watchers.push(fn);
 function changed() { watchers.forEach(fn => fn()); try { localStorage.setItem("bag-items", JSON.stringify(bag)); } catch (e) {} }
-function putIn(id) { if (inBag(id)) return false; bag.push(id); changed(); return true; }
+function putIn(id) { if (inBag(id) || isFull()) return false; bag.push(id); changed(); return true; }
 function takeOut(id) { const i = bag.indexOf(id); if (i >= 0) { bag.splice(i, 1); changed(); } }
-try { JSON.parse(localStorage.getItem("bag-items") || "[]").forEach(id => byId[id] && bag.push(id)); } catch (e) {}
+try { JSON.parse(localStorage.getItem("bag-items") || "[]").slice(0, MAX).forEach(id => byId[id] && bag.push(id)); } catch (e) {}
 
 // ---------- 단계 전환 ----------
 const steps = [...document.querySelectorAll(".step")];
 function show(id) {
   steps.forEach(s => { const on = s.getAttribute("aria-controls") === id; s.setAttribute("aria-selected", on); $(s.getAttribute("aria-controls")).hidden = !on; });
   $("dock").hidden = id === "bag";
-  if (id === "say") startSay();
+  if (id === "say") renderSay();
   try { localStorage.setItem("bag-tab", id); } catch (e) {}
   window.scrollTo({ top: 0 });
 }
@@ -343,10 +360,10 @@ document.querySelectorAll(".play").forEach(b => b.innerHTML = ICON.speaker);
 
 // ---------- 1. 단어 ----------
 const dock = $("dock");
-$("dock-bag").innerHTML = BAG_ICON; $("empty-bag").innerHTML = BAG_ICON;
+$("dock-bag").innerHTML = FLUENT.backpack; $("empty-bag").innerHTML = FLUENT.backpack;
 dock.addEventListener("click", () => show("bag"));
 dock.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); show("bag"); } });
-function overDock(y) { return y >= dock.getBoundingClientRect().top - 20; }
+const overDock = y => y >= dock.getBoundingClientRect().top - 20;
 
 let current = WORDS[0];
 function setDialog(w) {
@@ -355,29 +372,28 @@ function setDialog(w) {
   $("d-a").innerHTML = inBag(w.id) ? `Yes, I do. I have <em>${withArt(w)}</em>.` : `No, I don't. I don't have <em>${withArt(w)}</em>.`;
   [...$("shelf").children].forEach(c => c.classList.toggle("active", c.dataset.id === w.id));
 }
-document.querySelectorAll("#dialog .play").forEach(b => b.addEventListener("click", () => {
-  speak(b.dataset.k === "q" ? S.q(current) : (inBag(current.id) ? S.yes(current) : S.no(current)));
-}));
+document.querySelectorAll("#dialog .play").forEach(b => b.addEventListener("click", () => speak(b.dataset.k === "q" ? S.q(current) : (inBag(current.id) ? S.yes(current) : S.no(current)))));
 
 WORDS.forEach(w => {
   const el = document.createElement("div");
   el.className = "item"; el.dataset.id = w.id; el.tabIndex = 0; el.setAttribute("role", "button");
-  el.innerHTML = `<button class="add" type="button" aria-label="가방에 넣기">+</button><div class="pic">${PIC[w.id]}</div><div class="en">${w.en}</div><div class="ko">${w.ko}</div>`;
+  el.innerHTML = `<div class="pic">${PIC[w.id]}</div><div class="en">${w.en}</div><div class="ko">${w.ko}</div><button class="put" type="button">가방에 넣기</button>`;
   const tap = () => { setDialog(w); speak(w.en); };
   el.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tap(); } });
-  el.querySelector(".add").addEventListener("click", e => { e.stopPropagation(); if (inBag(w.id)) { takeOut(w.id); speak(`I don't have ${withArt(w)}.`); } else add(w); });
+  el.querySelector(".put").addEventListener("click", e => { e.stopPropagation(); if (inBag(w.id)) { takeOut(w.id); setDialog(w); speak(`I don't have ${withArt(w)}.`); } else add(w); });
   drag(el, w, tap);
   $("shelf").appendChild(el);
 });
 function add(w) {
-  if (putIn(w.id)) { dock.classList.remove("pop"); void dock.offsetWidth; dock.classList.add("pop"); speak(`I have ${withArt(w)}.`); }
-  else speak(`I already have ${withArt(w)}.`);
+  if (inBag(w.id)) { speak(`I already have ${withArt(w)}.`); }
+  else if (isFull()) { speak("My bag is full."); dock.classList.remove("pop"); void dock.offsetWidth; dock.classList.add("pop"); }
+  else { putIn(w.id); dock.classList.remove("pop"); void dock.offsetWidth; dock.classList.add("pop"); speak(`I have ${withArt(w)}.`); }
   setDialog(w);
 }
 function drag(el, w, onTap) {
   let ghost = null, sx = 0, sy = 0, moving = false;
   el.addEventListener("pointerdown", e => {
-    if (e.target.closest(".add") || (e.pointerType === "mouse" && e.button !== 0)) return;
+    if (e.target.closest(".put") || (e.pointerType === "mouse" && e.button !== 0)) return;
     sx = e.clientX; sy = e.clientY; moving = false; el.setPointerCapture(e.pointerId);
   });
   el.addEventListener("pointermove", e => {
@@ -397,92 +413,20 @@ function drag(el, w, onTap) {
   el.addEventListener("pointercancel", () => { if (ghost) ghost.remove(); ghost = null; moving = false; dock.classList.remove("over"); });
 }
 onBag(() => {
-  [...$("shelf").children].forEach(c => { const on = inBag(c.dataset.id); c.classList.toggle("inbag", on); c.querySelector(".add").textContent = on ? "✓" : "+"; });
-  $("dock-n").textContent = bag.length;
-  const show6 = bag.slice(0, 6);
-  $("dock-items").innerHTML = show6.map(id => `<span>${PIC[id]}</span>`).join("") + (bag.length > 6 ? `<span class="more">+${bag.length - 6}</span>` : "");
+  const full = isFull();
+  [...$("shelf").children].forEach(c => {
+    const on = inBag(c.dataset.id), b = c.querySelector(".put");
+    c.classList.toggle("inbag", on);
+    b.textContent = on ? "✓ 꺼내기" : full ? "가방이 가득 찼어요" : "가방에 넣기";
+    b.disabled = !on && full;
+  });
+  $("dock-n").textContent = `${bag.length} / ${MAX}`;
+  dock.classList.toggle("full", full);
+  $("slots").innerHTML = Array.from({ length: MAX }, (_, i) => bag[i] ? `<span class="slot filled">${PIC[bag[i]]}</span>` : `<span class="slot"></span>`).join("");
   setDialog(current);
 });
 
-// ---------- 2. 말하기: 한 번에 한 문장 ----------
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
-$("sr-warn").hidden = !!SR;
-$("s-listen").innerHTML = ICON.speaker; $("s-mic").innerHTML = ICON.mic; $("s-mic").disabled = !SR;
-$("say-go").addEventListener("click", () => show("learn"));
-let plan = [], pos = 0, results = {};
-function buildPlan() {
-  plan = [];
-  bag.forEach(id => { plan.push({ w: byId[id], k: "q" }); plan.push({ w: byId[id], k: "yes" }); });
-  // 가방에 없는 물건 하나로 No 대답도 연습해요
-  const out = WORDS.filter(w => !inBag(w.id));
-  if (out.length && bag.length) { const w = out[Math.floor(Math.random() * out.length)]; plan.push({ w, k: "q" }); plan.push({ w, k: "no" }); }
-}
-function startSay() {
-  const empty = bag.length === 0;
-  $("say-empty").hidden = !empty; $("say-body").hidden = empty;
-  if (empty) return;
-  const key = bag.join(",");
-  if (startSay.key !== key) { startSay.key = key; buildPlan(); pos = 0; results = {}; }
-  renderStep();
-}
-function renderStep() {
-  const st = plan[pos], text = S[st.k](st.w);
-  $("progress").innerHTML = plan.map((_, i) => `<i class="${i === pos ? "on" : results[i] >= 80 ? "done" : ""}"></i>`).join("");
-  $("s-pic").innerHTML = PIC[st.w.id];
-  const has = inBag(st.w.id);
-  $("s-tag").textContent = has ? "가방에 있어요" : "가방에 없어요"; $("s-tag").className = "tag " + (has ? "ok" : "no");
-  $("s-who").textContent = st.k === "q" ? "친구가 물어봐요" : "내가 대답해요";
-  $("s-text").innerHTML = text.split(" ").map(t => `<span class="w">${t}</span>`).join(" ");
-  $("s-result").innerHTML = "";
-  $("s-prev").disabled = pos === 0;
-  $("s-next").textContent = pos === plan.length - 1 ? "처음부터" : "다음 →";
-  speak(text);
-}
-$("s-listen").addEventListener("click", () => speak(S[plan[pos].k](plan[pos].w)));
-$("s-prev").addEventListener("click", () => { if (pos > 0) { pos--; renderStep(); } });
-$("s-next").addEventListener("click", () => { pos = (pos + 1) % plan.length; renderStep(); });
-
-// 표시 단어 하나 = 비교 단어 하나가 되도록, 들린 "do not" 은 "don't" 로 모아요
-const norm = s => s.toLowerCase().replace(/’/g, "'").replace(/\bdo not\b/g, "don't").replace(/\bi am\b/g, "i'm").replace(/[^a-z0-9 ]/g, "").split(/\s+/).filter(Boolean);
-function align(t, h) {
-  const n = t.length, m = h.length;
-  const d = Array.from({ length: n + 1 }, (_, i) => Array.from({ length: m + 1 }, (_, j) => i === 0 ? j : j === 0 ? i : 0));
-  for (let i = 1; i <= n; i++) for (let j = 1; j <= m; j++) d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (t[i-1] === h[j-1] ? 0 : 1));
-  const hit = Array(n).fill(false); let i = n, j = m;
-  while (i > 0 && j > 0) {
-    if (t[i-1] === h[j-1] && d[i][j] === d[i-1][j-1]) { hit[i-1] = true; i--; j--; }
-    else if (d[i][j] === d[i-1][j-1] + 1) { i--; j--; } else if (d[i][j] === d[i-1][j] + 1) i--; else j--;
-  }
-  return { acc: Math.max(0, Math.round(100 * (1 - d[n][m] / Math.max(n, m, 1)))), hit };
-}
-let rec = null;
-$("s-mic").addEventListener("click", () => {
-  if (!SR) return;
-  if (rec) { try { rec.abort(); } catch (e) {} }
-  speechSynthesis.cancel();
-  const text = S[plan[pos].k](plan[pos].w), mic = $("s-mic"), res = $("s-result");
-  rec = new SR(); rec.lang = "en-US"; rec.interimResults = false; rec.maxAlternatives = 5;
-  mic.classList.add("on"); $("mic-lbl").textContent = "듣고 있어요";
-  res.innerHTML = `<div class="heard">문장을 말해 보세요…</div>`;
-  rec.onresult = ev => {
-    const target = norm(text); let best = { acc: -1, hit: [], said: "" };
-    for (const alt of ev.results[0]) { const r = align(target, norm(alt.transcript)); if (r.acc > best.acc) best = { ...r, said: alt.transcript }; }
-    const g = best.acc >= 80 ? "good" : best.acc >= 50 ? "mid" : "low";
-    $("s-text").querySelectorAll(".w").forEach((el, i) => el.className = "w " + (best.hit[i] ? "hit" : "miss"));
-    res.innerHTML = `<div class="pct ${g}">${best.acc}%</div><div class="meter"><i class="${g}" style="width:${best.acc}%"></i></div>
-      <div class="heard">들린 말: <b>${best.said}</b><br>${g === "good" ? "Excellent!" : g === "mid" ? "Good try! 빨간 단어를 다시 들어 보세요." : "다시 한 번. 듣기를 누르고 천천히 말해요."}</div>`;
-    results[pos] = Math.max(results[pos] || 0, best.acc);
-    $("progress").children[pos].className = best.acc >= 80 ? "done" : "on";
-    if (g === "good") speak("Excellent!");
-  };
-  rec.onerror = ev => {
-    res.innerHTML = `<div class="heard">${{ "not-allowed": "마이크 사용을 허용해 주세요.", "no-speech": "소리가 안 들렸어요. 다시 눌러서 말해 보세요.", "audio-capture": "마이크를 찾을 수 없어요.", "network": "인터넷 연결을 확인해 주세요." }[ev.error] || "다시 한 번 해 보세요."}</div>`;
-  };
-  rec.onend = () => { mic.classList.remove("on"); $("mic-lbl").textContent = "따라 말하기"; rec = null; };
-  try { rec.start(); } catch (e) { res.innerHTML = `<div class="heard">다시 한 번 눌러 보세요.</div>`; }
-});
-
-// ---------- 3. 내 가방 ----------
+// ---------- 2. 내 가방 ----------
 $("backpack").innerHTML = BAG_SVG + `<div class="inside" id="inside"></div>`;
 $("face").innerHTML = FACE;
 function haveSentence() {
@@ -492,16 +436,15 @@ function haveSentence() {
   return `I have ${p.slice(0, -1).join(", ")} and ${p.at(-1)}.`;
 }
 function renderBag() {
-  const inside = $("inside"); inside.innerHTML = "";
-  if (!bag.length) inside.innerHTML = `<span class="none">비어 있어요</span>`;
-  bag.forEach(id => {
-    const b = document.createElement("button"); b.innerHTML = PIC[id]; b.title = byId[id].en + " 꺼내기"; b.setAttribute("aria-label", byId[id].en + " 꺼내기");
-    b.addEventListener("click", () => { takeOut(id); speak(`I don't have ${withArt(byId[id])}.`); });
-    inside.appendChild(b);
-  });
-  $("have-s").innerHTML = `${haveSentence()}<small>${bag.length ? "물건을 누르면 꺼내요" : "1번에서 물건을 넣어 보세요"}</small>`;
+  $("inside").innerHTML = Array.from({ length: MAX }, (_, i) => {
+    const id = bag[i];
+    return `<div class="s">${id ? `<button data-id="${id}" aria-label="${byId[id].en} 꺼내기" title="${byId[id].en} 꺼내기">${PIC[id]}</button>` : ""}</div>`;
+  }).join("");
+  $("inside").querySelectorAll("button").forEach(b => b.addEventListener("click", () => { takeOut(b.dataset.id); speak(`I don't have ${withArt(byId[b.dataset.id])}.`); }));
+  $("have-s").innerHTML = `${haveSentence()}<small>${bag.length ? `${bag.length}개 · 물건을 누르면 꺼내요` : "1번에서 물건을 넣어 보세요"}</small>`;
 }
 $("have-play").addEventListener("click", () => speak(haveSentence()));
+$("bag-more").addEventListener("click", () => show("learn"));
 $("bag-reset").addEventListener("click", () => { bag.length = 0; changed(); speak("My bag is empty."); });
 onBag(renderBag);
 
@@ -524,11 +467,88 @@ $("ans-no").addEventListener("click", () => answer(false));
 $("ask-next").addEventListener("click", () => nextAsk());
 $("ask-play").addEventListener("click", () => speak(S.q(askW)));
 
+// ---------- 3. 말하기: 물건마다 세 문장 ----------
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+$("sr-warn").hidden = !!SR;
+$("say-go").addEventListener("click", () => show("learn"));
+let sayId = null;
+const best = {};                     // "id:k" -> 최고 정확도
+const LINES = [
+  { k: "q",   who: "친구가 물어봐요" },
+  { k: "yes", who: "내가 대답해요 · 가방에 있어요" },
+  { k: "no",  who: "내가 대답해요 · 가방에 없을 때는 이렇게" },
+];
+function renderSay() {
+  const empty = bag.length === 0;
+  $("say-empty").hidden = !empty; $("say-body").hidden = empty;
+  if (empty) return;
+  if (!sayId || !inBag(sayId)) sayId = bag[0];
+  $("chips").innerHTML = bag.map(id => {
+    const done = LINES.every(L => (best[id + ":" + L.k] || 0) >= 80);
+    return `<button class="chip" data-id="${id}" aria-pressed="${id === sayId}">${PIC[id]}${byId[id].en}${done ? '<span class="done">✓</span>' : ""}</button>`;
+  }).join("");
+  $("chips").querySelectorAll(".chip").forEach(c => c.addEventListener("click", () => { sayId = c.dataset.id; renderSay(); }));
+  const w = byId[sayId];
+  $("stage").innerHTML = `<div class="head"><div class="pic">${PIC[w.id]}</div><div class="t">${withArt(w)}<small>${w.ko}</small></div></div>` + LINES.map(L => {
+    const text = S[L.k](w), b = best[w.id + ":" + L.k];
+    return `<div class="line" data-k="${L.k}"><div class="who">${L.who}</div>
+      <div class="sentence">${text.split(" ").map(t => `<span class="w">${t}</span>`).join(" ")}</div>
+      <div class="ctl"><button class="round listen" aria-label="듣기">${ICON.speaker}</button><button class="round mic" aria-label="따라 말하기" ${SR ? "" : "disabled"}>${ICON.mic}</button></div>
+      <div class="result">${b != null ? `<div class="pct ${grade(b)}">${b}%</div><div class="meter"><i class="${grade(b)}" style="width:${b}%"></i></div><div class="heard">지금까지 최고 기록</div>` : ""}</div></div>`;
+  }).join("");
+  $("stage").querySelectorAll(".line").forEach(line => {
+    const text = S[line.dataset.k](w);
+    line.querySelector(".listen").addEventListener("click", () => speak(text));
+    line.querySelector(".mic").addEventListener("click", () => listen(line, text, w.id + ":" + line.dataset.k));
+  });
+}
+onBag(() => { if (!$("say").hidden) renderSay(); });
+const grade = a => a >= 80 ? "good" : a >= 50 ? "mid" : "low";
+
+// 표시 단어 하나 = 비교 단어 하나가 되도록, 들린 "do not" 은 "don't" 로 모아요
+const norm = s => s.toLowerCase().replace(/’/g, "'").replace(/\bdo not\b/g, "don't").replace(/\bi am\b/g, "i'm").replace(/[^a-z0-9 ]/g, "").split(/\s+/).filter(Boolean);
+function align(t, h) {
+  const n = t.length, m = h.length;
+  const d = Array.from({ length: n + 1 }, (_, i) => Array.from({ length: m + 1 }, (_, j) => i === 0 ? j : j === 0 ? i : 0));
+  for (let i = 1; i <= n; i++) for (let j = 1; j <= m; j++) d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (t[i-1] === h[j-1] ? 0 : 1));
+  const hit = Array(n).fill(false); let i = n, j = m;
+  while (i > 0 && j > 0) {
+    if (t[i-1] === h[j-1] && d[i][j] === d[i-1][j-1]) { hit[i-1] = true; i--; j--; }
+    else if (d[i][j] === d[i-1][j-1] + 1) { i--; j--; } else if (d[i][j] === d[i-1][j] + 1) i--; else j--;
+  }
+  return { acc: Math.max(0, Math.round(100 * (1 - d[n][m] / Math.max(n, m, 1)))), hit };
+}
+let rec = null;
+function listen(line, text, key) {
+  if (!SR) return;
+  if (rec) { try { rec.abort(); } catch (e) {} }
+  speechSynthesis.cancel();
+  const mic = line.querySelector(".mic"), res = line.querySelector(".result");
+  rec = new SR(); rec.lang = "en-US"; rec.interimResults = false; rec.maxAlternatives = 5;
+  mic.classList.add("on");
+  res.innerHTML = `<div class="heard only">듣고 있어요. 문장을 말해 보세요…</div>`;
+  rec.onresult = ev => {
+    const target = norm(text); let top = { acc: -1, hit: [], said: "" };
+    for (const alt of ev.results[0]) { const r = align(target, norm(alt.transcript)); if (r.acc > top.acc) top = { ...r, said: alt.transcript }; }
+    const g = grade(top.acc);
+    line.querySelectorAll(".w").forEach((el, i) => el.className = "w " + (top.hit[i] ? "hit" : "miss"));
+    res.innerHTML = `<div class="pct ${g}">${top.acc}%</div><div class="meter"><i class="${g}" style="width:${top.acc}%"></i></div>
+      <div class="heard">들린 말: <b>${top.said}</b> · ${g === "good" ? "Excellent!" : g === "mid" ? "Good try! 빨간 단어를 다시 들어 보세요." : "다시 한 번. 듣기를 누르고 천천히 말해요."}</div>`;
+    best[key] = Math.max(best[key] || 0, top.acc);
+    if (g === "good") { speak("Excellent!"); const id = key.split(":")[0]; if (LINES.every(L => (best[id + ":" + L.k] || 0) >= 80)) setTimeout(renderSay, 1200); }
+  };
+  rec.onerror = ev => {
+    res.innerHTML = `<div class="heard only">${{ "not-allowed": "마이크 사용을 허용해 주세요.", "no-speech": "소리가 안 들렸어요. 다시 눌러서 말해 보세요.", "audio-capture": "마이크를 찾을 수 없어요.", "network": "인터넷 연결을 확인해 주세요." }[ev.error] || "다시 한 번 해 보세요."}</div>`;
+  };
+  rec.onend = () => { mic.classList.remove("on"); rec = null; };
+  try { rec.start(); } catch (e) { res.innerHTML = `<div class="heard only">다시 한 번 눌러 보세요.</div>`; }
+}
+
 // ---------- 시작 ----------
 watchers.forEach(fn => fn());
 nextAsk(false);
 let first = "learn";
-try { const t = localStorage.getItem("bag-tab"); if (["learn", "say", "bag"].includes(t)) first = t; } catch (e) {}
+try { const t = localStorage.getItem("bag-tab"); if (["learn", "bag", "say"].includes(t)) first = t; } catch (e) {}
 show(first);
 </script>
 </body>
