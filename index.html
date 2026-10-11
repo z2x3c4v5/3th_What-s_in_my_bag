@@ -6,7 +6,7 @@
 <title>What's in my bag?</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
 <style>
-/* Layout: one screen, big tab bar on top, a single working panel below; big tap targets for 9-year-olds on a tablet. */
+/* Layout: three tabs over one shared bag. Tab 1 drags words into a floating mini-bag, tab 2 practices sentences for what is in it, tab 3 shows the bag itself. */
 :root {
   --bg: #fff8e7;          /* warm paper */
   --panel: #ffffff;
@@ -45,7 +45,7 @@ body {
   font-family: var(--font-body); font-size: 17px; line-height: 1.45;
   -webkit-tap-highlight-color: transparent; user-select: none;
 }
-.wrap { max-width: 1080px; margin: 0 auto; padding-block: 14px 32px; padding-inline: 16px; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-block: 14px 120px; padding-inline: 16px; }
 
 /* Header */
 header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
@@ -55,28 +55,28 @@ h1 .q { color: var(--accent); }
 .score .st { color: var(--star); }
 
 /* Tabs */
-.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
 .tab {
-  font-family: var(--font-display); font-weight: 600; font-size: clamp(1rem, 2.6vw, 1.3rem);
+  font-family: var(--font-display); font-weight: 600; font-size: clamp(.9rem, 2.4vw, 1.25rem);
   background: var(--panel); color: var(--muted); border: 3px solid var(--line); border-radius: 18px;
-  padding: 12px 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap;
 }
-.tab .n { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--line); color: var(--fg); font-size: .95rem; }
+.tab .n { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--line); color: var(--fg); font-size: .95rem; flex: none; }
 .tab[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); box-shadow: var(--shadow); }
 .tab[aria-selected="true"] .n { background: var(--accent-ink); color: var(--accent); }
-.tab:focus-visible, button:focus-visible { outline: 3px solid var(--sky); outline-offset: 2px; }
+.tab:focus-visible, button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--sky); outline-offset: 2px; }
 
 .panel { margin-top: 16px; }
-.panel[hidden] { display: none; }
 .hint { color: var(--muted); font-size: .95rem; margin: 0 0 10px; }
+.hint b { color: var(--accent); }
 
 /* Pattern strip */
 .pattern { background: var(--panel); border: 2px solid var(--line); border-radius: 18px; padding: 14px 16px; display: grid; gap: 8px; }
 .pattern .line { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-family: var(--font-display); font-size: clamp(1.05rem, 2.6vw, 1.4rem); font-weight: 500; }
-.pattern .who { font-family: var(--font-body); font-size: .8rem; font-weight: 700; color: var(--muted); min-width: 2.6em; letter-spacing: .04em; text-transform: uppercase; }
+.who { font-family: var(--font-body); font-size: .8rem; font-weight: 700; color: var(--muted); min-width: 2.6em; letter-spacing: .04em; text-transform: uppercase; }
 .blank { display: inline-block; min-width: 5.5em; border-bottom: 3px dashed var(--accent); text-align: center; color: var(--accent); font-weight: 700; padding: 0 .3em; }
 .art { display: inline-block; background: var(--chip); border-radius: 8px; padding: 0 .35em; font-weight: 700; }
-.spk { background: var(--sky); color: var(--fg); border: 0; border-radius: 999px; width: 38px; height: 38px; font-size: 1.1rem; cursor: pointer; display: inline-grid; place-items: center; flex: none; }
+.spk { background: var(--sky); color: var(--fg); border: 0; border-radius: 999px; width: 40px; height: 40px; font-size: 1.1rem; cursor: pointer; display: inline-grid; place-items: center; flex: none; }
 .spk:active { transform: scale(.94); }
 
 /* Word cards */
@@ -86,16 +86,19 @@ h1 .q { color: var(--accent); }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
 .card {
   position: relative; background: var(--panel); border: 3px solid var(--line); border-radius: 20px; padding: 12px 10px 10px;
-  display: grid; justify-items: center; gap: 4px; cursor: pointer; text-align: center; transition: transform .12s;
+  display: grid; justify-items: center; gap: 4px; cursor: grab; text-align: center; transition: transform .12s; touch-action: none;
 }
 .card:hover { transform: translateY(-2px); }
 .card.active { border-color: var(--accent); box-shadow: var(--shadow); }
+.card.inbag { border-color: var(--yes); }
 .card .pic { width: 64px; height: 64px; display: grid; place-items: center; font-size: 48px; line-height: 1; }
 .card .pic svg { width: 60px; height: 60px; }
 .card .en { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; }
 .card .ko { color: var(--muted); font-size: .9rem; }
 .card .tb { position: absolute; top: 8px; left: 8px; }
 .card .a { position: absolute; top: 8px; right: 8px; font-family: var(--font-display); font-weight: 700; font-size: .8rem; background: var(--chip); border-radius: 8px; padding: 1px 7px; }
+.card .add { margin-top: 4px; font-family: var(--font-body); font-size: .8rem; font-weight: 700; border: 0; border-radius: 999px; padding: 5px 12px; cursor: pointer; background: var(--chip); color: var(--fg); }
+.card.inbag .add { background: var(--yes); color: #fff; }
 
 /* Listening quiz */
 .quizbox { background: var(--panel); border: 2px solid var(--line); border-radius: 18px; padding: 14px 16px; display: grid; gap: 12px; }
@@ -110,49 +113,88 @@ h1 .q { color: var(--accent); }
 .feedback { min-height: 1.6em; font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; }
 .feedback.ok { color: var(--yes); } .feedback.bad { color: var(--no); }
 
-/* Pack tab */
+/* Floating mini bag (drop target on tabs 1 and 2) */
+.minibag {
+  position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 40;
+  width: 96px; height: 96px; border: 0; border-radius: 40% 40% 22px 22px / 32% 32% 22px 22px; cursor: pointer;
+  background: var(--accent); box-shadow: inset 0 -8px 0 rgba(0,0,0,.12), 0 8px 18px rgba(0,0,0,.18);
+  display: grid; place-items: center; transition: transform .15s, box-shadow .15s; padding: 0;
+}
+.minibag::before { content: ""; position: absolute; left: 24%; right: 24%; top: -10px; height: 26px; border: 7px solid #a65419; border-bottom: 0; border-radius: 16px 16px 0 0; z-index: -1; }
+.minibag .mouthlet { width: 66%; height: 42%; margin-top: 2px; background: #4b2a14; border-radius: 10px; box-shadow: inset 0 5px 0 rgba(0,0,0,.35); display: flex; gap: 2px; align-items: center; justify-content: center; overflow: hidden; font-size: 16px; line-height: 1; }
+.minibag .mouthlet svg { width: 18px; height: 18px; }
+.minibag .n { position: absolute; top: -6px; right: -6px; min-width: 30px; height: 30px; padding: 0 8px; border-radius: 999px; background: var(--star); color: #2b2a33; font-family: var(--font-display); font-weight: 700; font-size: 1rem; display: grid; place-items: center; font-variant-numeric: tabular-nums; }
+.minibag .lbl { position: absolute; bottom: 8px; font-family: var(--font-body); font-size: .68rem; font-weight: 700; color: rgba(255,255,255,.9); }
+.minibag.over { transform: scale(1.12); box-shadow: inset 0 -8px 0 rgba(0,0,0,.12), 0 0 0 6px var(--sky), 0 8px 18px rgba(0,0,0,.18); }
+.minibag.pop { animation: pop .3s; }
+@keyframes pop { 40% { transform: scale(1.1) rotate(-3deg); } }
+.drag-ghost { position: fixed; z-index: 50; pointer-events: none; font-size: 48px; line-height: 1; transform: translate(-50%, -50%) scale(1.15); filter: drop-shadow(0 6px 6px rgba(0,0,0,.3)); }
+.drag-ghost svg { width: 52px; height: 52px; }
+
+/* Tab 2: sentence practice */
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { display: inline-flex; align-items: center; gap: 6px; background: var(--panel); border: 3px solid var(--line); border-radius: 999px; padding: 6px 14px 6px 8px; font-family: var(--font-display); font-weight: 600; font-size: 1rem; cursor: pointer; }
+.chip .pic { font-size: 22px; line-height: 1; display: grid; place-items: center; }
+.chip .pic svg { width: 26px; height: 26px; }
+.chip[aria-pressed="true"] { border-color: var(--accent); background: var(--chip); }
+.chip .done { color: var(--star); }
+.practice { margin-top: 14px; background: var(--panel); border: 2px solid var(--line); border-radius: 18px; padding: 14px 16px; display: grid; gap: 14px; }
+.pline { display: grid; grid-template-columns: auto 1fr auto; gap: 10px 12px; align-items: center; padding-bottom: 12px; border-bottom: 2px dashed var(--line); }
+.pline:last-child { border-bottom: 0; padding-bottom: 0; }
+.pline .txt { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.1rem, 2.6vw, 1.4rem); min-width: 0; }
+.pline .txt .w { display: inline-block; padding: 0 .1em; border-radius: 6px; }
+.pline .txt .w.hit { background: color-mix(in srgb, var(--yes) 22%, transparent); }
+.pline .txt .w.miss { background: color-mix(in srgb, var(--no) 25%, transparent); text-decoration: underline wavy var(--no); }
+.pline .note { grid-column: 2 / 4; font-size: .85rem; color: var(--muted); }
+.pline .ctl { display: flex; gap: 8px; align-items: center; }
+.mic { background: var(--no); color: #fff; border: 0; border-radius: 999px; width: 48px; height: 48px; font-size: 1.3rem; cursor: pointer; display: inline-grid; place-items: center; flex: none; box-shadow: 0 4px 0 rgba(0,0,0,.15); }
+.mic.on { animation: pulse 1s infinite; }
+@keyframes pulse { 50% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--no) 30%, transparent); } }
+.mic:disabled { opacity: .4; cursor: default; }
+.result { grid-column: 2 / 4; display: grid; gap: 6px; }
+.meter { height: 14px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.meter i { display: block; height: 100%; width: 0; border-radius: 999px; background: var(--no); transition: width .4s; }
+.meter i.mid { background: var(--star); } .meter i.good { background: var(--yes); }
+.acc { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; font-family: var(--font-display); font-weight: 600; }
+.acc .pct { font-size: 1.4rem; font-variant-numeric: tabular-nums; }
+.acc .pct.good { color: var(--yes); } .acc .pct.mid { color: #c9960a; } .acc .pct.low { color: var(--no); }
+.heard { font-size: .9rem; color: var(--muted); }
+.heard b { color: var(--fg); font-weight: 500; }
+.empty-state { background: var(--panel); border: 2px dashed var(--line); border-radius: 18px; padding: 28px 16px; text-align: center; display: grid; gap: 12px; justify-items: center; }
+.empty-state .big { font-size: 48px; line-height: 1; }
+.warn { background: var(--chip); border-radius: 12px; padding: 10px 14px; font-size: .9rem; }
+
+/* Tab 3: my bag */
 .pack { display: grid; grid-template-columns: minmax(260px, 1fr) minmax(0, 1.2fr); gap: 18px; align-items: start; }
 @media (max-width: 720px) { .pack { grid-template-columns: 1fr; } }
-
-.bagwrap { display: grid; justify-items: center; gap: 10px; position: sticky; top: env(safe-area-inset-top, 0px); }
+.bagwrap { display: grid; justify-items: center; gap: 10px; }
 .bag {
   position: relative; width: min(100%, 340px); aspect-ratio: 0.92; max-width: 100%;
   background: var(--accent); border-radius: 46% 46% 26px 26px / 34% 34% 26px 26px;
   box-shadow: inset 0 -10px 0 rgba(0,0,0,.12), 0 10px 0 rgba(0,0,0,.08);
   transition: transform .15s, box-shadow .15s;
 }
-.bag::before { /* straps */
-  content: ""; position: absolute; left: 18%; right: 18%; top: -14px; height: 40px; border: 10px solid #a65419; border-bottom: 0; border-radius: 20px 20px 0 0; z-index: -1;
-}
+.bag::before { content: ""; position: absolute; left: 18%; right: 18%; top: -14px; height: 40px; border: 10px solid #a65419; border-bottom: 0; border-radius: 20px 20px 0 0; z-index: -1; }
 .bag .pocket { position: absolute; left: 14%; right: 14%; bottom: 7%; height: 22%; background: rgba(0,0,0,.14); border-radius: 18px; }
 .bag .pocket::after { content: ""; position: absolute; left: 40%; right: 40%; top: 10px; height: 8px; background: rgba(255,255,255,.55); border-radius: 4px; }
 .bag .mouth {
   position: absolute; left: 8%; right: 8%; top: 9%; height: 58%; background: #4b2a14; border-radius: 22px;
   box-shadow: inset 0 8px 0 rgba(0,0,0,.35); padding: 12px; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 6px; overflow: auto;
 }
-.bag.over { transform: scale(1.03); box-shadow: inset 0 -10px 0 rgba(0,0,0,.12), 0 0 0 6px var(--sky); }
 .bag.pop { animation: pop .3s; }
-@keyframes pop { 40% { transform: scale(1.06) rotate(-1.5deg); } }
-.initem { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 14px; background: #fff; font-size: 34px; line-height: 1; cursor: pointer; animation: drop .35s; box-shadow: 0 3px 0 rgba(0,0,0,.25); }
+.initem { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 14px; background: #fff; font-size: 34px; line-height: 1; cursor: pointer; animation: drop .35s; box-shadow: 0 3px 0 rgba(0,0,0,.25); border: 0; padding: 0; }
 .initem svg { width: 42px; height: 42px; }
 @keyframes drop { from { transform: translateY(-40px) scale(.6); opacity: 0; } }
 .bag .empty { color: rgba(255,255,255,.55); font-family: var(--font-display); font-size: 1rem; width: 100%; text-align: center; align-self: center; }
 .count { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; color: var(--muted); font-variant-numeric: tabular-nums; }
-
 .say { background: var(--panel); border: 2px solid var(--line); border-radius: 18px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; min-height: 64px; width: 100%; }
-.say .txt { font-family: var(--font-display); font-weight: 600; font-size: 1.2rem; flex: 1; min-width: 0; }
+.say .txt { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; flex: 1; min-width: 0; }
 .say .txt .ko { display: block; font-family: var(--font-body); font-weight: 400; font-size: .85rem; color: var(--muted); }
-
-.shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; }
-.item { background: var(--panel); border: 3px solid var(--line); border-radius: 18px; padding: 10px 6px 8px; display: grid; justify-items: center; gap: 2px; cursor: grab; text-align: center; touch-action: none; }
-.item .pic { font-size: 40px; line-height: 1; height: 48px; display: grid; place-items: center; }
-.item .pic svg { width: 44px; height: 44px; }
-.item .en { font-family: var(--font-display); font-weight: 600; font-size: .95rem; }
-.item.inbag { opacity: .35; }
-.item.inbag::after { content: "가방 안"; font-size: .7rem; color: var(--muted); }
-.drag-ghost { position: fixed; z-index: 50; pointer-events: none; font-size: 48px; line-height: 1; transform: translate(-50%, -50%) scale(1.15); filter: drop-shadow(0 6px 6px rgba(0,0,0,.3)); }
-.drag-ghost svg { width: 52px; height: 52px; }
-
+.list { background: var(--panel); border: 2px solid var(--line); border-radius: 18px; padding: 14px 16px; display: grid; gap: 8px; }
+.list .li { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 600; font-size: 1.1rem; }
+.list .li .pic { font-size: 26px; line-height: 1; width: 32px; display: grid; place-items: center; }
+.list .li .pic svg { width: 28px; height: 28px; }
+.list .li .out { margin-left: auto; font-family: var(--font-body); font-size: .8rem; font-weight: 700; border: 2px solid var(--line); background: var(--panel); color: var(--muted); border-radius: 999px; padding: 4px 10px; cursor: pointer; }
 .friend { margin-top: 18px; background: var(--panel); border: 2px solid var(--line); border-radius: 18px; padding: 14px 16px; display: grid; gap: 12px; }
 .bubble { display: flex; align-items: center; gap: 12px; }
 .bubble .face { font-size: 48px; line-height: 1; flex: none; }
@@ -160,7 +202,7 @@ h1 .q { color: var(--accent); }
 .bubble .b::before { content: ""; position: absolute; left: -10px; top: 20px; border: 8px solid transparent; border-right-color: var(--sky); border-left: 0; }
 .stars { font-size: 1.4rem; letter-spacing: .1em; min-height: 1.6em; }
 
-@media (prefers-reduced-motion: reduce) { .bag.pop, .initem { animation: none; } .card:hover { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .bag.pop, .minibag.pop, .initem, .mic.on { animation: none; } .card:hover { transform: none; } }
 </style>
 </head>
 <body>
@@ -172,12 +214,13 @@ h1 .q { color: var(--accent); }
 
   <div class="tabs" role="tablist">
     <button class="tab" role="tab" id="tab-learn" aria-selected="true" aria-controls="learn"><span class="n">1</span> 단어 배우기</button>
-    <button class="tab" role="tab" id="tab-pack" aria-selected="false" aria-controls="pack"><span class="n">2</span> 가방 싸기</button>
+    <button class="tab" role="tab" id="tab-practice" aria-selected="false" aria-controls="practice"><span class="n">2</span> 문장 연습하기</button>
+    <button class="tab" role="tab" id="tab-pack" aria-selected="false" aria-controls="pack"><span class="n">3</span> 내 가방</button>
   </div>
 
   <!-- ===== Tab 1: 단어 배우기 ===== -->
   <section class="panel" id="learn" role="tabpanel" aria-labelledby="tab-learn">
-    <p class="hint">카드를 누르면 소리가 나요. 아래 문장에 단어가 들어가요. <b>a</b> / <b>an</b> 을 잘 보세요!</p>
+    <p class="hint">카드를 누르면 소리가 나요. 카드를 <b>오른쪽 아래 가방으로 끌어다 놓으면</b> 가방에 들어가고, 2번 문장 연습에 자동으로 추가돼요.</p>
 
     <div class="pattern" id="pattern">
       <div class="line"><span class="who">A</span><span>Do you have <span class="art" id="p-art1">a(n)</span> <span class="blank" id="p-w1">____</span>?</span><button class="spk" data-say="q" aria-label="질문 듣기">🔊</button></div>
@@ -199,14 +242,30 @@ h1 .q { color: var(--accent); }
     </div>
   </section>
 
-  <!-- ===== Tab 2: 가방 싸기 ===== -->
+  <!-- ===== Tab 2: 문장 연습하기 ===== -->
+  <section class="panel" id="practice" role="tabpanel" aria-labelledby="tab-practice" hidden>
+    <p class="hint">가방에 넣은 단어로 문장을 연습해요. 🔊 를 눌러 듣고, 🎤 를 누른 뒤 따라 말하면 정확도를 알려줘요.</p>
+    <div class="warn" id="sr-warn" hidden>이 브라우저는 음성 인식을 지원하지 않아요. Chrome 이나 Edge 에서 열어 주세요. 듣기 연습은 그대로 할 수 있어요.</div>
+    <div class="empty-state" id="pr-empty">
+      <div class="big">🎒</div>
+      <div>가방이 비어 있어요.<br>1번에서 단어 카드를 가방으로 끌어다 놓으면 여기에 연습 문장이 생겨요.</div>
+      <button class="btn" id="pr-go-learn">1번 단어 배우기로 가기</button>
+    </div>
+    <div id="pr-body" hidden>
+      <div class="section-title" style="margin-top:0">연습할 단어 <span class="legend">가방에 있는 단어예요. 눌러서 골라요</span></div>
+      <div class="chips" id="pr-chips"></div>
+      <div class="practice" id="pr-lines"></div>
+    </div>
+  </section>
+
+  <!-- ===== Tab 3: 내 가방 ===== -->
   <section class="panel" id="pack" role="tabpanel" aria-labelledby="tab-pack" hidden>
-    <p class="hint">물건을 눌러서(또는 끌어서) 가방에 넣어요. 가방 안의 물건을 누르면 다시 꺼내요.</p>
+    <p class="hint">1번에서 넣은 물건이 여기에 들어 있어요. 물건을 누르면 가방에서 꺼내요.</p>
 
     <div class="pack">
       <div class="bagwrap">
         <div class="bag" id="bag" aria-label="my bag">
-          <div class="mouth" id="mouth"><span class="empty">가방이 비어 있어요</span></div>
+          <div class="mouth" id="mouth"></div>
           <div class="pocket"></div>
         </div>
         <div class="count" id="count">0 items</div>
@@ -214,11 +273,15 @@ h1 .q { color: var(--accent); }
           <span class="txt" id="say-txt">What's in my bag?<span class="ko">내 가방 안에 뭐가 있을까?</span></span>
           <button class="spk" id="say-spk" aria-label="문장 듣기">🔊</button>
         </div>
-        <button class="btn ghost" id="reset">가방 비우기</button>
+        <div class="row">
+          <button class="btn ghost" id="go-learn">+ 물건 더 넣기</button>
+          <button class="btn ghost" id="reset">가방 비우기</button>
+        </div>
       </div>
 
       <div>
-        <div class="shelf" id="shelf"></div>
+        <div class="section-title" style="margin-top:0">In my bag, I have… <span class="legend">가방에 든 것</span></div>
+        <div class="list" id="baglist"></div>
 
         <div class="friend">
           <div class="section-title" style="margin:0">친구가 물어봐요 <span class="legend">가방을 보고 대답해요</span></div>
@@ -240,9 +303,15 @@ h1 .q { color: var(--accent); }
   </section>
 </div>
 
+<button class="minibag" id="minibag" aria-label="내 가방 (3번 탭으로 가기)">
+  <div class="mouthlet" id="mouthlet"></div>
+  <span class="n" id="mini-n">0</span>
+  <span class="lbl">my bag</span>
+</button>
+
 <script>
 // ---------- 단어 목록 ----------
-// tb: 교과서 단어, art: a / an, pic: 이모지 또는 SVG
+// tb: 교과서 단어, art: a / an ('' 이면 관사 없이), pic: 이모지 또는 SVG
 const SVG = {
   glue: `<svg viewBox="0 0 64 64"><rect x="22" y="18" width="20" height="40" rx="5" fill="#f5c542"/><rect x="24" y="8" width="16" height="12" rx="3" fill="#e8a000"/><rect x="26" y="26" width="12" height="18" rx="2" fill="#fff6d6"/><text x="32" y="40" font-size="9" text-anchor="middle" font-family="sans-serif" font-weight="700" fill="#b07400">GLUE</text></svg>`,
   eraser: `<svg viewBox="0 0 64 64"><g transform="rotate(-25 32 32)"><rect x="10" y="22" width="44" height="22" rx="5" fill="#ff9ab0"/><rect x="10" y="22" width="18" height="22" rx="5" fill="#5aa9ff"/><rect x="24" y="22" width="4" height="22" fill="#4a90e2"/></g></svg>`,
@@ -254,29 +323,34 @@ const SVG = {
   marker: `<svg viewBox="0 0 64 64"><g transform="rotate(45 32 32)"><rect x="24" y="6" width="16" height="36" rx="4" fill="#3bb4ff"/><rect x="24" y="6" width="16" height="12" rx="4" fill="#1e86cc"/><path d="M26 42h12l-4 12h-4z" fill="#eee"/><path d="M30 54h4l-2 5z" fill="#3bb4ff"/></g></svg>`,
 };
 const WORDS = [
-  { en: "pen",          ko: "펜",        art: "a",  pic: "🖊️", tb: true },
-  { en: "glue stick",   ko: "딱풀",      art: "a",  pic: SVG.glue, tb: true },
-  { en: "ruler",        ko: "자",        art: "a",  pic: "📏", tb: true },
-  { en: "eraser",       ko: "지우개",    art: "an", pic: SVG.eraser, tb: true },
-  { en: "notebook",     ko: "공책",      art: "a",  pic: "📓", tb: true },
-  { en: "crayon",       ko: "크레용",    art: "a",  pic: "🖍️", tb: true },
-  { en: "pencil",       ko: "연필",      art: "a",  pic: "✏️" },
-  { en: "pencil case",  ko: "필통",      art: "a",  pic: SVG.pcase },
-  { en: "marker",       ko: "사인펜",    art: "a",  pic: SVG.marker },
-  { en: "scissors",     ko: "가위",      art: "",   pic: "✂️", plural: true },
-  { en: "book",         ko: "책",        art: "a",  pic: "📘" },
-  { en: "water bottle", ko: "물병",      art: "a",  pic: SVG.bottle },
-  { en: "umbrella",     ko: "우산",      art: "an", pic: "☂️" },
-  { en: "lunch box",    ko: "도시락",    art: "a",  pic: "🍱" },
-  { en: "sticker",      ko: "스티커",    art: "a",  pic: "🌟" },
-  { en: "keyring",      ko: "키링",      art: "a",  pic: SVG.keyring },
-  { en: "keycap",       ko: "키캡",      art: "a",  pic: SVG.keycap },
-  { en: "slime",        ko: "슬라임",    art: "",   pic: SVG.slime, mass: true },
+  { id: "pen",         en: "pen",          ko: "펜",     art: "a",  pic: "🖊️", tb: true },
+  { id: "glue",        en: "glue stick",   ko: "딱풀",   art: "a",  pic: SVG.glue, tb: true },
+  { id: "ruler",       en: "ruler",        ko: "자",     art: "a",  pic: "📏", tb: true },
+  { id: "eraser",      en: "eraser",       ko: "지우개", art: "an", pic: SVG.eraser, tb: true },
+  { id: "notebook",    en: "notebook",     ko: "공책",   art: "a",  pic: "📓", tb: true },
+  { id: "crayon",      en: "crayon",       ko: "크레용", art: "a",  pic: "🖍️", tb: true },
+  { id: "pencil",      en: "pencil",       ko: "연필",   art: "a",  pic: "✏️" },
+  { id: "pcase",       en: "pencil case",  ko: "필통",   art: "a",  pic: SVG.pcase },
+  { id: "marker",      en: "marker",       ko: "사인펜", art: "a",  pic: SVG.marker },
+  { id: "scissors",    en: "scissors",     ko: "가위",   art: "",   pic: "✂️" },
+  { id: "book",        en: "book",         ko: "책",     art: "a",  pic: "📘" },
+  { id: "bottle",      en: "water bottle", ko: "물병",   art: "a",  pic: SVG.bottle },
+  { id: "umbrella",    en: "umbrella",     ko: "우산",   art: "an", pic: "☂️" },
+  { id: "lunchbox",    en: "lunch box",    ko: "도시락", art: "a",  pic: "🍱" },
+  { id: "sticker",     en: "sticker",      ko: "스티커", art: "a",  pic: "🌟" },
+  { id: "keyring",     en: "keyring",      ko: "키링",   art: "a",  pic: SVG.keyring },
+  { id: "keycap",      en: "keycap",       ko: "키캡",   art: "a",  pic: SVG.keycap },
+  { id: "slime",       en: "slime",        ko: "슬라임", art: "",   pic: SVG.slime },
 ];
-// a/an 이 없는 단어(scissors, slime)는 관사 없이 말해요.
+const byId = Object.fromEntries(WORDS.map(w => [w.id, w]));
 const withArt = w => (w.art ? w.art + " " : "") + w.en;
-const isSvg = p => p.startsWith("<svg");
-const picHTML = w => isSvg(w.pic) ? w.pic : w.pic;
+const sentences = {
+  q:   w => `Do you have ${withArt(w)}?`,
+  yes: w => `Yes, I do. I have ${withArt(w)}.`,
+  no:  w => `No, I don't. I don't have ${withArt(w)}.`,
+};
+const shuffle = a => a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(p => p[1]);
+const $ = id => document.getElementById(id);
 
 // ---------- 말하기 (TTS) ----------
 let voice = null;
@@ -297,8 +371,26 @@ function speak(text, rate = 0.85) {
 
 // ---------- 점수 ----------
 let score = 0;
-const scoreEl = document.getElementById("score");
-function addScore(n = 1) { score += n; scoreEl.textContent = score; }
+function addScore(n = 1) { score += n; $("score").textContent = score; }
+
+// ---------- 공유 상태: 가방 (세 탭이 모두 같은 가방을 봐요) ----------
+const bag = [];                           // 넣은 순서대로 word id
+const inBag = id => bag.includes(id);
+const listeners = [];
+function onBagChange(fn) { listeners.push(fn); }
+function bagChanged() {
+  listeners.forEach(fn => fn());
+  try { localStorage.setItem("bag-items", JSON.stringify(bag)); } catch (e) {}
+}
+function putIn(id) {
+  if (inBag(id)) return false;
+  bag.push(id); bagChanged(); return true;
+}
+function takeOut(id) {
+  const i = bag.indexOf(id); if (i < 0) return;
+  bag.splice(i, 1); bagChanged();
+}
+try { const saved = JSON.parse(localStorage.getItem("bag-items") || "[]"); saved.forEach(id => byId[id] && bag.push(id)); } catch (e) {}
 
 // ---------- 탭 ----------
 const tabs = [...document.querySelectorAll(".tab")];
@@ -306,114 +398,23 @@ function showTab(id) {
   tabs.forEach(t => {
     const on = t.getAttribute("aria-controls") === id;
     t.setAttribute("aria-selected", on);
-    document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+    $(t.getAttribute("aria-controls")).hidden = !on;
   });
+  $("minibag").hidden = id === "pack";
+  if (id === "practice") renderPractice();
   try { localStorage.setItem("bag-tab", id); } catch (e) {}
+  window.scrollTo({ top: 0 });
 }
 tabs.forEach(t => t.addEventListener("click", () => showTab(t.getAttribute("aria-controls"))));
-try { const saved = localStorage.getItem("bag-tab"); if (saved === "pack") showTab("pack"); } catch (e) {}
 
-// ---------- 탭1: 단어 카드 + 문장 패턴 ----------
-let current = null;
-const cardsEl = document.getElementById("cards");
-WORDS.forEach((w, i) => {
-  const c = document.createElement("button");
-  c.className = "card"; c.dataset.i = i;
-  c.innerHTML = `${w.tb ? '<span class="tb badge">교과서</span>' : ""}${w.art ? `<span class="a">${w.art}</span>` : ""}
-    <span class="pic">${picHTML(w)}</span><span class="en">${w.en}</span><span class="ko">${w.ko}</span>`;
-  c.addEventListener("click", () => { setPattern(w); speak(w.en); });
-  cardsEl.appendChild(c);
-});
-function setPattern(w) {
-  current = w;
-  [...cardsEl.children].forEach(c => c.classList.toggle("active", WORDS[c.dataset.i] === w));
-  const art = w.art || "";
-  ["p-art1", "p-art2", "p-art3"].forEach(id => { const el = document.getElementById(id); el.textContent = art; el.hidden = !art; });
-  ["p-w1", "p-w2", "p-w3"].forEach(id => document.getElementById(id).textContent = w.en);
-}
-const sentences = {
-  q:   w => `Do you have ${withArt(w)}?`,
-  yes: w => `Yes, I do. I have ${withArt(w)}.`,
-  no:  w => `No, I don't. I don't have ${withArt(w)}.`,
-};
-document.querySelectorAll("#pattern .spk").forEach(b => b.addEventListener("click", () => {
-  if (!current) { speak("Do you have a pen?"); setPattern(WORDS[0]); return; }
-  speak(sentences[b.dataset.say](current));
-}));
-
-// ---------- 탭1: 듣고 고르기 ----------
-const lq = { target: null, choices: [] };
-const lqChoices = document.getElementById("lq-choices"), lqFb = document.getElementById("lq-fb"), lqAgain = document.getElementById("lq-again");
-const shuffle = a => a.map(x => [Math.random(), x]).sort((p, q) => p[0] - q[0]).map(p => p[1]);
-function newListen() {
-  lq.choices = shuffle(WORDS).slice(0, 4);
-  lq.target = lq.choices[Math.floor(Math.random() * 4)];
-  lqFb.textContent = ""; lqFb.className = "feedback"; lqAgain.hidden = false;
-  lqChoices.innerHTML = "";
-  lq.choices.forEach(w => {
-    const c = document.createElement("button"); c.className = "card";
-    c.innerHTML = `<span class="pic">${picHTML(w)}</span><span class="en">${w.en}</span>`;
-    c.addEventListener("click", () => {
-      if (w === lq.target) {
-        lqFb.textContent = "맞아요! " + withArt(w); lqFb.className = "feedback ok"; addScore();
-        speak(`Great! I have ${withArt(w)}.`); setTimeout(newListen, 1600);
-      } else { lqFb.textContent = "다시 들어 보세요!"; lqFb.className = "feedback bad"; speak(lq.target.en); }
-    });
-    lqChoices.appendChild(c);
-  });
-  setTimeout(() => speak(lq.target.en), 250);
-}
-document.getElementById("lq-start").addEventListener("click", newListen);
-lqAgain.addEventListener("click", () => lq.target && speak(lq.target.en));
-
-// ---------- 탭2: 가방 싸기 ----------
-const bag = new Set();
-const shelf = document.getElementById("shelf"), mouth = document.getElementById("mouth"), bagEl = document.getElementById("bag");
-const countEl = document.getElementById("count"), sayTxt = document.getElementById("say-txt");
-let lastSentence = "What's in my bag?";
-
-function say(en, ko) { lastSentence = en; sayTxt.innerHTML = `${en}<span class="ko">${ko}</span>`; speak(en); }
-document.getElementById("say-spk").addEventListener("click", () => speak(lastSentence));
-
-WORDS.forEach((w, i) => {
-  const it = document.createElement("div");
-  it.className = "item"; it.dataset.i = i; it.setAttribute("role", "button"); it.tabIndex = 0;
-  it.innerHTML = `<span class="pic">${picHTML(w)}</span><span class="en">${w.en}</span>`;
-  it.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); putIn(w); } });
-  attachDrag(it, w);
-  shelf.appendChild(it);
-});
-
-function render() {
-  mouth.innerHTML = "";
-  if (bag.size === 0) mouth.innerHTML = `<span class="empty">가방이 비어 있어요</span>`;
-  bag.forEach(w => {
-    const b = document.createElement("button"); b.className = "initem"; b.title = w.en + " 꺼내기";
-    b.innerHTML = picHTML(w);
-    b.addEventListener("click", () => takeOut(w));
-    mouth.appendChild(b);
-  });
-  [...shelf.children].forEach(it => it.classList.toggle("inbag", bag.has(WORDS[it.dataset.i])));
-  countEl.textContent = `${bag.size} item${bag.size === 1 ? "" : "s"}`;
-}
-function putIn(w) {
-  if (bag.has(w)) { say(`I already have ${withArt(w)}.`, `${w.ko}은(는) 벌써 가방에 있어요.`); return; }
-  bag.add(w); render();
-  bagEl.classList.remove("pop"); void bagEl.offsetWidth; bagEl.classList.add("pop");
-  say(`I have ${withArt(w)}.`, `나는 ${w.ko}이(가) 있어요.`);
-}
-function takeOut(w) {
-  bag.delete(w); render();
-  say(`I don't have ${withArt(w)}.`, `나는 ${w.ko}이(가) 없어요.`);
-}
-document.getElementById("reset").addEventListener("click", () => { bag.clear(); render(); say("My bag is empty.", "내 가방은 비어 있어요."); });
-render();
-
-// 누르기 = 넣기, 끌어서 가방 위에 놓기 = 넣기 (마우스/터치 모두)
-function attachDrag(el, w) {
+// ---------- 끌어서 가방에 넣기 (마우스/터치 공통) ----------
+const minibag = $("minibag");
+function overEl(el, x, y) { const r = el.getBoundingClientRect(); return x >= r.left - 12 && x <= r.right + 12 && y >= r.top - 12 && y <= r.bottom + 12; }
+function attachDrag(el, w, onTap) {
   let ghost = null, sx = 0, sy = 0, dragging = false;
   el.addEventListener("pointerdown", e => {
-    if (e.button !== 0 && e.pointerType === "mouse") return;
+    if (e.target.closest(".add")) return;          // 버튼은 그냥 버튼
+    if (e.pointerType === "mouse" && e.button !== 0) return;
     sx = e.clientX; sy = e.clientY; dragging = false;
     el.setPointerCapture(e.pointerId);
   });
@@ -421,61 +422,288 @@ function attachDrag(el, w) {
     if (!el.hasPointerCapture(e.pointerId)) return;
     if (!dragging && Math.hypot(e.clientX - sx, e.clientY - sy) > 8) {
       dragging = true;
-      ghost = document.createElement("div"); ghost.className = "drag-ghost"; ghost.innerHTML = picHTML(w);
+      ghost = document.createElement("div"); ghost.className = "drag-ghost"; ghost.innerHTML = w.pic;
       document.body.appendChild(ghost);
     }
     if (dragging) {
       ghost.style.left = e.clientX + "px"; ghost.style.top = e.clientY + "px";
-      bagEl.classList.toggle("over", overBag(e.clientX, e.clientY));
+      minibag.classList.toggle("over", overEl(minibag, e.clientX, e.clientY));
     }
   });
   const end = e => {
     if (!el.hasPointerCapture(e.pointerId)) return;
     el.releasePointerCapture(e.pointerId);
-    if (dragging) { if (overBag(e.clientX, e.clientY)) putIn(w); }
-    else putIn(w);
+    if (dragging) { if (overEl(minibag, e.clientX, e.clientY)) dropIntoBag(w); }
+    else onTap();
     if (ghost) { ghost.remove(); ghost = null; }
-    bagEl.classList.remove("over"); dragging = false;
+    minibag.classList.remove("over"); dragging = false;
   };
   el.addEventListener("pointerup", end);
-  el.addEventListener("pointercancel", e => { if (ghost) ghost.remove(); ghost = null; dragging = false; bagEl.classList.remove("over"); });
+  el.addEventListener("pointercancel", () => { if (ghost) ghost.remove(); ghost = null; dragging = false; minibag.classList.remove("over"); });
 }
-function overBag(x, y) { const r = bagEl.getBoundingClientRect(); return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom; }
+function dropIntoBag(w) {
+  if (putIn(w.id)) {
+    minibag.classList.remove("pop"); void minibag.offsetWidth; minibag.classList.add("pop");
+    speak(`I have ${withArt(w)}.`);
+  } else {
+    speak(`I already have ${withArt(w)}.`);
+  }
+}
+minibag.addEventListener("click", () => showTab("pack"));
 
-// ---------- 탭2: 친구가 물어봐요 ----------
-const askEl = document.getElementById("ask"), askFb = document.getElementById("ask-fb"), starsEl = document.getElementById("stars"), faceEl = document.getElementById("face");
+function renderMini() {
+  $("mini-n").textContent = bag.length;
+  $("mouthlet").innerHTML = bag.slice(-3).map(id => `<span>${byId[id].pic}</span>`).join("");
+}
+onBagChange(renderMini);
+
+// ---------- 탭1: 단어 카드 + 문장 패턴 ----------
+let current = null;
+const cardsEl = $("cards");
+WORDS.forEach(w => {
+  const c = document.createElement("div");
+  c.className = "card"; c.dataset.id = w.id; c.tabIndex = 0; c.setAttribute("role", "button");
+  c.innerHTML = `${w.tb ? '<span class="tb badge">교과서</span>' : ""}${w.art ? `<span class="a">${w.art}</span>` : ""}
+    <span class="pic">${w.pic}</span><span class="en">${w.en}</span><span class="ko">${w.ko}</span>
+    <button class="add" type="button">+ 가방에 넣기</button>`;
+  const tap = () => { setPattern(w); speak(w.en); };
+  attachDrag(c, w, tap);
+  c.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tap(); } });
+  c.querySelector(".add").addEventListener("click", e => {
+    e.stopPropagation();
+    if (inBag(w.id)) { takeOut(w.id); speak(`I don't have ${withArt(w)}.`); }
+    else dropIntoBag(w);
+  });
+  cardsEl.appendChild(c);
+});
+function renderCards() {
+  [...cardsEl.children].forEach(c => {
+    const on = inBag(c.dataset.id);
+    c.classList.toggle("inbag", on);
+    c.querySelector(".add").textContent = on ? "✓ 가방에 있음" : "+ 가방에 넣기";
+  });
+}
+onBagChange(renderCards);
+function setPattern(w) {
+  current = w;
+  [...cardsEl.children].forEach(c => c.classList.toggle("active", c.dataset.id === w.id));
+  ["p-art1", "p-art2", "p-art3"].forEach(id => { $(id).textContent = w.art; $(id).hidden = !w.art; });
+  ["p-w1", "p-w2", "p-w3"].forEach(id => $(id).textContent = w.en);
+}
+document.querySelectorAll("#pattern .spk").forEach(b => b.addEventListener("click", () => {
+  if (!current) setPattern(WORDS[0]);
+  speak(sentences[b.dataset.say](current));
+}));
+
+// ---------- 탭1: 듣고 고르기 ----------
+const lq = { target: null };
+function newListen() {
+  const choices = shuffle(WORDS).slice(0, 4);
+  lq.target = choices[Math.floor(Math.random() * 4)];
+  $("lq-fb").textContent = ""; $("lq-fb").className = "feedback"; $("lq-again").hidden = false;
+  const box = $("lq-choices"); box.innerHTML = "";
+  choices.forEach(w => {
+    const c = document.createElement("button"); c.className = "card"; c.style.cursor = "pointer";
+    c.innerHTML = `<span class="pic">${w.pic}</span><span class="en">${w.en}</span>`;
+    c.addEventListener("click", () => {
+      if (w === lq.target) {
+        $("lq-fb").textContent = "맞아요! " + withArt(w); $("lq-fb").className = "feedback ok"; addScore();
+        speak(`Great! ${withArt(w)}.`); setTimeout(newListen, 1600);
+      } else { $("lq-fb").textContent = "다시 들어 보세요!"; $("lq-fb").className = "feedback bad"; speak(lq.target.en); }
+    });
+    box.appendChild(c);
+  });
+  setTimeout(() => speak(lq.target.en), 250);
+}
+$("lq-start").addEventListener("click", newListen);
+$("lq-again").addEventListener("click", () => lq.target && speak(lq.target.en));
+
+// ---------- 탭2: 문장 연습하기 (가방 단어로 자동 생성) ----------
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+$("sr-warn").hidden = !!SR;
+let practiceId = null;
+const practiceDone = {};          // id -> 3줄 중 80% 넘긴 줄 수
+$("pr-go-learn").addEventListener("click", () => showTab("learn"));
+
+function renderPractice() {
+  const empty = bag.length === 0;
+  $("pr-empty").hidden = !empty; $("pr-body").hidden = empty;
+  if (empty) return;
+  if (!practiceId || !inBag(practiceId)) practiceId = bag[0];
+  const chips = $("pr-chips"); chips.innerHTML = "";
+  bag.forEach(id => {
+    const w = byId[id];
+    const b = document.createElement("button"); b.className = "chip"; b.setAttribute("aria-pressed", id === practiceId);
+    b.innerHTML = `<span class="pic">${w.pic}</span>${w.en}${(practiceDone[id] || 0) >= 3 ? ' <span class="done">★</span>' : ""}`;
+    b.addEventListener("click", () => { practiceId = id; renderPractice(); });
+    chips.appendChild(b);
+  });
+  renderLines(byId[practiceId]);
+}
+onBagChange(() => { if (!$("practice").hidden) renderPractice(); });
+
+const LINES = [
+  { key: "q",   who: "A", note: "친구가 물어봐요" },
+  { key: "yes", who: "B", note: "가방에 있으니까 Yes!" },
+  { key: "no",  who: "B", note: "가방에 없을 때는 이렇게 말해요" },
+];
+function renderLines(w) {
+  const box = $("pr-lines"); box.innerHTML = "";
+  LINES.forEach(L => {
+    const text = sentences[L.key](w);
+    const row = document.createElement("div"); row.className = "pline";
+    row.innerHTML = `<span class="who">${L.who}</span>
+      <div class="txt">${text.split(" ").map(t => `<span class="w">${t}</span>`).join(" ")}</div>
+      <div class="ctl"><button class="spk" aria-label="듣기">🔊</button><button class="mic" aria-label="따라 말하기" ${SR ? "" : "disabled"}>🎤</button></div>
+      <div class="note">${L.note}</div>
+      <div class="result" hidden><div class="acc"><span>정확도</span><span class="pct">0%</span></div><div class="meter"><i></i></div><div class="heard"></div></div>`;
+    row.querySelector(".spk").addEventListener("click", () => speak(text));
+    const mic = row.querySelector(".mic");
+    mic.addEventListener("click", () => listen(text, row, mic, w, L.key));
+    box.appendChild(row);
+  });
+}
+
+// ---------- 음성 인식 + 정확도 ----------
+let rec = null;
+// 표시 단어 하나 = 비교 단어 하나가 되도록, 인식된 "do not" 은 "don't" 로 모아요.
+const norm = s => s.toLowerCase().replace(/’/g, "'").replace(/\bdo not\b/g, "don't").replace(/\bi am\b/g, "i'm").replace(/[^a-z0-9 ]/g, "").split(/\s+/).filter(Boolean);
+function align(target, heard) {
+  // 단어 단위 편집 거리 + 어떤 목표 단어가 맞았는지 되짚기
+  const n = target.length, m = heard.length;
+  const d = Array.from({ length: n + 1 }, (_, i) => Array.from({ length: m + 1 }, (_, j) => i === 0 ? j : j === 0 ? i : 0));
+  for (let i = 1; i <= n; i++) for (let j = 1; j <= m; j++)
+    d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (target[i-1] === heard[j-1] ? 0 : 1));
+  const hit = Array(n).fill(false);
+  let i = n, j = m;
+  while (i > 0 && j > 0) {
+    if (target[i-1] === heard[j-1] && d[i][j] === d[i-1][j-1]) { hit[i-1] = true; i--; j--; }
+    else if (d[i][j] === d[i-1][j-1] + 1) { i--; j--; }
+    else if (d[i][j] === d[i-1][j] + 1) i--;
+    else j--;
+  }
+  const acc = Math.max(0, Math.round(100 * (1 - d[n][m] / Math.max(n, m, 1))));
+  return { acc, hit };
+}
+function listen(text, row, mic, w, key) {
+  if (!SR) return;
+  if (rec) { try { rec.abort(); } catch (e) {} }
+  speechSynthesis.cancel();
+  rec = new SR(); rec.lang = "en-US"; rec.interimResults = false; rec.maxAlternatives = 5;
+  const res = row.querySelector(".result"), heardEl = row.querySelector(".heard");
+  mic.classList.add("on"); mic.textContent = "⏺";
+  res.hidden = false; heardEl.innerHTML = "듣고 있어요… 문장을 말해 보세요!";
+  rec.onresult = ev => {
+    const target = norm(text);
+    let best = { acc: -1, hit: [], said: "" };
+    for (const alt of ev.results[0]) {
+      const r = align(target, norm(alt.transcript));
+      if (r.acc > best.acc) best = { ...r, said: alt.transcript };
+    }
+    showResult(row, best, target, w, key);
+  };
+  rec.onerror = ev => {
+    const msg = { "not-allowed": "마이크 사용을 허용해 주세요.", "no-speech": "소리가 안 들렸어요. 다시 눌러서 말해 보세요.", "audio-capture": "마이크를 찾을 수 없어요.", "network": "인터넷 연결을 확인해 주세요." }[ev.error] || "다시 한 번 해 보세요.";
+    heardEl.innerHTML = msg;
+  };
+  rec.onend = () => { mic.classList.remove("on"); mic.textContent = "🎤"; rec = null; };
+  try { rec.start(); } catch (e) { heardEl.textContent = "다시 한 번 눌러 보세요."; }
+}
+function showResult(row, best, target, w, key) {
+  const pct = row.querySelector(".pct"), bar = row.querySelector(".meter i"), heardEl = row.querySelector(".heard");
+  const grade = best.acc >= 80 ? "good" : best.acc >= 50 ? "mid" : "low";
+  pct.textContent = best.acc + "%"; pct.className = "pct " + grade;
+  bar.style.width = best.acc + "%"; bar.className = grade;
+  const words = row.querySelectorAll(".txt .w");
+  words.forEach((el, i) => { el.className = "w " + (best.hit[i] ? "hit" : "miss"); });
+  const praise = grade === "good" ? "Excellent! 🎉" : grade === "mid" ? "Good try! 빨간 단어를 다시 들어 보세요." : "다시 한 번! 🔊 를 듣고 천천히 말해요.";
+  heardEl.innerHTML = `들린 말: <b>${best.said || "(없음)"}</b> · ${praise}`;
+  if (grade === "good") {
+    addScore();
+    if (!row.dataset.done) { row.dataset.done = "1"; practiceDone[w.id] = (practiceDone[w.id] || 0) + 1; if (practiceDone[w.id] >= 3) renderPractice(); }
+    speak("Excellent!");
+  }
+}
+
+// ---------- 탭3: 내 가방 ----------
+let lastSentence = "What's in my bag?";
+function say(en, ko) { lastSentence = en; $("say-txt").innerHTML = `${en}<span class="ko">${ko}</span>`; speak(en); }
+$("say-spk").addEventListener("click", () => speak(lastSentence));
+$("go-learn").addEventListener("click", () => showTab("learn"));
+$("reset").addEventListener("click", () => { bag.length = 0; bagChanged(); say("My bag is empty.", "내 가방은 비어 있어요."); });
+
+function listSentence() {
+  const parts = bag.map(id => withArt(byId[id]));
+  if (!parts.length) return "My bag is empty.";
+  if (parts.length === 1) return `I have ${parts[0]}.`;
+  return `I have ${parts.slice(0, -1).join(", ")} and ${parts.at(-1)}.`;
+}
+function renderBag() {
+  const mouth = $("mouth"); mouth.innerHTML = "";
+  if (!bag.length) mouth.innerHTML = `<span class="empty">가방이 비어 있어요</span>`;
+  bag.forEach(id => {
+    const w = byId[id];
+    const b = document.createElement("button"); b.className = "initem"; b.title = w.en + " 꺼내기"; b.innerHTML = w.pic;
+    b.addEventListener("click", () => { takeOut(id); say(`I don't have ${withArt(w)}.`, `나는 ${w.ko}이(가) 없어요.`); });
+    mouth.appendChild(b);
+  });
+  $("count").textContent = `${bag.length} item${bag.length === 1 ? "" : "s"}`;
+  const list = $("baglist"); list.innerHTML = "";
+  if (!bag.length) list.innerHTML = `<div class="hint" style="margin:0">아직 아무것도 없어요. 1번에서 물건을 넣어 보세요.</div>`;
+  bag.forEach(id => {
+    const w = byId[id];
+    const li = document.createElement("div"); li.className = "li";
+    li.innerHTML = `<span class="pic">${w.pic}</span><span>I have ${withArt(w)}.</span><button class="out">꺼내기</button>`;
+    li.querySelector("span:nth-child(2)").addEventListener("click", () => speak(`I have ${withArt(w)}.`));
+    li.querySelector(".out").addEventListener("click", () => { takeOut(id); say(`I don't have ${withArt(w)}.`, `나는 ${w.ko}이(가) 없어요.`); });
+    list.appendChild(li);
+  });
+  const all = document.createElement("div"); all.className = "li";
+  all.innerHTML = `<span class="pic">🎒</span><span>${listSentence()}</span><button class="out">🔊</button>`;
+  all.querySelector(".out").addEventListener("click", () => speak(listSentence()));
+  list.appendChild(all);
+}
+onBagChange(renderBag);
+// 가방에 새 물건이 들어오면 3번 탭의 가방이 통통 튀어요
+onBagChange(() => { const b = $("bag"); b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop"); });
+
+// ---------- 탭3: 친구가 물어봐요 ----------
 let askWord = WORDS[0], answered = false;
 const FACES = ["🙋", "🧒", "👧", "👦", "🧑‍🎓"];
 function nextAsk(speakIt = true) {
-  // 가방에 있는 것과 없는 것을 반반 섞어서 물어봐요.
-  const inside = WORDS.filter(w => bag.has(w)), outside = WORDS.filter(w => !bag.has(w));
+  const inside = WORDS.filter(w => inBag(w.id)), outside = WORDS.filter(w => !inBag(w.id));
   const pool = inside.length && Math.random() < 0.5 ? inside : outside.length ? outside : inside;
   askWord = pool[Math.floor(Math.random() * pool.length)];
   answered = false;
-  askEl.textContent = sentences.q(askWord);
-  askFb.textContent = ""; askFb.className = "feedback";
-  faceEl.textContent = FACES[Math.floor(Math.random() * FACES.length)];
+  $("ask").textContent = sentences.q(askWord);
+  $("ask-fb").textContent = ""; $("ask-fb").className = "feedback";
+  $("face").textContent = FACES[Math.floor(Math.random() * FACES.length)];
   if (speakIt) speak(sentences.q(askWord));
 }
 function answer(yes) {
   if (answered) return;
-  const truth = bag.has(askWord);
+  const truth = inBag(askWord.id);
   if (yes === truth) {
     answered = true; addScore();
     const s = yes ? sentences.yes(askWord) : sentences.no(askWord);
-    askFb.textContent = "정답! " + s; askFb.className = "feedback ok";
-    starsEl.textContent += "⭐"; if (starsEl.textContent.length > 20) starsEl.textContent = "⭐";
+    $("ask-fb").textContent = "정답! " + s; $("ask-fb").className = "feedback ok";
+    const st = $("stars"); st.textContent += "⭐"; if (st.textContent.length > 20) st.textContent = "⭐";
     speak(s);
   } else {
-    askFb.textContent = truth ? `가방을 다시 봐요! ${askWord.ko}이(가) 있어요.` : `가방을 다시 봐요! ${askWord.ko}이(가) 없어요.`;
-    askFb.className = "feedback bad"; speak("Look in your bag!");
+    $("ask-fb").textContent = truth ? `가방을 다시 봐요! ${askWord.ko}이(가) 있어요.` : `가방을 다시 봐요! ${askWord.ko}이(가) 없어요.`;
+    $("ask-fb").className = "feedback bad"; speak("Look in your bag!");
   }
 }
-document.getElementById("ans-yes").addEventListener("click", () => answer(true));
-document.getElementById("ans-no").addEventListener("click", () => answer(false));
-document.getElementById("ask-next").addEventListener("click", () => nextAsk());
-document.getElementById("ask-spk").addEventListener("click", () => speak(sentences.q(askWord)));
-nextAsk(false);
+$("ans-yes").addEventListener("click", () => answer(true));
+$("ans-no").addEventListener("click", () => answer(false));
+$("ask-next").addEventListener("click", () => nextAsk());
+$("ask-spk").addEventListener("click", () => speak(sentences.q(askWord)));
+
+// ---------- 시작 ----------
+renderMini(); renderCards(); renderBag(); nextAsk(false);
+let startTab = "learn";
+try { const t = localStorage.getItem("bag-tab"); if (["learn", "practice", "pack"].includes(t)) startTab = t; } catch (e) {}
+showTab(startTab);
 </script>
 </body>
 </html>
