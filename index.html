@@ -152,55 +152,49 @@ button:focus-visible, [tabindex]:focus-visible { outline: 4px solid var(--sun); 
 @media (max-width: 460px) { .slot { width: 38px; height: 38px; } .slot svg { width: 26px; height: 26px; } .dock .bagico { width: 46px; height: 52px; } }
 
 /* 2. my bag */
-.bagarea { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; align-items: start; }
-@media (max-width: 720px) { .bagarea { grid-template-columns: 1fr; } }
-.bagcol { display: grid; justify-items: center; gap: 12px; }
-.bagstage { position: relative; width: min(100%, 380px); padding-top: 34px; }
+.bagcol { display: grid; justify-items: center; gap: 16px; }
+.bagstage { position: relative; width: min(100%, 500px); padding-top: 40px; }
 .bagstage .holder { position: relative; }
 .bagstage svg.back { width: 100%; height: auto; }
 .bagstage svg.front { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .bagstage svg.front .hit { pointer-events: visiblePainted; cursor: pointer; }
 .bagstage .items { position: absolute; inset: 0; }
-.bagstage .it { position: absolute; width: 32%; aspect-ratio: 1; padding: 0; border: 0; background: transparent; cursor: pointer; transform: rotate(var(--r)); transform-origin: 50% 85%; }
-.bagstage .it svg { width: 100%; height: 100%; filter: drop-shadow(0 4px 3px rgba(40,20,10,.35)); }
-.bagstage .it.new { animation: fall .7s cubic-bezier(.3,1.4,.5,1) both; }
+/* 버튼 상자는 클릭을 받지 않고, 그림의 칠해진 부분만 눌려요 (겹친 물건도 보이는 곳을 누르면 돼요) */
+.bagstage .it { position: absolute; aspect-ratio: 1; padding: 0; border: 0; background: transparent; transform: rotate(var(--r)); transform-origin: 50% 90%; pointer-events: none; }
+.bagstage .it svg { width: 100%; height: 100%; filter: drop-shadow(0 5px 4px rgba(40,20,10,.35)); }
+.bagstage .it svg * { pointer-events: visiblePainted; cursor: pointer; }
+.bagstage .it.new { animation: fall .75s cubic-bezier(.3,1.4,.5,1) both; }
 .bagstage .it.wig { animation: shake .5s; }
-@keyframes fall { 0% { transform: translateY(-150%) rotate(calc(var(--r) - 30deg)); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(0) rotate(var(--r)); } }
-@keyframes shake { 25% { transform: translateY(-10%) rotate(calc(var(--r) - 10deg)); } 75% { transform: translateY(-10%) rotate(calc(var(--r) + 10deg)); } }
+@keyframes fall { 0% { transform: translateY(-160%) rotate(calc(var(--r) - 30deg)); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(0) rotate(var(--r)); } }
+@keyframes shake { 25% { transform: translateY(-12%) rotate(calc(var(--r) - 10deg)) scale(1.08); } 75% { transform: translateY(-12%) rotate(calc(var(--r) + 10deg)) scale(1.08); } }
 .bagstage.squish .holder { animation: squish .5s; transform-origin: 50% 100%; }
+.bag-count { position: absolute; top: 2px; left: 2%; z-index: 5; font-family: var(--font-en); font-weight: 700; font-size: 1.3rem; color: #fff; background: var(--pink); border-radius: 999px; padding: 4px 14px; box-shadow: 0 4px 0 var(--pink-d); font-variant-numeric: tabular-nums; }
+.bag-count.full { background: var(--mint); box-shadow: 0 4px 0 var(--mint-d); }
 .bear-say {
-  position: absolute; top: 0; right: 4%; max-width: 70%; background: #fff; border: 3px solid var(--pink); border-radius: 18px; padding: 6px 14px;
-  font-family: var(--font-en); font-weight: 600; font-size: 1.1rem; color: var(--ink); box-shadow: 0 4px 0 var(--pink-d); z-index: 5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  position: absolute; top: 0; right: 2%; max-width: 64%; background: #fff; border: 3px solid var(--pink); border-radius: 18px; padding: 5px 14px;
+  font-family: var(--font-en); font-weight: 600; font-size: 1.25rem; color: var(--ink); box-shadow: 0 4px 0 var(--pink-d); z-index: 5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   transition: opacity .2s, transform .2s;
 }
-.bear-say::after { content: ""; position: absolute; left: 22px; bottom: -11px; border: 8px solid transparent; border-top-color: var(--pink); border-bottom: 0; }
+.bear-say.ko { font-family: var(--font-ko); font-weight: 400; }
 .bear-say.hide { opacity: 0; transform: translateY(6px); }
 .swatches { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
-.swatches span { color: var(--muted); font-size: .95rem; }
-.sw { width: 38px; height: 38px; border-radius: 50%; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 0 2px var(--line), 0 3px 0 rgba(58,46,92,.15); padding: 0; }
+.swatches span { color: var(--muted); font-size: 1rem; }
+.sw { width: 40px; height: 40px; border-radius: 50%; border: 4px solid #fff; cursor: pointer; box-shadow: 0 0 0 2px var(--line), 0 3px 0 rgba(58,46,92,.15); padding: 0; }
 .sw[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--ink), 0 3px 0 rgba(58,46,92,.15); }
-
-.side { display: grid; gap: 14px; min-width: 0; }
+.contents { width: min(100%, 560px); }
 .ttl { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; font-size: 1.15rem; }
 .ttl b { font-family: var(--font-en); font-weight: 700; color: var(--pink-d); font-variant-numeric: tabular-nums; }
-.ichips { display: flex; flex-wrap: wrap; gap: 8px; }
-.ichip { display: inline-flex; align-items: center; background: var(--p6); border: 3px solid #ffc3da; border-radius: 999px; overflow: hidden; }
-.ichip .w { display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; padding: 4px 4px 4px 6px; font-family: var(--font-en); font-weight: 600; font-size: 1rem; cursor: pointer; }
-.ichip .w svg { width: 28px; height: 28px; }
-.ichip .x { border: 0; background: transparent; width: 32px; height: 36px; cursor: pointer; color: var(--pink-d); font-family: var(--font-en); font-weight: 700; font-size: 1.15rem; }
+.ichips { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.ichip { display: flex; align-items: center; background: var(--p6); border: 3px solid #ffc3da; border-radius: 18px; overflow: hidden; }
+.ichip .w { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; border: 0; background: transparent; padding: 6px 4px 6px 8px; cursor: pointer; text-align: left; }
+.ichip .w svg { width: 36px; height: 36px; flex: none; }
+.ichip .w span { display: grid; line-height: 1.15; min-width: 0; }
+.ichip .w b { font-family: var(--font-en); font-weight: 600; font-size: 1.05rem; }
+.ichip .w small { color: var(--muted); font-size: .85rem; }
+.ichip .x { border: 0; background: transparent; width: 36px; align-self: stretch; cursor: pointer; color: var(--pink-d); font-family: var(--font-en); font-weight: 700; font-size: 1.3rem; flex: none; }
 .ichip .x:hover { background: #ffd3e4; }
-.none { color: var(--muted); display: grid; gap: 10px; justify-items: start; }
-.have { display: flex; align-items: center; gap: 12px; }
-.have .s { font-family: var(--font-en); font-weight: 600; font-size: 1.2rem; flex: 1; min-width: 0; }
-.ask { display: grid; gap: 12px; }
-.ask .q { display: flex; align-items: center; gap: 10px; }
-.ask .q .ava { border-color: var(--sky); }
-.ask .q .t { font-family: var(--font-en); font-weight: 600; font-size: 1.3rem; flex: 1; min-width: 0; }
-.row { display: flex; gap: 10px; }
+.none { color: var(--muted); grid-column: 1 / -1; }
 .rowc { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-.fb { min-height: 1.5em; font-family: var(--font-en); font-weight: 600; font-size: 1.1rem; text-align: center; }
-.fb.ok { color: var(--mint-d); } .fb.bad { color: var(--red-d); }
-.fb .ko { font-family: var(--font-ko); }
 
 /* 3. speaking */
 .warn { background: var(--p5); border: 3px solid var(--sun); border-radius: 16px; padding: 10px 14px; font-size: .95rem; margin-bottom: 14px; }
@@ -277,28 +271,19 @@ button:focus-visible, [tabindex]:focus-visible { outline: 4px solid var(--sun); 
 
   <!-- 2. 내 가방 -->
   <section class="panel" id="bag" role="tabpanel" hidden>
-    <p class="lead"><span class="n">2</span><span>가방 속 물건을 누르면 단어를 들려줘요. 곰돌이 얼굴을 눌러 보세요!</span></p>
-    <div class="bagarea">
-      <div class="bagcol">
-        <div class="bagstage" id="bagstage">
-          <div class="bear-say hide" id="bear-say"></div>
-          <div class="holder" id="holder"></div>
-        </div>
-        <div class="swatches" id="swatches"><span>가방 색</span></div>
+    <p class="lead"><span class="n">2</span><span>1번에서 넣은 물건이 가방 속에 들어 있어요. 물건을 누르면 단어를 들려줘요!</span></p>
+    <div class="bagcol">
+      <div class="bagstage" id="bagstage">
+        <div class="bag-count" id="bag-count">0/5</div>
+        <div class="bear-say hide" id="bear-say"></div>
+        <div class="holder" id="holder"></div>
       </div>
-      <div class="side">
-        <div class="card">
-          <div class="ttl"><span>가방 속 물건</span><b id="bag-n">0 / 5</b></div>
-          <div class="ichips" id="ichips"></div>
-        </div>
-        <div class="card have"><span class="s" id="have-s"></span><button class="play" id="have-play" aria-label="듣기"></button></div>
-        <div class="card ask">
-          <div class="q"><span class="ava" id="ava-ask"></span><span class="t" id="ask-t"></span><button class="play" id="ask-play" aria-label="듣기"></button></div>
-          <div class="row"><button class="btn big yes" id="ans-yes">Yes, I do.</button><button class="btn big no" id="ans-no">No, I don't.</button></div>
-          <div class="fb" id="ask-fb"></div>
-          <div class="rowc"><button class="btn soft" id="ask-next">다른 질문</button><button class="btn soft" id="bag-reset">가방 비우기</button></div>
-        </div>
+      <div class="swatches" id="swatches"><span>가방 색</span></div>
+      <div class="card contents">
+        <div class="ttl"><span>가방 속 물건</span><b id="bag-n">0 / 5</b></div>
+        <div class="ichips" id="ichips"></div>
       </div>
+      <div class="rowc"><button class="btn" id="bag-more">물건 더 넣기</button><button class="btn soft" id="bag-reset">가방 비우기</button></div>
     </div>
   </section>
 
@@ -373,22 +358,22 @@ const BAG_BACK = `
   <circle cx="232" cy="76" r="34" fill="url(#bagM)"/><circle cx="232" cy="76" r="18" style="fill:var(--bag-4)"/>
   <rect x="34" y="54" width="232" height="266" rx="76" fill="url(#bagM)"/>
   <path d="M72 108c12-24 34-38 62-42" stroke="rgba(255,255,255,.55)" stroke-width="9" fill="none" stroke-linecap="round"/>
-  <ellipse cx="150" cy="152" rx="104" ry="28" fill="url(#bagIn)"/>
-  <path d="M46 152a104 28 0 0 1 208 0" fill="none" stroke="url(#bagD)" stroke-width="7"/>`;
+  <ellipse cx="150" cy="176" rx="110" ry="36" fill="url(#bagIn)"/>
+  <path d="M40 176a110 36 0 0 1 220 0" fill="none" stroke="url(#bagD)" stroke-width="7"/>`;
 const BAG_FRONT = `
-  <path class="hit" d="M34 154 Q150 190 266 154 V244 a76 76 0 0 1 -76 76 H110 a76 76 0 0 1 -76 -76 Z" fill="url(#bagF)"/>
-  <path d="M36 157 Q150 193 264 157" fill="none" stroke="url(#bagD)" stroke-width="9" stroke-linecap="round"/>
-  <path d="M44 172 Q150 206 256 172" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="3" stroke-dasharray="7 7" stroke-linecap="round"/>
-  <rect x="226" y="164" width="9" height="20" rx="4.5" fill="#c9c3d6"/>
-  <path d="M230.5 212c-12-8-17-14-17-20a8.5 8.5 0 0 1 17-2.5 8.5 8.5 0 0 1 17 2.5c0 6-5 12-17 20z" fill="#ff6fa8" stroke="#fff" stroke-width="2.5"/>
-  <path d="M58 206l4 8 9 1.3-6.5 6.3 1.5 9-8-4.2-8 4.2 1.5-9-6.5-6.3 9-1.3z" fill="#ffc93c" stroke="#fff" stroke-width="2"/>
-  <ellipse class="hit" cx="150" cy="258" rx="84" ry="52" fill="url(#bagFace)" style="stroke:var(--bag-2)" stroke-width="4"/>
-  <circle cx="121" cy="250" r="9.5" fill="#3a2a2a"/><circle cx="179" cy="250" r="9.5" fill="#3a2a2a"/>
-  <circle cx="124.5" cy="246.5" r="3.4" fill="#fff"/><circle cx="182.5" cy="246.5" r="3.4" fill="#fff"/>
-  <ellipse cx="150" cy="264" rx="10" ry="7" fill="#3a2a2a"/><ellipse cx="147" cy="261.5" rx="3" ry="1.8" fill="rgba(255,255,255,.6)"/>
-  <path d="M137 274q6.5 8 13 0q6.5 8 13 0" stroke="#3a2a2a" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-  <ellipse cx="101" cy="268" rx="13" ry="8" fill="#ff8fab" opacity=".55"/><ellipse cx="199" cy="268" rx="13" ry="8" fill="#ff8fab" opacity=".55"/>
-  <path d="M52 254c2 20 10 36 24 46" stroke="rgba(255,255,255,.4)" stroke-width="8" fill="none" stroke-linecap="round"/>`;
+  <path class="hit" d="M34 190 Q150 228 266 190 V244 a76 76 0 0 1 -76 76 H110 a76 76 0 0 1 -76 -76 Z" fill="url(#bagF)"/>
+  <path d="M36 193 Q150 231 264 193" fill="none" stroke="url(#bagD)" stroke-width="9" stroke-linecap="round"/>
+  <path d="M46 206 Q150 242 254 206" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="3" stroke-dasharray="7 7" stroke-linecap="round"/>
+  <rect x="232" y="198" width="9" height="18" rx="4.5" fill="#c9c3d6"/>
+  <path d="M236.5 242c-11-7.5-16-13-16-18.5a8 8 0 0 1 16-2.3 8 8 0 0 1 16 2.3c0 5.5-5 11-16 18.5z" fill="#ff6fa8" stroke="#fff" stroke-width="2.5"/>
+  <path d="M60 238l3.6 7.2 8 1.2-5.8 5.6 1.4 8-7.2-3.8-7.2 3.8 1.4-8-5.8-5.6 8-1.2z" fill="#ffc93c" stroke="#fff" stroke-width="2"/>
+  <ellipse class="hit" cx="150" cy="272" rx="76" ry="40" fill="url(#bagFace)" style="stroke:var(--bag-2)" stroke-width="4"/>
+  <circle cx="124" cy="266" r="8.5" fill="#3a2a2a"/><circle cx="176" cy="266" r="8.5" fill="#3a2a2a"/>
+  <circle cx="127" cy="263" r="3" fill="#fff"/><circle cx="179" cy="263" r="3" fill="#fff"/>
+  <ellipse cx="150" cy="278" rx="9" ry="6.2" fill="#3a2a2a"/><ellipse cx="147.5" cy="276" rx="2.6" ry="1.6" fill="rgba(255,255,255,.6)"/>
+  <path d="M138.5 287q5.75 7 11.5 0q5.75 7 11.5 0" stroke="#3a2a2a" stroke-width="3.2" fill="none" stroke-linecap="round"/>
+  <ellipse cx="106" cy="282" rx="11" ry="7" fill="#ff8fab" opacity=".55"/><ellipse cx="194" cy="282" rx="11" ry="7" fill="#ff8fab" opacity=".55"/>
+  <path d="M50 262c2 16 8 30 20 40" stroke="rgba(255,255,255,.4)" stroke-width="8" fill="none" stroke-linecap="round"/>`;
 const BAG_ICON = `<svg viewBox="0 0 300 330" xmlns="http://www.w3.org/2000/svg">${BAG_BACK}${BAG_FRONT}</svg>`;
 const BAG_COLORS = {
   yellow: ["#ffd75e", "#f5a623", "#6b3f1f", "#fff4d6", "#e08a12"],
@@ -479,7 +464,7 @@ function setBagColor(name) {
 Object.entries(BAG_COLORS).forEach(([name, c]) => {
   const b = document.createElement("button");
   b.className = "sw"; b.dataset.c = name; b.style.background = c[1]; b.setAttribute("aria-label", name + " 가방");
-  b.addEventListener("click", () => { setBagColor(name); bearSay({ yellow: "Yellow!", pink: "Pink!", mint: "Green!", sky: "Blue!", purple: "Purple!" }[name]); });
+  b.addEventListener("click", () => { setBagColor(name); bearSay(SWATCH_KO[name], true); squish(); });
   $("swatches").appendChild(b);
 });
 let startColor = "yellow";
@@ -497,7 +482,7 @@ function show(id) {
 }
 steps.forEach(s => s.addEventListener("click", () => show(s.getAttribute("aria-controls"))));
 $("logo").innerHTML = BAG_ICON; $("ico1").innerHTML = PIC.book; $("ico2").innerHTML = BAG_ICON; $("ico3").innerHTML = ICON.mic;
-$("ava-friend").innerHTML = FACE; $("ava-ask").innerHTML = FACE;
+$("ava-friend").innerHTML = FACE;
 document.querySelectorAll(".play").forEach(b => b.innerHTML = ICON.speaker);
 
 // ---------- 1. 단어 ----------
@@ -571,67 +556,52 @@ onBag(() => {
 
 // ---------- 2. 내 가방 ----------
 $("holder").innerHTML = `<svg class="back" viewBox="0 0 300 330" xmlns="http://www.w3.org/2000/svg">${BAG_BACK}</svg><div class="items" id="items"></div><svg class="front" viewBox="0 0 300 330" xmlns="http://www.w3.org/2000/svg">${BAG_FRONT}</svg>`;
-// 물건은 가방 입구에 꽂혀서 아랫부분이 앞판에 가려져요
-const POS = { 1: [150], 2: [116, 184], 3: [92, 150, 208], 4: [84, 128, 172, 216], 5: [80, 115, 150, 185, 220] };
-const ROT = [-16, 10, -4, 14, -10], LIFT = [8, -8, -14, -6, 8];
+// 물건 자리: [가운데 x, 바닥 y, 기울기, 크기(가방 폭의 %), 앞줄이면 1]
+// 4~5개일 때는 뒷줄을 높이, 앞줄을 낮게 세워서 모든 물건이 보이게 해요. 아랫부분은 가방 앞판에 가려져요.
+const LAYOUT = {
+  1: [[150, 222, -4, 40, 1]],
+  2: [[108, 222, -12, 37, 1], [192, 222, 12, 37, 1]],
+  3: [[150, 190, 0, 34, 0], [92, 228, -15, 34, 1], [208, 228, 15, 34, 1]],
+  4: [[84, 190, -18, 31, 0], [216, 190, 18, 31, 0], [118, 234, -7, 31, 1], [182, 234, 7, 31, 1]],
+  5: [[78, 190, -20, 30, 0], [150, 176, 0, 30, 0], [222, 190, 20, 30, 0], [112, 236, -8, 30, 1], [188, 236, 8, 30, 1]],
+};
+const SWATCH_KO = { yellow: "노란 가방!", pink: "분홍 가방!", mint: "초록 가방!", sky: "파란 가방!", purple: "보라 가방!" };
 let sayTimer = null;
-function bearSay(text) {
-  const b = $("bear-say"); b.textContent = text; b.classList.remove("hide");
+function bearSay(text, ko = false) {
+  const b = $("bear-say"); b.textContent = text; b.classList.toggle("ko", ko); b.classList.remove("hide");
   clearTimeout(sayTimer); sayTimer = setTimeout(() => b.classList.add("hide"), 2200);
 }
 function squish() { const s = $("bagstage"); s.classList.remove("squish"); void s.offsetWidth; s.classList.add("squish"); }
 $("holder").querySelectorAll(".front .hit").forEach(h => h.addEventListener("click", () => {
-  const t = haveSentence(); speak(t); bearSay(bag.length ? "What's in my bag?" : "My bag is empty!"); squish();
+  bearSay(bag.length ? `물건이 ${bag.length}개 들어 있어요!` : "가방이 비어 있어요!", true); squish();
 }));
-function haveSentence() {
-  const p = bag.map(id => withArt(byId[id]));
-  if (!p.length) return "My bag is empty.";
-  if (p.length === 1) return `I have ${p[0]}.`;
-  return `I have ${p.slice(0, -1).join(", ")} and ${p.at(-1)}.`;
-}
+function sayWord(w) { speak(w.en); bearSay(`${w.en}!`); }
 function renderBag() {
-  const xs = POS[bag.length] || [];
-  // 가운데 물건이 뒤에, 바깥 물건이 앞에 오도록
+  const slots = LAYOUT[bag.length] || [];
   $("items").innerHTML = bag.map((id, i) => {
-    const left = (xs[i] - 48) / 300 * 100, top = (200 - 96 - LIFT[i]) / 330 * 100;
-    const z = 10 - Math.abs(xs[i] - 150) / 20 | 0;
-    return `<button class="it${id === lastAdded ? " new" : ""}" data-id="${id}" style="left:${left}%;top:${top}%;--r:${ROT[i]}deg;z-index:${10 - z}" aria-label="${byId[id].en} 듣기">${PIC[id]}</button>`;
+    const [x, bottom, r, size, front] = slots[i], u = size * 3;          // 크기를 viewBox 단위로
+    const left = (x - u / 2) / 300 * 100, top = (bottom - u) / 330 * 100;
+    return `<button class="it${id === lastAdded ? " new" : ""}" data-id="${id}" style="left:${left}%;top:${top}%;width:${size}%;--r:${r}deg;z-index:${front ? 3 : 1}" aria-label="${byId[id].en} 듣기">${PIC[id]}</button>`;
   }).join("");
   $("items").querySelectorAll(".it").forEach(b => {
     b.addEventListener("animationend", () => b.classList.remove("new", "wig"));
-    b.addEventListener("click", () => { const w = byId[b.dataset.id]; speak(w.en); bearSay(`${withArt(w)}!`); b.classList.remove("new", "wig"); void b.offsetWidth; b.classList.add("wig"); });
+    b.addEventListener("click", () => { sayWord(byId[b.dataset.id]); b.classList.remove("new", "wig"); void b.offsetWidth; b.classList.add("wig"); });
   });
   lastAdded = null;
   $("bag-n").textContent = `${bag.length} / ${MAX}`;
-  $("ichips").innerHTML = bag.length ? bag.map(id => `<span class="ichip"><button class="w" data-id="${id}">${PIC[id]}${byId[id].en}</button><button class="x" data-id="${id}" aria-label="${byId[id].en} 꺼내기" title="꺼내기">×</button></span>`).join("")
-    : `<div class="none">아직 비어 있어요. 1번에서 물건을 넣어 보세요!<button class="btn" id="go-learn">물건 넣으러 가기</button></div>`;
-  $("ichips").querySelectorAll(".w").forEach(b => b.addEventListener("click", () => { const w = byId[b.dataset.id]; speak(w.en); bearSay(`${withArt(w)}!`); }));
-  $("ichips").querySelectorAll(".x").forEach(b => b.addEventListener("click", () => { const w = byId[b.dataset.id]; takeOut(w.id); speak(`I don't have ${withArt(w)}.`); bearSay("Bye bye!"); }));
-  const go = $("go-learn"); if (go) go.addEventListener("click", () => show("learn"));
-  $("have-s").textContent = haveSentence();
+  $("bag-count").textContent = `${bag.length}/${MAX}`;
+  $("bag-count").classList.toggle("full", isFull());
+  $("ichips").innerHTML = bag.length ? bag.map(id => `<span class="ichip"><button class="w" data-id="${id}">${PIC[id]}<span><b>${byId[id].en}</b><small>${byId[id].ko}</small></span></button><button class="x" data-id="${id}" aria-label="${byId[id].en} 꺼내기" title="꺼내기">×</button></span>`).join("")
+    : `<div class="none">아직 비어 있어요. 1번에서 물건을 넣어 보세요!</div>`;
+  $("ichips").querySelectorAll(".w").forEach(b => b.addEventListener("click", () => {
+    sayWord(byId[b.dataset.id]);
+    const it = $("items").querySelector(`.it[data-id="${b.dataset.id}"]`); if (it) { it.classList.remove("new", "wig"); void it.offsetWidth; it.classList.add("wig"); }
+  }));
+  $("ichips").querySelectorAll(".x").forEach(b => b.addEventListener("click", () => { takeOut(b.dataset.id); bearSay("꺼냈어요!", true); }));
 }
-$("have-play").addEventListener("click", () => speak(haveSentence()));
-$("bag-reset").addEventListener("click", () => { bag.length = 0; changed(); speak("My bag is empty."); bearSay("My bag is empty!"); });
+$("bag-more").addEventListener("click", () => show("learn"));
+$("bag-reset").addEventListener("click", () => { bag.length = 0; changed(); bearSay("가방이 비었어요!", true); });
 onBag(renderBag);
-
-let askW = WORDS[0], answered = false;
-function nextAsk(sayIt = true) {
-  const ins = WORDS.filter(w => inBag(w.id)), outs = WORDS.filter(w => !inBag(w.id));
-  const pool = ins.length && Math.random() < 0.5 ? ins : outs.length ? outs : ins;
-  askW = pool[Math.floor(Math.random() * pool.length)]; answered = false;
-  $("ask-t").textContent = S.q(askW); $("ask-fb").innerHTML = ""; $("ask-fb").className = "fb";
-  if (sayIt) speak(S.q(askW));
-}
-function answer(yes) {
-  if (answered) return;
-  const truth = inBag(askW.id);
-  if (yes === truth) { answered = true; const s = yes ? S.yes(askW) : S.no(askW); $("ask-fb").textContent = "⭐ " + s; $("ask-fb").className = "fb ok"; speak(s); bearSay("Great!"); squish(); }
-  else { $("ask-fb").innerHTML = `<span class="ko">가방을 다시 봐요. ${askW.ko}이(가) ${truth ? "있어요" : "없어요"}.</span>`; $("ask-fb").className = "fb bad"; speak("Look in your bag."); }
-}
-$("ans-yes").addEventListener("click", () => answer(true));
-$("ans-no").addEventListener("click", () => answer(false));
-$("ask-next").addEventListener("click", () => nextAsk());
-$("ask-play").addEventListener("click", () => speak(S.q(askW)));
 
 // ---------- 3. 말하기: 물건마다 세 문장 ----------
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition || null;
@@ -713,7 +683,6 @@ function listen(line, text, key) {
 
 // ---------- 시작 ----------
 watchers.forEach(fn => fn());
-nextAsk(false);
 let first = "learn";
 try { const t = localStorage.getItem("bag-tab"); if (["learn", "bag", "say"].includes(t)) first = t; } catch (e) {}
 show(first);
