@@ -200,6 +200,32 @@ button:focus-visible, [tabindex]:focus-visible { outline: 4px solid var(--sun); 
 .namebox { grid-column: 1 / -1; display: flex; gap: 8px; }
 .namebox input { flex: 1; min-width: 0; font-family: var(--font-ko); font-size: 1.25rem; border: 3px solid var(--line); border-radius: 14px; padding: 8px 12px; color: var(--ink); background: #fff; user-select: text; }
 .namebox input:focus { outline: none; border-color: var(--pink); }
+.show-btn { --c: #8a63f2; --cd: #6a45d4; width: 100%; margin-top: 16px; font-size: 1.15rem; padding: 13px 16px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+.show-btn .ex { width: 22px; height: 22px; flex: none; }
+.show-btn .ex svg { width: 100%; height: 100%; fill: #fff; }
+/* 전체화면 보기 */
+body.noscroll { overflow: hidden; }
+.showcase {
+  position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; gap: 8px; overflow: auto;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 16px calc(14px + env(safe-area-inset-bottom, 0px));
+  background: radial-gradient(circle at 50% 45%, #fffdf6 0, rgba(255,253,246,0) 60%), var(--bg) radial-gradient(var(--dot) 2.2px, transparent 2.8px) 0 0 / 30px 30px;
+  animation: scIn .35s ease-out;
+}
+@keyframes scIn { from { opacity: 0; transform: scale(.96); } }
+.sc-top { width: 100%; max-width: 900px; display: flex; align-items: center; justify-content: center; position: relative; min-height: 52px; }
+.sc-top h2 { margin: 0; font-family: var(--font-ko); font-weight: 400; font-size: clamp(1.6rem, 5vw, 2.6rem); color: var(--ink); text-align: center; padding: 0 96px; text-wrap: balance; }
+.sc-top .btn { position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
+.sc-top .btn:active { transform: translateY(calc(-50% + 3px)); }
+.sc-stage { flex: 1; min-height: 0; display: grid; place-items: center; width: 100%; }
+.showcase .bagstage { width: min(92vw, 640px); width: min(92vw, calc((100vh - 230px) * .88), 760px); width: min(92vw, calc((100dvh - 230px) * .88), 760px); }
+.sc-items { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; max-width: 900px; }
+.sc-chip { display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 3px solid var(--bag-2); border-radius: 999px; padding: 4px 14px 4px 6px; font-family: var(--font-en); font-weight: 600; font-size: 1.1rem; box-shadow: 0 3px 0 var(--bag-5); }
+.sc-chip svg { width: 32px; height: 32px; }
+.sc-sparkles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.sc-sparkles i { position: absolute; width: var(--s); height: var(--s); animation: twinkle var(--d) ease-in-out var(--dl) infinite; opacity: 0; }
+.sc-sparkles i svg { width: 100%; height: 100%; }
+@keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(.4) rotate(0deg); } 50% { opacity: 1; transform: scale(1) rotate(30deg); } }
+@media (prefers-reduced-motion: reduce) { .showcase, .sc-sparkles i { animation: none; } .sc-sparkles i { opacity: .8; } }
 /* 가방 위 스티커: 흰 테두리를 두른 스티커 모양, 끌어서 옮기고 누르면 떼기 버튼이 나와요 */
 .stickers { position: absolute; inset: 0; pointer-events: none; z-index: 4; }
 .stk { position: absolute; width: 16%; aspect-ratio: 1; transform: translate(-50%, -50%) rotate(var(--r)); pointer-events: auto; touch-action: none; cursor: grab;
@@ -318,6 +344,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 4px solid var(--sun); 
         <div class="ttl"><span>꾸미기</span></div>
         <div class="dtabs" id="dtabs"></div>
         <div class="dopts" id="dopts"></div>
+        <button class="btn show-btn" id="show-full"><span class="ex"></span>다 꾸몄어요! 전체화면으로 보기</button>
       </div>
     </div>
     <div class="card contents">
@@ -341,6 +368,13 @@ button:focus-visible, [tabindex]:focus-visible { outline: 4px solid var(--sun); 
       <div class="card stage" id="stage"></div>
     </div>
   </section>
+</div>
+
+<div class="showcase" id="showcase" role="dialog" aria-modal="true" aria-labelledby="sc-title" hidden>
+  <div class="sc-sparkles" id="sc-sparkles" aria-hidden="true"></div>
+  <div class="sc-top"><h2 id="sc-title">나의 가방</h2><button class="btn soft" id="sc-close">닫기 ✕</button></div>
+  <div class="sc-stage" id="sc-stage"></div>
+  <div class="sc-items" id="sc-items"></div>
 </div>
 
 <div class="dock" id="dock" role="button" tabindex="0" aria-label="내 가방 열기">
@@ -732,6 +766,40 @@ function renderDeco() {
     deco[decoTab] = k; saveDeco(); drawBag(); renderDeco(); squish(); bearSay(OPTS[decoTab].say(k), true);
   }));
 }
+// ---------- 전체화면으로 보기 ----------
+// 같은 가방(물건, 스티커, 이름표 그대로)을 화면 가득 보여줘요. 브라우저가 허락하면 진짜 전체화면도 켜요.
+const EXPAND = `<svg viewBox="0 0 24 24"><path d="M4 9V4h5v2H6v3zm10-5h6v5h-2V6h-4zM6 15v3h3v2H4v-5zm12 0h2v5h-5v-2h3z"/></svg>`;
+$("show-full").querySelector(".ex").innerHTML = EXPAND;
+const stageHome = $("bagstage").parentNode, stageNext = $("bagstage").nextElementSibling;
+function sparkles() {
+  const spots = [[6, 18], [92, 14], [12, 62], [88, 58], [4, 88], [95, 86], [22, 34], [78, 36], [16, 8], [84, 76], [50, 6], [30, 92]];
+  $("sc-sparkles").innerHTML = spots.map(([x, y], i) => `<i style="left:${x}%;top:${y}%;--s:${22 + (i % 3) * 10}px;--d:${2.2 + (i % 4) * .5}s;--dl:${(i * .37) % 2}s">${flatIcon(i % 3 ? "sparkles" : "star")}</i>`).join("");
+}
+function openShowcase() {
+  const nm = deco.name.trim();
+  $("sc-title").textContent = nm ? `${nm}의 가방` : "나의 가방";
+  $("sc-items").innerHTML = bag.map(id => `<span class="sc-chip">${PIC[id]}${byId[id].en}</span>`).join("");
+  sparkles();
+  selStk = -1; renderStickers();
+  $("sc-stage").appendChild($("bagstage"));
+  $("showcase").hidden = false; document.body.classList.add("noscroll");
+  const el = $("showcase");
+  try { const r = el.requestFullscreen && el.requestFullscreen(); if (r && r.catch) r.catch(() => {}); } catch (e) {}
+  $("sc-close").focus();
+  setTimeout(() => { squish(); bearSay("짜잔!", true); }, 200);
+}
+function closeShowcase() {
+  if ($("showcase").hidden) return;
+  $("showcase").hidden = true; document.body.classList.remove("noscroll");
+  stageHome.insertBefore($("bagstage"), stageNext);
+  if (document.fullscreenElement) { try { document.exitFullscreen().catch(() => {}); } catch (e) {} }
+  $("show-full").focus();
+}
+$("show-full").addEventListener("click", openShowcase);
+$("sc-close").addEventListener("click", closeShowcase);
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeShowcase(); });
+document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement) closeShowcase(); });
+
 $("holder").addEventListener("click", e => {
   if (!e.target.closest("#bag-back .hit")) return;
   bearSay(bag.length ? `물건이 ${bag.length}개 들어 있어요!` : "가방이 비어 있어요!", true); squish();
